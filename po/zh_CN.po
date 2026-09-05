@@ -4078,7 +4078,7 @@ msgid "Try: “{name}”  or  “ssh {target}”  or  “sftp {name2}”"
 msgstr "尝试：“{name}” 或 “ssh {target}” 或 “sftp {name2}”"
 
 #: src/sshpilot/omni_search.py:696
-msgid "Try: “ssh root@203.0.113.7”  or  “sftp”  or  “首选项”"
+msgid "Try: “ssh root@203.0.113.7”  or  “sftp”  or  “preferences”"
 msgstr "尝试：“ssh root@203.0.113.7” 或 “sftp” 或 “首选项”"
 
 #. Tools-menu "Docker Console" → sidebar selection, else Local. The page
