@@ -154,6 +154,58 @@ def ui_language_codes() -> List[str]:
     return []
 
 
+# Scripts written right to left. GTK works out its default text direction by
+# translating a marker string in its *own* catalogue, which follows the C
+# library's LC_MESSAGES -- not ``LANGUAGE``. So picking a language in
+# Preferences translates every string while leaving the interface laid out left
+# to right: Persian text, but the search placeholder, entry alignment and
+# margins all still mirrored the wrong way. The direction has to be set
+# explicitly for the in-app preference to mean anything.
+RTL_LANGUAGES = frozenset({
+    'ar', 'ckb', 'dv', 'fa', 'he', 'iw', 'ji', 'ps', 'sd', 'ug', 'ur', 'yi',
+})
+
+
+def is_rtl_language(code: Optional[str]) -> bool:
+    """Whether *code* names a right-to-left language.
+
+    Accepts anything the environment may hold -- ``fa``, ``pt_BR``,
+    ``ar_EG.UTF-8``, ``sr-Latn`` -- and looks only at the language subtag.
+    """
+    tag = str(code or '').split(':')[0].split('.')[0].split('@')[0]
+    tag = tag.replace('-', '_').split('_')[0].lower()
+    return bool(tag) and tag in RTL_LANGUAGES
+
+
+def apply_text_direction() -> Optional[str]:
+    """Point GTK's text direction at the language the UI actually runs in.
+
+    Returns the language code the direction was taken from, or ``None`` when
+    there was nothing to go on and GTK's own default was left alone. Must run
+    before the first widget exists -- the default direction is read at
+    construction time, so a later change would leave built widgets behind.
+
+    This deliberately follows :func:`ui_language_codes`, which puts ``LANGUAGE``
+    first: when the two disagree, the messages the user sees come from
+    ``LANGUAGE``, so that is the one the layout has to match.
+    """
+    codes = ui_language_codes()
+    if not codes:
+        return None
+    code = codes[0]
+    try:
+        from gi.repository import Gtk
+
+        Gtk.Widget.set_default_direction(
+            Gtk.TextDirection.RTL if is_rtl_language(code)
+            else Gtk.TextDirection.LTR
+        )
+    except Exception as exc:  # pragma: no cover - GTK missing or too old
+        logger.debug("Could not set the interface text direction: %s", exc)
+        return None
+    return code
+
+
 def apply_language(code: Optional[str] = None) -> str:
     """Export ``LANGUAGE`` for the chosen code. Returns what was applied.
 

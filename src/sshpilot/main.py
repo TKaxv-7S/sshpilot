@@ -469,6 +469,17 @@ class SshPilotApplication(Adw.Application):
         builds never call ``install_menubar``.
         """
         Adw.Application.do_startup(self)
+
+        # Before any widget exists: widgets read the default text direction at
+        # construction, so an RTL interface language has to be applied here or
+        # the whole window stays laid out left to right.
+        try:
+            from .i18n import apply_text_direction
+
+            apply_text_direction()
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.debug("Could not apply the interface text direction: %s", exc)
+
         self.connect("window-added", self._disable_menubar_accel_on_window)
 
         if getattr(self, "_macos_menubar_installed", False):
