@@ -500,7 +500,7 @@ class WindowActions:
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before deleting groups."),
+                    _("Connect to the SSH Pilot daemon before deleting groups."),
                 )
                 return
 
@@ -613,7 +613,7 @@ class WindowActions:
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before moving groups."),
+                    _("Connect to the SSH Pilot daemon before moving groups."),
                 )
                 return
 

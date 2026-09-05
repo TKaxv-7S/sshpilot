@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:33+0330\n"
+"POT-Creation-Date: 2026-09-06 01:45+0330\n"
 "PO-Revision-Date: 2026-09-05 11:35+0330\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -218,8 +218,8 @@ msgid "Service unavailable"
 msgstr "Служба недоступна"
 
 #: src/sshpilot/actions.py:503
-msgid "Connect to the sshPilot daemon before deleting groups."
-msgstr "Подключитесь к демону sshPilot перед удалением групп."
+msgid "Connect to the SSH Pilot daemon before deleting groups."
+msgstr "Подключитесь к демону SSH Pilot перед удалением групп."
 
 #: src/sshpilot/actions.py:514
 #, python-brace-format
@@ -263,8 +263,8 @@ msgid "Delete"
 msgstr "Удалить"
 
 #: src/sshpilot/actions.py:616
-msgid "Connect to the sshPilot daemon before moving groups."
-msgstr "Подключитесь к демону sshPilot перед перемещением групп."
+msgid "Connect to the SSH Pilot daemon before moving groups."
+msgstr "Подключитесь к демону SSH Pilot перед перемещением групп."
 
 #: src/sshpilot/actions.py:658
 msgid "Save Session"
@@ -813,10 +813,10 @@ msgstr "Не удалось загрузить Bitwarden CLI."
 #: src/sshpilot/bitwarden_setup.py:236
 msgid ""
 "The Bitwarden CLI was installed but could not be verified. Try restarting "
-"sshPilot."
+"SSH Pilot."
 msgstr ""
 "Bitwarden CLI был установлен, но не прошел проверку. Попробуйте "
-"перезапустить sshPilot."
+"перезапустить SSH Pilot."
 
 #: src/sshpilot/bitwarden_setup.py:252
 #, python-brace-format
@@ -862,10 +862,10 @@ msgstr "Сбой установки."
 #: src/sshpilot/bitwarden_setup.py:287
 msgid ""
 "The install command finished but “bw” is still not available. Try restarting "
-"sshPilot."
+"SSH Pilot."
 msgstr ""
 "Команда установки завершилась, но «bw» по-прежнему недоступен. Попробуйте "
-"перезапустить sshPilot."
+"перезапустить SSH Pilot."
 
 #: src/sshpilot/bitwarden_setup.py:663
 msgid "Open a terminal"
@@ -1212,7 +1212,7 @@ msgid ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot installs to:\n"
+"SSH Pilot installs to:\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -1225,7 +1225,7 @@ msgstr ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot выполняет установку в:\n"
+"SSH Pilot выполняет установку в:\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -3739,8 +3739,8 @@ msgid "The chosen Bitwarden backup could not be read"
 msgstr "Не удалось прочитать выбранную резервную копию Bitwarden"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:80
-msgid "The chosen backup is not a valid sshPilot backup"
-msgstr "Выбранная резервная копия не является корректной копией sshPilot"
+msgid "The chosen backup is not a valid SSH Pilot backup"
+msgstr "Выбранная резервная копия не является корректной копией SSH Pilot"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:83
 msgid "Could not list backups on the SSH server"
@@ -5753,11 +5753,11 @@ msgstr "Журналирование"
 
 #: src/sshpilot/preferences.py:2011
 msgid ""
-"Controls how verbose sshPilot is in the console and the rotated log file. "
+"Controls how verbose SSH Pilot is in the console and the rotated log file. "
 "The command-line flags --verbose / --quiet always override this."
 msgstr ""
-"Управляет уровнем подробности sshPilot в консоли и ротируемом файле журнала. "
-"Флаги командной строки --verbose / --quiet всегда имеют приоритет."
+"Управляет уровнем подробности SSH Pilot в консоли и ротируемом файле "
+"журнала. Флаги командной строки --verbose / --quiet всегда имеют приоритет."
 
 #: src/sshpilot/preferences.py:2016
 msgid "Log Level"
@@ -5777,16 +5777,16 @@ msgstr "Хранилище паролей"
 
 #: src/sshpilot/preferences.py:2040
 msgid ""
-"Where sshPilot stores passwords and key passphrases. Switching does not "
+"Where SSH Pilot stores passwords and key passphrases. Switching does not "
 "migrate existing secrets.\n"
 "Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
-"environment while sshPilot runs, so other programs running as your user can "
+"environment while SSH Pilot runs, so other programs running as your user can "
 "read the vault until you quit."
 msgstr ""
-"Место хранения паролей и кодовых фраз ключей sshPilot. Переключение не "
+"Место хранения паролей и кодовых фраз ключей SSH Pilot. Переключение не "
 "переносит существующие секреты.\n"
 "Примечание: Bitwarden/Vaultwarden сохраняют токен разблокированной сессии в "
-"переменных окружения во время работы sshPilot, поэтому другие программы, "
+"переменных окружения во время работы SSH Pilot, поэтому другие программы, "
 "запущенные от имени вашего пользователя, могут считывать данные хранилища до "
 "вашего выхода."
 
@@ -5924,11 +5924,11 @@ msgstr "Без хранилища паролей"
 
 #: src/sshpilot/preferences.py:2222
 msgid ""
-"Passwords and passphrases are not saved by sshPilot. Use ssh-agent and SSH's "
-"own prompts instead."
+"Passwords and passphrases are not saved by SSH Pilot. Use ssh-agent and "
+"SSH's own prompts instead."
 msgstr ""
-"Пароли и кодовые фразы не сохраняются sshPilot. Используйте вместо этого ssh-"
-"agent и собственные запросы SSH."
+"Пароли и кодовые фразы не сохраняются SSH Pilot. Используйте вместо этого "
+"ssh-agent и собственные запросы SSH."
 
 #: src/sshpilot/preferences.py:2239
 msgid "SSH Identity"
@@ -6060,9 +6060,9 @@ msgid "File Manager Options"
 msgstr "Параметры диспетчера файлов"
 
 #: src/sshpilot/preferences.py:2601
-msgid "These preferences only affect sshPilot's built-in SFTP file manager."
+msgid "These preferences only affect SSH Pilot's built-in SFTP file manager."
 msgstr ""
-"Эти параметры влияют только на встроенный диспетчер файлов SFTP в sshPilot."
+"Эти параметры влияют только на встроенный диспетчер файлов SFTP в SSH Pilot."
 
 #: src/sshpilot/preferences.py:2605
 msgid "Open File Manager in Separate Window"
@@ -6078,10 +6078,10 @@ msgstr "Расширенные настройки SFTP"
 
 #: src/sshpilot/preferences.py:2661
 msgid ""
-"Fine-tune options that only apply to sshPilot's built-in SFTP file manager."
+"Fine-tune options that only apply to SSH Pilot's built-in SFTP file manager."
 msgstr ""
 "Точная настройка параметров, применимых только к встроенному диспетчеру "
-"файлов SFTP в sshPilot."
+"файлов SFTP в SSH Pilot."
 
 #: src/sshpilot/preferences.py:2666
 msgid "SFTP Keepalive Interval (seconds)"
@@ -6202,12 +6202,12 @@ msgstr "Проверка статуса Bitwarden…"
 msgid ""
 "The “bw” command was not found.\n"
 "\n"
-"sshPilot installs the CLI to:\n"
+"SSH Pilot installs the CLI to:\n"
 "    {path}"
 msgstr ""
 "Команда «bw» не найдена.\n"
 "\n"
-"sshPilot устанавливает CLI в:\n"
+"SSH Pilot устанавливает CLI в:\n"
 "    {path}"
 
 #: src/sshpilot/preferences.py:3151
@@ -6594,10 +6594,10 @@ msgstr "Особые разрешения не заявлены."
 #: src/sshpilot/preferences.py:4899
 msgid ""
 "Permissions are declared by the author for transparency; they are not "
-"enforced. Changes take effect after restarting sshPilot."
+"enforced. Changes take effect after restarting SSH Pilot."
 msgstr ""
 "Разрешения указываются автором для прозрачности; они не ограничиваются "
-"принудительно. Изменения вступают в силу после перезапуска sshPilot."
+"принудительно. Изменения вступают в силу после перезапуска SSH Pilot."
 
 #: src/sshpilot/preferences.py:4910
 msgid "SHA-256"
@@ -7792,8 +7792,8 @@ msgid "The background service is required to deploy a key."
 msgstr "Для установки ключа требуется фоновая служба."
 
 #: src/sshpilot/sshcopyid_window.py:868 src/sshpilot/sshcopyid_window.py:929
-msgid "Reconnect to the sshPilot daemon and try again."
-msgstr "Подключитесь к демону sshPilot заново и повторите попытку."
+msgid "Reconnect to the SSH Pilot daemon and try again."
+msgstr "Подключитесь к демону SSH Pilot заново и повторите попытку."
 
 #: src/sshpilot/sshcopyid_window.py:918 src/sshpilot/sshcopyid_window.py:928
 msgid "Could not start public-key deployment."
@@ -8822,8 +8822,8 @@ msgid "Daemon unavailable"
 msgstr "Демон недоступен"
 
 #: src/sshpilot/window.py:5416
-msgid "Connect to the sshPilot daemon and retry this operation."
-msgstr "Подключитесь к демону sshPilot и повторите эту операцию."
+msgid "Connect to the SSH Pilot daemon and retry this operation."
+msgstr "Подключитесь к демону SSH Pilot и повторите эту операцию."
 
 #: src/sshpilot/window.py:5426
 msgid "Operation mode change rejected"
@@ -8899,8 +8899,8 @@ msgid "Show Sidebar (F9, {modifier}+B)"
 msgstr "Показать боковую панель (F9, {modifier}+B)"
 
 #: src/sshpilot/window.py:6211
-msgid "Connect to the sshPilot daemon and retry the deletion."
-msgstr "Подключитесь к демону sshPilot и повторите удаление."
+msgid "Connect to the SSH Pilot daemon and retry the deletion."
+msgstr "Подключитесь к демону SSH Pilot и повторите удаление."
 
 #: src/sshpilot/window.py:6262
 msgid "Failed to delete connection"
@@ -8973,8 +8973,8 @@ msgid "The SSH command for this connection could not be prepared."
 msgstr "Не удалось подготовить команду SSH для этого подключения."
 
 #: src/sshpilot/window.py:7170 src/sshpilot/window.py:7228
-msgid "Connect to the sshPilot daemon before moving connections."
-msgstr "Подключитесь к демону sshPilot перед перемещением подключений."
+msgid "Connect to the SSH Pilot daemon before moving connections."
+msgstr "Подключитесь к демону SSH Pilot перед перемещением подключений."
 
 #: src/sshpilot/window.py:7214 src/sshpilot/window.py:7238
 #, python-brace-format
@@ -9147,9 +9147,9 @@ msgstr "Сохранить пароль"
 #: src/sshpilot/window_dialogs.py:456
 msgid ""
 "Secret storage is set to SSH Agent Only — passwords and passphrases are not "
-"saved by sshPilot."
+"saved by SSH Pilot."
 msgstr ""
-"Для хранилища секретов выбрано «Только ssh-agent» — sshPilot не сохраняет "
+"Для хранилища секретов выбрано «Только ssh-agent» — SSH Pilot не сохраняет "
 "пароли и парольные фразы."
 
 #: src/sshpilot/window_dialogs.py:555
@@ -9157,8 +9157,8 @@ msgid "Known hosts unavailable"
 msgstr "known_hosts недоступен"
 
 #: src/sshpilot/window_dialogs.py:556
-msgid "Connect to the sshPilot daemon before editing known hosts."
-msgstr "Подключитесь к демону sshPilot перед редактированием known_hosts."
+msgid "Connect to the SSH Pilot daemon before editing known hosts."
+msgstr "Подключитесь к демону SSH Pilot перед редактированием known_hosts."
 
 #: src/sshpilot/window_dialogs.py:630 src/sshpilot/window_dialogs.py:635
 #: src/sshpilot/window_dialogs.py:1276 src/sshpilot/window_dialogs.py:1329
@@ -9320,8 +9320,9 @@ msgstr "Экспорт отменен"
 
 #: src/sshpilot/window_dialogs.py:1152
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected."
-msgstr "Хранилище секретов управляется демоном sshPilot, который не подключен."
+"Secret storage is managed by the SSH Pilot daemon, which is not connected."
+msgstr ""
+"Хранилище секретов управляется демоном SSH Pilot, который не подключен."
 
 #: src/sshpilot/window_dialogs.py:1181
 msgid "Export to SSH Server"
@@ -9404,8 +9405,8 @@ msgstr ""
 "Включено учетных данных: {}, закрытых ключей: {}; шифрование: {}."
 
 #: src/sshpilot/window_dialogs.py:1333
-msgid "sshPilot backup (*.spbk)"
-msgstr "Резервная копия sshPilot (*.spbk)"
+msgid "SSH Pilot backup (*.spbk)"
+msgstr "Резервная копия SSH Pilot (*.spbk)"
 
 #: src/sshpilot/window_dialogs.py:1381
 msgid "Import a backup from a file, an SSH server, or your Bitwarden vault."
@@ -9426,8 +9427,8 @@ msgid "From File"
 msgstr "Из файла"
 
 #: src/sshpilot/window_dialogs.py:1411
-msgid "sshPilot backups & configs"
-msgstr "Резервные копии и конфигурации sshPilot"
+msgid "SSH Pilot backups & configs"
+msgstr "Резервные копии и конфигурации SSH Pilot"
 
 #: src/sshpilot/window_dialogs.py:1416
 msgid "All files"
@@ -9456,8 +9457,8 @@ msgid "No backups found"
 msgstr "Резервные копии не найдены"
 
 #: src/sshpilot/window_dialogs.py:1488
-msgid "No sshPilot backups were found in your Bitwarden vault."
-msgstr "В вашем хранилище Bitwarden не найдено резервных копий sshPilot."
+msgid "No SSH Pilot backups were found in your Bitwarden vault."
+msgstr "В вашем хранилище Bitwarden не найдено резервных копий SSH Pilot."
 
 #: src/sshpilot/window_dialogs.py:1509
 msgid "Choose a backup to restore:"
@@ -9495,8 +9496,9 @@ msgstr "Загрузка резервных копий…"
 
 #: src/sshpilot/window_dialogs.py:1713
 #, python-brace-format
-msgid "No sshPilot backups were found in {path} on that server."
-msgstr "В каталоге {path} на этом сервере не найдено резервных копий sshPilot."
+msgid "No SSH Pilot backups were found in {path} on that server."
+msgstr ""
+"В каталоге {path} на этом сервере не найдено резервных копий SSH Pilot."
 
 #: src/sshpilot/window_dialogs.py:1730 src/sshpilot/window_dialogs.py:1796
 msgid "Reading backup…"
@@ -9583,10 +9585,10 @@ msgstr "Все равно заменить"
 
 #: src/sshpilot/window_dialogs.py:2028
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected, so "
-"the operation was cancelled."
+"Secret storage is managed by the SSH Pilot daemon, which is not connected, "
+"so the operation was cancelled."
 msgstr ""
-"Хранилище секретов управляется демоном sshPilot, который не подключен, "
+"Хранилище секретов управляется демоном SSH Pilot, который не подключен, "
 "поэтому операция была отменена."
 
 #: src/sshpilot/window_dialogs.py:2039
@@ -9640,18 +9642,18 @@ msgstr ", "
 
 #: src/sshpilot/window_dialogs.py:2173
 msgid ""
-"{} credential(s) already existed and were left untouched — sshPilot never "
+"{} credential(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a saved secret."
 msgstr ""
-"Учетных данных уже существовало и осталось без изменений: {} — sshPilot "
+"Учетных данных уже существовало и осталось без изменений: {} — SSH Pilot "
 "никогда не перезаписывает сохраненный секрет."
 
 #: src/sshpilot/window_dialogs.py:2176
 msgid ""
-"{} private key(s) already existed and were left untouched — sshPilot never "
+"{} private key(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a private key."
 msgstr ""
-"Закрытых ключей уже существовало и осталось без изменений: {} — sshPilot "
+"Закрытых ключей уже существовало и осталось без изменений: {} — SSH Pilot "
 "никогда не перезаписывает закрытый ключ."
 
 #: src/sshpilot/window_dialogs.py:2179
@@ -9667,11 +9669,11 @@ msgstr ""
 #: src/sshpilot/window_dialogs.py:2186
 msgid ""
 "Reload now to apply the imported configuration. Some settings may still need "
-"a full restart of sshPilot to take effect."
+"a full restart of SSH Pilot to take effect."
 msgstr ""
 "Перезагрузите сейчас, чтобы применить импортированную конфигурацию. Для "
 "вступления в силу некоторых настроек может потребоваться полный перезапуск "
-"sshPilot."
+"SSH Pilot."
 
 #: src/sshpilot/window_dialogs.py:2191
 msgid "Import Successful"
@@ -9694,8 +9696,8 @@ msgid "Please enter a group name."
 msgstr "Введите название группы."
 
 #: src/sshpilot/window_dialogs.py:2390
-msgid "Connect to the sshPilot daemon before creating groups."
-msgstr "Подключитесь к демону sshPilot перед созданием групп."
+msgid "Connect to the SSH Pilot daemon before creating groups."
+msgstr "Подключитесь к демону SSH Pilot перед созданием групп."
 
 #: src/sshpilot/window_dialogs.py:2411
 #, python-brace-format
@@ -9715,8 +9717,8 @@ msgid "e.g., Production Servers"
 msgstr "например, Рабочие серверы"
 
 #: src/sshpilot/window_dialogs.py:2461
-msgid "Connect to the sshPilot daemon before editing groups."
-msgstr "Подключитесь к демону sshPilot перед редактированием групп."
+msgid "Connect to the SSH Pilot daemon before editing groups."
+msgstr "Подключитесь к демону SSH Pilot перед редактированием групп."
 
 #: src/sshpilot/window_dialogs.py:2491
 #, python-brace-format
@@ -9741,17 +9743,17 @@ msgid "Failed to rename tag: {error}"
 msgstr "Не удалось переименовать тег: {error}"
 
 #: src/sshpilot/window_dialogs.py:2579
-msgid "Connect to the sshPilot daemon before renaming tags."
-msgstr "Подключитесь к демону sshPilot перед переименованием тегов."
+msgid "Connect to the SSH Pilot daemon before renaming tags."
+msgstr "Подключитесь к демону SSH Pilot перед переименованием тегов."
 
 #: src/sshpilot/window_dialogs.py:2585
 msgid "Enter a new name for the tag:"
 msgstr "Введите новое название для тега:"
 
 #: src/sshpilot/window_dialogs.py:2631
-msgid "Connect to the sshPilot daemon before using group operations."
+msgid "Connect to the SSH Pilot daemon before using group operations."
 msgstr ""
-"Подключитесь к демону sshPilot перед использованием групповых операций."
+"Подключитесь к демону SSH Pilot перед использованием групповых операций."
 
 #: src/sshpilot/window_dialogs.py:2641
 msgid "Move"

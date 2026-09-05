@@ -5413,7 +5413,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             detail_text = str(detail)
         self._error_dialog(
             _("Daemon unavailable"),
-            _("Connect to the sshPilot daemon and retry this operation."),
+            _("Connect to the SSH Pilot daemon and retry this operation."),
             detail=detail_text or "",
         )
 
@@ -6208,7 +6208,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if not self._is_quitting:
                 self._error_dialog(
                     _("Daemon unavailable"),
-                    _("Connect to the sshPilot daemon and retry the deletion."),
+                    _("Connect to the SSH Pilot daemon and retry the deletion."),
                 )
             return
         pending = iter(connection for connection in connections if connection)
@@ -7167,7 +7167,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before moving connections."),
+                    _("Connect to the SSH Pilot daemon before moving connections."),
                 )
                 return
 
@@ -7225,7 +7225,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before moving connections."),
+                    _("Connect to the SSH Pilot daemon before moving connections."),
                 )
                 return
             controller.run(

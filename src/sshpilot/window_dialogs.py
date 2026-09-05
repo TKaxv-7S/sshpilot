@@ -454,7 +454,7 @@ def _show_password_passphrase_dialog(
         no_store_label = Gtk.Label(
             label=_(
                 "Secret storage is set to SSH Agent Only — passwords and passphrases "
-                "are not saved by sshPilot."
+                "are not saved by SSH Pilot."
             ),
         )
         no_store_label.set_wrap(True)
@@ -553,7 +553,7 @@ class WindowConfigDialogsMixin:
             logger.error("Known hosts editor requires a daemon-backed client")
             self._simple_dialog(
                 _("Known hosts unavailable"),
-                _("Connect to the sshPilot daemon before editing known hosts."),
+                _("Connect to the SSH Pilot daemon before editing known hosts."),
             )
             return
         try:
@@ -1149,7 +1149,7 @@ class WindowConfigDialogsMixin:
         controller = getattr(self, "secrets_controller", None)
         if controller is None:
             raise RuntimeError(
-                _("Secret storage is managed by the sshPilot daemon, which is not connected."))
+                _("Secret storage is managed by the SSH Pilot daemon, which is not connected."))
         return controller
 
     @staticmethod
@@ -1330,7 +1330,7 @@ class WindowConfigDialogsMixin:
         file_dialog.set_initial_name(
             f"sshpilot_backup_{datetime.now().strftime('%Y%m%d')}.spbk")
         spbk_filter = Gtk.FileFilter()
-        spbk_filter.set_name(_("sshPilot backup (*.spbk)"))
+        spbk_filter.set_name(_("SSH Pilot backup (*.spbk)"))
         spbk_filter.add_pattern("*.spbk")
         filters = Gio.ListStore.new(Gtk.FileFilter)
         filters.append(spbk_filter)
@@ -1408,7 +1408,7 @@ class WindowConfigDialogsMixin:
             
             # Backups (.spbk) and legacy JSON configs.
             filter_backup = Gtk.FileFilter()
-            filter_backup.set_name(_("sshPilot backups & configs"))
+            filter_backup.set_name(_("SSH Pilot backups & configs"))
             filter_backup.add_pattern("*.spbk")
             filter_backup.add_pattern("*.json")
 
@@ -1485,7 +1485,7 @@ class WindowConfigDialogsMixin:
                 if not entries:
                     self._simple_dialog(
                         _("No backups found"),
-                        _("No sshPilot backups were found in your Bitwarden vault."))
+                        _("No SSH Pilot backups were found in your Bitwarden vault."))
                     return
                 self._show_bitwarden_entry_chooser(entries)
 
@@ -1710,7 +1710,7 @@ class WindowConfigDialogsMixin:
             if not entries:
                 self._simple_dialog(
                     _("No backups found"),
-                    _("No sshPilot backups were found in {path} on that server.").format(path=remote_dir))
+                    _("No SSH Pilot backups were found in {path} on that server.").format(path=remote_dir))
                 return
             self._choose_backup_entry(
                 entries, heading=_("Import from SSH Server"),
@@ -2025,7 +2025,7 @@ class WindowConfigDialogsMixin:
         if controller is None:
             self._simple_dialog(
                 cancelled_heading,
-                _("Secret storage is managed by the sshPilot daemon, which is not "
+                _("Secret storage is managed by the SSH Pilot daemon, which is not "
                   "connected, so the operation was cancelled."))
             return
         try:
@@ -2171,10 +2171,10 @@ class WindowConfigDialogsMixin:
                 lines.append(_("Restored {items}.").format(items=_(", ").join(done)))
             if skipped_creds:
                 lines.append(_("{} credential(s) already existed and were left untouched — "
-                               "sshPilot never overwrites a saved secret.").format(skipped_creds))
+                               "SSH Pilot never overwrites a saved secret.").format(skipped_creds))
             if keys_skipped:
                 lines.append(_("{} private key(s) already existed and were left untouched — "
-                               "sshPilot never overwrites a private key.").format(keys_skipped))
+                               "SSH Pilot never overwrites a private key.").format(keys_skipped))
             if ignored:
                 lines.append(_("{} saved password(s)/key(s) in this .json file were not "
                                "imported — legacy JSON backups can't restore secrets. Use an "
@@ -2184,7 +2184,7 @@ class WindowConfigDialogsMixin:
                 format_secret_transfer_messages(result.warnings)
             ))
         lines.append(_("Reload now to apply the imported configuration. Some settings may still "
-                       "need a full restart of sshPilot to take effect."))
+                       "need a full restart of SSH Pilot to take effect."))
         body = "\n\n".join(lines)
 
         success_dialog = Adw.MessageDialog(
@@ -2387,7 +2387,7 @@ class WindowConfigDialogsMixin:
                 if controller is None:
                     self._simple_dialog(
                         _("Service unavailable"),
-                        _("Connect to the sshPilot daemon before creating groups."),
+                        _("Connect to the SSH Pilot daemon before creating groups."),
                     )
                     return False
                 if set_busy is not None:
@@ -2458,7 +2458,7 @@ class WindowConfigDialogsMixin:
                 if controller is None:
                     self._simple_dialog(
                         _("Service unavailable"),
-                        _("Connect to the sshPilot daemon before editing groups."),
+                        _("Connect to the SSH Pilot daemon before editing groups."),
                     )
                     return False
                 if set_busy is not None:
@@ -2576,7 +2576,7 @@ class WindowConfigDialogsMixin:
                 # No controller/client available — service unavailable.
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before renaming tags."),
+                    _("Connect to the SSH Pilot daemon before renaming tags."),
                 )
                 return False
 
@@ -2628,7 +2628,7 @@ class WindowConfigDialogsMixin:
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before using group operations."),
+                    _("Connect to the SSH Pilot daemon before using group operations."),
                 )
                 return
 

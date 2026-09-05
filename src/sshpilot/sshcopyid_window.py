@@ -865,7 +865,7 @@ class SshCopyIdRunner:
             self.window._error_dialog(
                 _("SSH Key Copy Error"),
                 _("The background service is required to deploy a key."),
-                _("Reconnect to the sshPilot daemon and try again."),
+                _("Reconnect to the SSH Pilot daemon and try again."),
             )
             return
         # Attach the interaction presenter before starting the operation so a
@@ -926,7 +926,7 @@ class SshCopyIdRunner:
             self.window._error_dialog(
                 _("SSH Key Copy Error"),
                 _("Could not start public-key deployment."),
-                _("Reconnect to the sshPilot daemon and try again."),
+                _("Reconnect to the SSH Pilot daemon and try again."),
             )
             return
         if dialogs is not None:

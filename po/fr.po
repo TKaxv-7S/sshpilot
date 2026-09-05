@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:33+0330\n"
+"POT-Creation-Date: 2026-09-06 01:45+0330\n"
 "PO-Revision-Date: 2026-09-02 12:23+0200\n"
 "Last-Translator: French translation contributors\n"
 "Language-Team: French\n"
@@ -216,8 +216,8 @@ msgid "Service unavailable"
 msgstr "Service indisponible"
 
 #: src/sshpilot/actions.py:503
-msgid "Connect to the sshPilot daemon before deleting groups."
-msgstr "Connectez-vous au démon sshPilot avant de supprimer des groupes."
+msgid "Connect to the SSH Pilot daemon before deleting groups."
+msgstr "Connectez-vous au démon SSH Pilot avant de supprimer des groupes."
 
 #: src/sshpilot/actions.py:514
 #, python-brace-format
@@ -261,8 +261,8 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: src/sshpilot/actions.py:616
-msgid "Connect to the sshPilot daemon before moving groups."
-msgstr "Connectez-vous au démon sshPilot avant de déplacer des groupes."
+msgid "Connect to the SSH Pilot daemon before moving groups."
+msgstr "Connectez-vous au démon SSH Pilot avant de déplacer des groupes."
 
 #: src/sshpilot/actions.py:658
 msgid "Save Session"
@@ -806,10 +806,10 @@ msgstr "Impossible de télécharger la CLI Bitwarden."
 #: src/sshpilot/bitwarden_setup.py:236
 msgid ""
 "The Bitwarden CLI was installed but could not be verified. Try restarting "
-"sshPilot."
+"SSH Pilot."
 msgstr ""
 "La CLI Bitwarden a été installée, mais n’a pas pu être vérifiée. Essayez de "
-"redémarrer sshPilot."
+"redémarrer SSH Pilot."
 
 #: src/sshpilot/bitwarden_setup.py:252
 #, python-brace-format
@@ -855,10 +855,10 @@ msgstr "Échec de l’installation."
 #: src/sshpilot/bitwarden_setup.py:287
 msgid ""
 "The install command finished but “bw” is still not available. Try restarting "
-"sshPilot."
+"SSH Pilot."
 msgstr ""
 "La commande d’installation s’est terminée, mais « bw » reste indisponible. "
-"Essayez de redémarrer sshPilot."
+"Essayez de redémarrer SSH Pilot."
 
 #: src/sshpilot/bitwarden_setup.py:663
 msgid "Open a terminal"
@@ -1212,7 +1212,7 @@ msgid ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot installs to:\n"
+"SSH Pilot installs to:\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -1225,7 +1225,7 @@ msgstr ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot l’installe dans :\n"
+"SSH Pilot l’installe dans :\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -3761,8 +3761,8 @@ msgid "The chosen Bitwarden backup could not be read"
 msgstr "La sauvegarde Bitwarden choisie n’a pas pu être lue"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:80
-msgid "The chosen backup is not a valid sshPilot backup"
-msgstr "La sauvegarde choisie n’est pas une sauvegarde sshPilot valide"
+msgid "The chosen backup is not a valid SSH Pilot backup"
+msgstr "La sauvegarde choisie n’est pas une sauvegarde SSH Pilot valide"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:83
 msgid "Could not list backups on the SSH server"
@@ -5800,12 +5800,12 @@ msgstr "Journalisation"
 
 #: src/sshpilot/preferences.py:2011
 msgid ""
-"Controls how verbose sshPilot is in the console and the rotated log file. "
+"Controls how verbose SSH Pilot is in the console and the rotated log file. "
 "The command-line flags --verbose / --quiet always override this."
 msgstr ""
-"Détermine le niveau de détail des messages de sshPilot dans la console et le "
-"fichier journal avec rotation. Les options de ligne de commande --verbose / "
-"--quiet ont toujours priorité."
+"Détermine le niveau de détail des messages de SSH Pilot dans la console et "
+"le fichier journal avec rotation. Les options de ligne de commande --"
+"verbose / --quiet ont toujours priorité."
 
 #: src/sshpilot/preferences.py:2016
 msgid "Log Level"
@@ -5825,16 +5825,16 @@ msgstr "Stockage des secrets"
 
 #: src/sshpilot/preferences.py:2040
 msgid ""
-"Where sshPilot stores passwords and key passphrases. Switching does not "
+"Where SSH Pilot stores passwords and key passphrases. Switching does not "
 "migrate existing secrets.\n"
 "Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
-"environment while sshPilot runs, so other programs running as your user can "
+"environment while SSH Pilot runs, so other programs running as your user can "
 "read the vault until you quit."
 msgstr ""
-"Emplacement où sshPilot stocke les mots de passe et les phrases de passe des "
-"clés. Changer de méthode ne migre pas les secrets existants.\n"
+"Emplacement où SSH Pilot stocke les mots de passe et les phrases de passe "
+"des clés. Changer de méthode ne migre pas les secrets existants.\n"
 "Remarque : Bitwarden/Vaultwarden conservent le jeton de session déverrouillé "
-"dans l’environnement pendant l’exécution de sshPilot. Les autres programmes "
+"dans l’environnement pendant l’exécution de SSH Pilot. Les autres programmes "
 "exécutés sous votre compte peuvent donc accéder au coffre-fort jusqu’à la "
 "fermeture de l’application."
 
@@ -5972,10 +5972,10 @@ msgstr "Aucun stockage des secrets"
 
 #: src/sshpilot/preferences.py:2222
 msgid ""
-"Passwords and passphrases are not saved by sshPilot. Use ssh-agent and SSH's "
-"own prompts instead."
+"Passwords and passphrases are not saved by SSH Pilot. Use ssh-agent and "
+"SSH's own prompts instead."
 msgstr ""
-"Les mots de passe et phrases de passe ne sont pas enregistrés par sshPilot. "
+"Les mots de passe et phrases de passe ne sont pas enregistrés par SSH Pilot. "
 "Utilisez plutôt ssh-agent et les invites propres à SSH."
 
 #: src/sshpilot/preferences.py:2239
@@ -6108,10 +6108,10 @@ msgid "File Manager Options"
 msgstr "Options du gestionnaire de fichiers"
 
 #: src/sshpilot/preferences.py:2601
-msgid "These preferences only affect sshPilot's built-in SFTP file manager."
+msgid "These preferences only affect SSH Pilot's built-in SFTP file manager."
 msgstr ""
 "Ces préférences concernent uniquement le gestionnaire de fichiers SFTP "
-"intégré à sshPilot."
+"intégré à SSH Pilot."
 
 #: src/sshpilot/preferences.py:2605
 msgid "Open File Manager in Separate Window"
@@ -6129,10 +6129,10 @@ msgstr "Paramètres SFTP avancés"
 
 #: src/sshpilot/preferences.py:2661
 msgid ""
-"Fine-tune options that only apply to sshPilot's built-in SFTP file manager."
+"Fine-tune options that only apply to SSH Pilot's built-in SFTP file manager."
 msgstr ""
 "Régler précisément les options propres au gestionnaire de fichiers SFTP "
-"intégré à sshPilot."
+"intégré à SSH Pilot."
 
 #: src/sshpilot/preferences.py:2666
 msgid "SFTP Keepalive Interval (seconds)"
@@ -6256,12 +6256,12 @@ msgstr "Vérification de l’état de Bitwarden…"
 msgid ""
 "The “bw” command was not found.\n"
 "\n"
-"sshPilot installs the CLI to:\n"
+"SSH Pilot installs the CLI to:\n"
 "    {path}"
 msgstr ""
 "La commande « bw » est introuvable.\n"
 "\n"
-"sshPilot installe la CLI dans :\n"
+"SSH Pilot installe la CLI dans :\n"
 "    {path}"
 
 #: src/sshpilot/preferences.py:3151
@@ -6659,11 +6659,11 @@ msgstr "Aucune permission particulière déclarée."
 #: src/sshpilot/preferences.py:4899
 msgid ""
 "Permissions are declared by the author for transparency; they are not "
-"enforced. Changes take effect after restarting sshPilot."
+"enforced. Changes take effect after restarting SSH Pilot."
 msgstr ""
 "Les permissions sont déclarées par l’auteur à des fins de transparence ; "
 "elles ne sont pas appliquées. Les modifications prennent effet après le "
-"redémarrage de sshPilot."
+"redémarrage de SSH Pilot."
 
 #: src/sshpilot/preferences.py:4910
 msgid "SHA-256"
@@ -7874,8 +7874,8 @@ msgid "The background service is required to deploy a key."
 msgstr "Le service en arrière-plan est requis pour installer une clé."
 
 #: src/sshpilot/sshcopyid_window.py:868 src/sshpilot/sshcopyid_window.py:929
-msgid "Reconnect to the sshPilot daemon and try again."
-msgstr "Reconnectez-vous au démon sshPilot et réessayez."
+msgid "Reconnect to the SSH Pilot daemon and try again."
+msgstr "Reconnectez-vous au démon SSH Pilot et réessayez."
 
 #: src/sshpilot/sshcopyid_window.py:918 src/sshpilot/sshcopyid_window.py:928
 msgid "Could not start public-key deployment."
@@ -8913,8 +8913,8 @@ msgid "Daemon unavailable"
 msgstr "Démon indisponible"
 
 #: src/sshpilot/window.py:5416
-msgid "Connect to the sshPilot daemon and retry this operation."
-msgstr "Connectez-vous au démon sshPilot et recommencez cette opération."
+msgid "Connect to the SSH Pilot daemon and retry this operation."
+msgstr "Connectez-vous au démon SSH Pilot et recommencez cette opération."
 
 #: src/sshpilot/window.py:5426
 msgid "Operation mode change rejected"
@@ -8990,8 +8990,8 @@ msgid "Show Sidebar (F9, {modifier}+B)"
 msgstr "Afficher la barre latérale (F9, {modifier}+B)"
 
 #: src/sshpilot/window.py:6211
-msgid "Connect to the sshPilot daemon and retry the deletion."
-msgstr "Connectez-vous au démon sshPilot et recommencez la suppression."
+msgid "Connect to the SSH Pilot daemon and retry the deletion."
+msgstr "Connectez-vous au démon SSH Pilot et recommencez la suppression."
 
 #: src/sshpilot/window.py:6262
 msgid "Failed to delete connection"
@@ -9064,8 +9064,8 @@ msgid "The SSH command for this connection could not be prepared."
 msgstr "La commande SSH de cette connexion n’a pas pu être préparée."
 
 #: src/sshpilot/window.py:7170 src/sshpilot/window.py:7228
-msgid "Connect to the sshPilot daemon before moving connections."
-msgstr "Connectez-vous au démon sshPilot avant de déplacer les connexions."
+msgid "Connect to the SSH Pilot daemon before moving connections."
+msgstr "Connectez-vous au démon SSH Pilot avant de déplacer les connexions."
 
 #: src/sshpilot/window.py:7214 src/sshpilot/window.py:7238
 #, python-brace-format
@@ -9244,18 +9244,18 @@ msgstr "Enregistrer le mot de passe"
 #: src/sshpilot/window_dialogs.py:456
 msgid ""
 "Secret storage is set to SSH Agent Only — passwords and passphrases are not "
-"saved by sshPilot."
+"saved by SSH Pilot."
 msgstr ""
 "Le stockage des secrets est réglé sur Agent SSH uniquement — les mots de "
-"passe et phrases de passe ne sont pas enregistrés par sshPilot."
+"passe et phrases de passe ne sont pas enregistrés par SSH Pilot."
 
 #: src/sshpilot/window_dialogs.py:555
 msgid "Known hosts unavailable"
 msgstr "Hôtes connus indisponibles"
 
 #: src/sshpilot/window_dialogs.py:556
-msgid "Connect to the sshPilot daemon before editing known hosts."
-msgstr "Connectez-vous au démon sshPilot avant de modifier les hôtes connus."
+msgid "Connect to the SSH Pilot daemon before editing known hosts."
+msgstr "Connectez-vous au démon SSH Pilot avant de modifier les hôtes connus."
 
 #: src/sshpilot/window_dialogs.py:630 src/sshpilot/window_dialogs.py:635
 #: src/sshpilot/window_dialogs.py:1276 src/sshpilot/window_dialogs.py:1329
@@ -9422,9 +9422,9 @@ msgstr "Exportation annulée"
 
 #: src/sshpilot/window_dialogs.py:1152
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected."
+"Secret storage is managed by the SSH Pilot daemon, which is not connected."
 msgstr ""
-"Le stockage des secrets est géré par le démon sshPilot, qui n’est pas "
+"Le stockage des secrets est géré par le démon SSH Pilot, qui n’est pas "
 "connecté."
 
 #: src/sshpilot/window_dialogs.py:1181
@@ -9509,8 +9509,8 @@ msgstr ""
 "Identifiants inclus : {} ; clés privées incluses : {} ; chiffrement : {}."
 
 #: src/sshpilot/window_dialogs.py:1333
-msgid "sshPilot backup (*.spbk)"
-msgstr "Sauvegarde sshPilot (*.spbk)"
+msgid "SSH Pilot backup (*.spbk)"
+msgstr "Sauvegarde SSH Pilot (*.spbk)"
 
 #: src/sshpilot/window_dialogs.py:1381
 msgid "Import a backup from a file, an SSH server, or your Bitwarden vault."
@@ -9531,8 +9531,8 @@ msgid "From File"
 msgstr "Depuis un fichier"
 
 #: src/sshpilot/window_dialogs.py:1411
-msgid "sshPilot backups & configs"
-msgstr "Sauvegardes et configurations sshPilot"
+msgid "SSH Pilot backups & configs"
+msgstr "Sauvegardes et configurations SSH Pilot"
 
 #: src/sshpilot/window_dialogs.py:1416
 msgid "All files"
@@ -9561,9 +9561,9 @@ msgid "No backups found"
 msgstr "Aucune sauvegarde trouvée"
 
 #: src/sshpilot/window_dialogs.py:1488
-msgid "No sshPilot backups were found in your Bitwarden vault."
+msgid "No SSH Pilot backups were found in your Bitwarden vault."
 msgstr ""
-"Aucune sauvegarde sshPilot n’a été trouvée dans le coffre-fort Bitwarden."
+"Aucune sauvegarde SSH Pilot n’a été trouvée dans le coffre-fort Bitwarden."
 
 #: src/sshpilot/window_dialogs.py:1509
 msgid "Choose a backup to restore:"
@@ -9602,8 +9602,9 @@ msgstr "Chargement des sauvegardes…"
 
 #: src/sshpilot/window_dialogs.py:1713
 #, python-brace-format
-msgid "No sshPilot backups were found in {path} on that server."
-msgstr "Aucune sauvegarde sshPilot n’a été trouvée dans {path} sur ce serveur."
+msgid "No SSH Pilot backups were found in {path} on that server."
+msgstr ""
+"Aucune sauvegarde SSH Pilot n’a été trouvée dans {path} sur ce serveur."
 
 #: src/sshpilot/window_dialogs.py:1730 src/sshpilot/window_dialogs.py:1796
 msgid "Reading backup…"
@@ -9694,10 +9695,10 @@ msgstr "Remplacer quand même"
 
 #: src/sshpilot/window_dialogs.py:2028
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected, so "
-"the operation was cancelled."
+"Secret storage is managed by the SSH Pilot daemon, which is not connected, "
+"so the operation was cancelled."
 msgstr ""
-"Le stockage des secrets est géré par le démon sshPilot, qui n’est pas "
+"Le stockage des secrets est géré par le démon SSH Pilot, qui n’est pas "
 "connecté ; l’opération a donc été annulée."
 
 #: src/sshpilot/window_dialogs.py:2039
@@ -9751,18 +9752,18 @@ msgstr ", "
 
 #: src/sshpilot/window_dialogs.py:2173
 msgid ""
-"{} credential(s) already existed and were left untouched — sshPilot never "
+"{} credential(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a saved secret."
 msgstr ""
-"Identifiants déjà présents et laissés intacts : {} — sshPilot n’écrase "
+"Identifiants déjà présents et laissés intacts : {} — SSH Pilot n’écrase "
 "jamais un secret enregistré."
 
 #: src/sshpilot/window_dialogs.py:2176
 msgid ""
-"{} private key(s) already existed and were left untouched — sshPilot never "
+"{} private key(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a private key."
 msgstr ""
-"Clés privées déjà présentes et laissées intactes : {} — sshPilot n’écrase "
+"Clés privées déjà présentes et laissées intactes : {} — SSH Pilot n’écrase "
 "jamais une clé privée."
 
 #: src/sshpilot/window_dialogs.py:2179
@@ -9778,10 +9779,10 @@ msgstr ""
 #: src/sshpilot/window_dialogs.py:2186
 msgid ""
 "Reload now to apply the imported configuration. Some settings may still need "
-"a full restart of sshPilot to take effect."
+"a full restart of SSH Pilot to take effect."
 msgstr ""
 "Rechargez maintenant pour appliquer la configuration importée. Certains "
-"paramètres peuvent encore nécessiter un redémarrage complet de sshPilot."
+"paramètres peuvent encore nécessiter un redémarrage complet de SSH Pilot."
 
 #: src/sshpilot/window_dialogs.py:2191
 msgid "Import Successful"
@@ -9804,8 +9805,8 @@ msgid "Please enter a group name."
 msgstr "Saisissez un nom de groupe."
 
 #: src/sshpilot/window_dialogs.py:2390
-msgid "Connect to the sshPilot daemon before creating groups."
-msgstr "Connectez-vous au démon sshPilot avant de créer des groupes."
+msgid "Connect to the SSH Pilot daemon before creating groups."
+msgstr "Connectez-vous au démon SSH Pilot avant de créer des groupes."
 
 #: src/sshpilot/window_dialogs.py:2411
 #, python-brace-format
@@ -9825,8 +9826,8 @@ msgid "e.g., Production Servers"
 msgstr "par exemple Serveurs de production"
 
 #: src/sshpilot/window_dialogs.py:2461
-msgid "Connect to the sshPilot daemon before editing groups."
-msgstr "Connectez-vous au démon sshPilot avant de modifier les groupes."
+msgid "Connect to the SSH Pilot daemon before editing groups."
+msgstr "Connectez-vous au démon SSH Pilot avant de modifier les groupes."
 
 #: src/sshpilot/window_dialogs.py:2491
 #, python-brace-format
@@ -9851,17 +9852,17 @@ msgid "Failed to rename tag: {error}"
 msgstr "Échec du renommage de l’étiquette : {error}"
 
 #: src/sshpilot/window_dialogs.py:2579
-msgid "Connect to the sshPilot daemon before renaming tags."
-msgstr "Connectez-vous au démon sshPilot avant de renommer les étiquettes."
+msgid "Connect to the SSH Pilot daemon before renaming tags."
+msgstr "Connectez-vous au démon SSH Pilot avant de renommer les étiquettes."
 
 #: src/sshpilot/window_dialogs.py:2585
 msgid "Enter a new name for the tag:"
 msgstr "Saisissez un nouveau nom pour l’étiquette :"
 
 #: src/sshpilot/window_dialogs.py:2631
-msgid "Connect to the sshPilot daemon before using group operations."
+msgid "Connect to the SSH Pilot daemon before using group operations."
 msgstr ""
-"Connectez-vous au démon sshPilot avant d’utiliser les opérations de groupe."
+"Connectez-vous au démon SSH Pilot avant d’utiliser les opérations de groupe."
 
 #: src/sshpilot/window_dialogs.py:2641
 msgid "Move"

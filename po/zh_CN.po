@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:33+0330\n"
+"POT-Creation-Date: 2026-09-06 01:45+0330\n"
 "PO-Revision-Date: 2026-09-05 11:35+0330\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -217,8 +217,8 @@ msgid "Service unavailable"
 msgstr "服务不可用"
 
 #: src/sshpilot/actions.py:503
-msgid "Connect to the sshPilot daemon before deleting groups."
-msgstr "删除分组前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before deleting groups."
+msgstr "删除分组前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/actions.py:514
 #, python-brace-format
@@ -262,8 +262,8 @@ msgid "Delete"
 msgstr "删除"
 
 #: src/sshpilot/actions.py:616
-msgid "Connect to the sshPilot daemon before moving groups."
-msgstr "移动分组前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before moving groups."
+msgstr "移动分组前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/actions.py:658
 msgid "Save Session"
@@ -794,8 +794,8 @@ msgstr "无法下载 Bitwarden CLI。"
 #: src/sshpilot/bitwarden_setup.py:236
 msgid ""
 "The Bitwarden CLI was installed but could not be verified. Try restarting "
-"sshPilot."
-msgstr "已安装 Bitwarden CLI，但无法通过验证。请尝试重启 sshPilot。"
+"SSH Pilot."
+msgstr "已安装 Bitwarden CLI，但无法通过验证。请尝试重启 SSH Pilot。"
 
 #: src/sshpilot/bitwarden_setup.py:252
 #, python-brace-format
@@ -840,8 +840,8 @@ msgstr "安装失败。"
 #: src/sshpilot/bitwarden_setup.py:287
 msgid ""
 "The install command finished but “bw” is still not available. Try restarting "
-"sshPilot."
-msgstr "安装命令已完成，但“bw”仍不可用。请尝试重启 sshPilot。"
+"SSH Pilot."
+msgstr "安装命令已完成，但“bw”仍不可用。请尝试重启 SSH Pilot。"
 
 #: src/sshpilot/bitwarden_setup.py:663
 msgid "Open a terminal"
@@ -1171,7 +1171,7 @@ msgid ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot installs to:\n"
+"SSH Pilot installs to:\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -1183,7 +1183,7 @@ msgstr ""
 "\n"
 "  {url}\n"
 "\n"
-"sshPilot 安装至：\n"
+"SSH Pilot 安装至：\n"
 "\n"
 "    {path}\n"
 "\n"
@@ -3643,8 +3643,8 @@ msgid "The chosen Bitwarden backup could not be read"
 msgstr "无法读取所选的 Bitwarden 备份"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:80
-msgid "The chosen backup is not a valid sshPilot backup"
-msgstr "所选备份不是有效的 sshPilot 备份"
+msgid "The chosen backup is not a valid SSH Pilot backup"
+msgstr "所选备份不是有效的 SSH Pilot 备份"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:83
 msgid "Could not list backups on the SSH server"
@@ -5596,10 +5596,10 @@ msgstr "日志记录"
 
 #: src/sshpilot/preferences.py:2011
 msgid ""
-"Controls how verbose sshPilot is in the console and the rotated log file. "
+"Controls how verbose SSH Pilot is in the console and the rotated log file. "
 "The command-line flags --verbose / --quiet always override this."
 msgstr ""
-"控制 sshPilot 在控制台和轮换日志文件中的详细程度。命令行选项 --verbose / --"
+"控制 SSH Pilot 在控制台和轮换日志文件中的详细程度。命令行选项 --verbose / --"
 "quiet 始终优先于此设置。"
 
 #: src/sshpilot/preferences.py:2016
@@ -5618,14 +5618,14 @@ msgstr "密码与密钥存储"
 
 #: src/sshpilot/preferences.py:2040
 msgid ""
-"Where sshPilot stores passwords and key passphrases. Switching does not "
+"Where SSH Pilot stores passwords and key passphrases. Switching does not "
 "migrate existing secrets.\n"
 "Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
-"environment while sshPilot runs, so other programs running as your user can "
+"environment while SSH Pilot runs, so other programs running as your user can "
 "read the vault until you quit."
 msgstr ""
-"sshPilot 存储密码和密钥口令的位置。切换存储后端不会迁移现有保密数据。\n"
-"注意：当 sshPilot 运行时，Bitwarden/Vaultwarden 会在环境中保留已解锁的会话令"
+"SSH Pilot 存储密码和密钥口令的位置。切换存储后端不会迁移现有保密数据。\n"
+"注意：当 SSH Pilot 运行时，Bitwarden/Vaultwarden 会在环境中保留已解锁的会话令"
 "牌，因此以您用户身份运行的其他程序在您退出前均可读取密码库。"
 
 #: src/sshpilot/preferences.py:2048
@@ -5758,9 +5758,9 @@ msgstr "无密码与密钥存储"
 
 #: src/sshpilot/preferences.py:2222
 msgid ""
-"Passwords and passphrases are not saved by sshPilot. Use ssh-agent and SSH's "
-"own prompts instead."
-msgstr "sshPilot 不保存密码和口令。请改用 ssh-agent 和 SSH 自身的提示。"
+"Passwords and passphrases are not saved by SSH Pilot. Use ssh-agent and "
+"SSH's own prompts instead."
+msgstr "SSH Pilot 不保存密码和口令。请改用 ssh-agent 和 SSH 自身的提示。"
 
 #: src/sshpilot/preferences.py:2239
 msgid "SSH Identity"
@@ -5888,8 +5888,8 @@ msgid "File Manager Options"
 msgstr "文件管理器选项"
 
 #: src/sshpilot/preferences.py:2601
-msgid "These preferences only affect sshPilot's built-in SFTP file manager."
-msgstr "这些首选项仅影响 sshPilot 内置的 SFTP 文件管理器。"
+msgid "These preferences only affect SSH Pilot's built-in SFTP file manager."
+msgstr "这些首选项仅影响 SSH Pilot 内置的 SFTP 文件管理器。"
 
 #: src/sshpilot/preferences.py:2605
 msgid "Open File Manager in Separate Window"
@@ -5905,8 +5905,8 @@ msgstr "高级 SFTP 设置"
 
 #: src/sshpilot/preferences.py:2661
 msgid ""
-"Fine-tune options that only apply to sshPilot's built-in SFTP file manager."
-msgstr "微调仅适用于 sshPilot 内置 SFTP 文件管理器的选项。"
+"Fine-tune options that only apply to SSH Pilot's built-in SFTP file manager."
+msgstr "微调仅适用于 SSH Pilot 内置 SFTP 文件管理器的选项。"
 
 #: src/sshpilot/preferences.py:2666
 msgid "SFTP Keepalive Interval (seconds)"
@@ -6021,12 +6021,12 @@ msgstr "正在检查 Bitwarden 状态…"
 msgid ""
 "The “bw” command was not found.\n"
 "\n"
-"sshPilot installs the CLI to:\n"
+"SSH Pilot installs the CLI to:\n"
 "    {path}"
 msgstr ""
 "未找到 “bw” 命令。\n"
 "\n"
-"sshPilot 会将 CLI 安装到：\n"
+"SSH Pilot 会将 CLI 安装到：\n"
 "    {path}"
 
 #: src/sshpilot/preferences.py:3151
@@ -6401,9 +6401,9 @@ msgstr "未声明特殊权限。"
 #: src/sshpilot/preferences.py:4899
 msgid ""
 "Permissions are declared by the author for transparency; they are not "
-"enforced. Changes take effect after restarting sshPilot."
+"enforced. Changes take effect after restarting SSH Pilot."
 msgstr ""
-"权限由作者声明以提高透明度；这些权限并非强制执行。更改将在重启 sshPilot 后生"
+"权限由作者声明以提高透明度；这些权限并非强制执行。更改将在重启 SSH Pilot 后生"
 "效。"
 
 #: src/sshpilot/preferences.py:4910
@@ -7573,8 +7573,8 @@ msgid "The background service is required to deploy a key."
 msgstr "部署密钥需要后台服务。"
 
 #: src/sshpilot/sshcopyid_window.py:868 src/sshpilot/sshcopyid_window.py:929
-msgid "Reconnect to the sshPilot daemon and try again."
-msgstr "重新连接到 sshPilot 守护进程并重试。"
+msgid "Reconnect to the SSH Pilot daemon and try again."
+msgstr "重新连接到 SSH Pilot 守护进程并重试。"
 
 #: src/sshpilot/sshcopyid_window.py:918 src/sshpilot/sshcopyid_window.py:928
 msgid "Could not start public-key deployment."
@@ -8573,8 +8573,8 @@ msgid "Daemon unavailable"
 msgstr "守护进程不可用"
 
 #: src/sshpilot/window.py:5416
-msgid "Connect to the sshPilot daemon and retry this operation."
-msgstr "连接到 sshPilot 守护进程并重试此操作。"
+msgid "Connect to the SSH Pilot daemon and retry this operation."
+msgstr "连接到 SSH Pilot 守护进程并重试此操作。"
 
 #: src/sshpilot/window.py:5426
 msgid "Operation mode change rejected"
@@ -8646,8 +8646,8 @@ msgid "Show Sidebar (F9, {modifier}+B)"
 msgstr "显示侧边栏 (F9, {modifier}+B)"
 
 #: src/sshpilot/window.py:6211
-msgid "Connect to the sshPilot daemon and retry the deletion."
-msgstr "连接到 sshPilot 守护进程并重试删除。"
+msgid "Connect to the SSH Pilot daemon and retry the deletion."
+msgstr "连接到 SSH Pilot 守护进程并重试删除。"
 
 #: src/sshpilot/window.py:6262
 msgid "Failed to delete connection"
@@ -8720,8 +8720,8 @@ msgid "The SSH command for this connection could not be prepared."
 msgstr "无法为此连接准备 SSH 命令。"
 
 #: src/sshpilot/window.py:7170 src/sshpilot/window.py:7228
-msgid "Connect to the sshPilot daemon before moving connections."
-msgstr "移动连接前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before moving connections."
+msgstr "移动连接前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window.py:7214 src/sshpilot/window.py:7238
 #, python-brace-format
@@ -8891,16 +8891,16 @@ msgstr "存储密码"
 #: src/sshpilot/window_dialogs.py:456
 msgid ""
 "Secret storage is set to SSH Agent Only — passwords and passphrases are not "
-"saved by sshPilot."
-msgstr "密码与密钥存储设置为“仅使用 ssh-agent” — sshPilot 不保存密码和口令。"
+"saved by SSH Pilot."
+msgstr "密码与密钥存储设置为“仅使用 ssh-agent” — SSH Pilot 不保存密码和口令。"
 
 #: src/sshpilot/window_dialogs.py:555
 msgid "Known hosts unavailable"
 msgstr "known_hosts 不可用"
 
 #: src/sshpilot/window_dialogs.py:556
-msgid "Connect to the sshPilot daemon before editing known hosts."
-msgstr "编辑 known_hosts 前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before editing known hosts."
+msgstr "编辑 known_hosts 前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window_dialogs.py:630 src/sshpilot/window_dialogs.py:635
 #: src/sshpilot/window_dialogs.py:1276 src/sshpilot/window_dialogs.py:1329
@@ -9053,8 +9053,8 @@ msgstr "导出已取消"
 
 #: src/sshpilot/window_dialogs.py:1152
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected."
-msgstr "密码与密钥存储由 sshPilot 守护进程管理，该守护进程尚未连接。"
+"Secret storage is managed by the SSH Pilot daemon, which is not connected."
+msgstr "密码与密钥存储由 SSH Pilot 守护进程管理，该守护进程尚未连接。"
 
 #: src/sshpilot/window_dialogs.py:1181
 msgid "Export to SSH Server"
@@ -9135,8 +9135,8 @@ msgstr ""
 "包含 {} 个凭据和 {} 个私钥；加密：{}。"
 
 #: src/sshpilot/window_dialogs.py:1333
-msgid "sshPilot backup (*.spbk)"
-msgstr "sshPilot 备份 (*.spbk)"
+msgid "SSH Pilot backup (*.spbk)"
+msgstr "SSH Pilot 备份 (*.spbk)"
 
 #: src/sshpilot/window_dialogs.py:1381
 msgid "Import a backup from a file, an SSH server, or your Bitwarden vault."
@@ -9155,8 +9155,8 @@ msgid "From File"
 msgstr "从文件"
 
 #: src/sshpilot/window_dialogs.py:1411
-msgid "sshPilot backups & configs"
-msgstr "sshPilot 备份与配置"
+msgid "SSH Pilot backups & configs"
+msgstr "SSH Pilot 备份与配置"
 
 #: src/sshpilot/window_dialogs.py:1416
 msgid "All files"
@@ -9185,8 +9185,8 @@ msgid "No backups found"
 msgstr "未找到备份"
 
 #: src/sshpilot/window_dialogs.py:1488
-msgid "No sshPilot backups were found in your Bitwarden vault."
-msgstr "在您的 Bitwarden 密码库中未找到 sshPilot 备份。"
+msgid "No SSH Pilot backups were found in your Bitwarden vault."
+msgstr "在您的 Bitwarden 密码库中未找到 SSH Pilot 备份。"
 
 #: src/sshpilot/window_dialogs.py:1509
 msgid "Choose a backup to restore:"
@@ -9224,8 +9224,8 @@ msgstr "正在加载备份…"
 
 #: src/sshpilot/window_dialogs.py:1713
 #, python-brace-format
-msgid "No sshPilot backups were found in {path} on that server."
-msgstr "在该服务器的 {path} 中未找到 sshPilot 备份。"
+msgid "No SSH Pilot backups were found in {path} on that server."
+msgstr "在该服务器的 {path} 中未找到 SSH Pilot 备份。"
 
 #: src/sshpilot/window_dialogs.py:1730 src/sshpilot/window_dialogs.py:1796
 msgid "Reading backup…"
@@ -9308,9 +9308,10 @@ msgstr "仍然替换"
 
 #: src/sshpilot/window_dialogs.py:2028
 msgid ""
-"Secret storage is managed by the sshPilot daemon, which is not connected, so "
-"the operation was cancelled."
-msgstr "密码与密钥存储由 sshPilot 守护进程管理，该进程未连接，因此操作已取消。"
+"Secret storage is managed by the SSH Pilot daemon, which is not connected, "
+"so the operation was cancelled."
+msgstr ""
+"密码与密钥存储由 SSH Pilot 守护进程管理，该进程未连接，因此操作已取消。"
 
 #: src/sshpilot/window_dialogs.py:2039
 msgid ""
@@ -9358,15 +9359,15 @@ msgstr "，"
 
 #: src/sshpilot/window_dialogs.py:2173
 msgid ""
-"{} credential(s) already existed and were left untouched — sshPilot never "
+"{} credential(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a saved secret."
-msgstr "{} 个凭据已存在且未作改动 — sshPilot 绝不覆盖已保存的保密数据。"
+msgstr "{} 个凭据已存在且未作改动 — SSH Pilot 绝不覆盖已保存的保密数据。"
 
 #: src/sshpilot/window_dialogs.py:2176
 msgid ""
-"{} private key(s) already existed and were left untouched — sshPilot never "
+"{} private key(s) already existed and were left untouched — SSH Pilot never "
 "overwrites a private key."
-msgstr "{} 个私钥已存在且未作改动 — sshPilot 绝不覆盖私钥。"
+msgstr "{} 个私钥已存在且未作改动 — SSH Pilot 绝不覆盖私钥。"
 
 #: src/sshpilot/window_dialogs.py:2179
 msgid ""
@@ -9380,9 +9381,9 @@ msgstr ""
 #: src/sshpilot/window_dialogs.py:2186
 msgid ""
 "Reload now to apply the imported configuration. Some settings may still need "
-"a full restart of sshPilot to take effect."
+"a full restart of SSH Pilot to take effect."
 msgstr ""
-"立即重新载入以应用导入的配置。某些设置可能仍需完全重启 sshPilot 才能生效。"
+"立即重新载入以应用导入的配置。某些设置可能仍需完全重启 SSH Pilot 才能生效。"
 
 #: src/sshpilot/window_dialogs.py:2191
 msgid "Import Successful"
@@ -9405,8 +9406,8 @@ msgid "Please enter a group name."
 msgstr "请输入分组名称。"
 
 #: src/sshpilot/window_dialogs.py:2390
-msgid "Connect to the sshPilot daemon before creating groups."
-msgstr "创建分组前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before creating groups."
+msgstr "创建分组前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window_dialogs.py:2411
 #, python-brace-format
@@ -9426,8 +9427,8 @@ msgid "e.g., Production Servers"
 msgstr "例如：生产服务器"
 
 #: src/sshpilot/window_dialogs.py:2461
-msgid "Connect to the sshPilot daemon before editing groups."
-msgstr "编辑分组前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before editing groups."
+msgstr "编辑分组前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window_dialogs.py:2491
 #, python-brace-format
@@ -9452,16 +9453,16 @@ msgid "Failed to rename tag: {error}"
 msgstr "重命名标签失败：{error}"
 
 #: src/sshpilot/window_dialogs.py:2579
-msgid "Connect to the sshPilot daemon before renaming tags."
-msgstr "重命名标签前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before renaming tags."
+msgstr "重命名标签前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window_dialogs.py:2585
 msgid "Enter a new name for the tag:"
 msgstr "输入标签的新名称："
 
 #: src/sshpilot/window_dialogs.py:2631
-msgid "Connect to the sshPilot daemon before using group operations."
-msgstr "使用分组操作前请先连接到 sshPilot 守护进程。"
+msgid "Connect to the SSH Pilot daemon before using group operations."
+msgstr "使用分组操作前请先连接到 SSH Pilot 守护进程。"
 
 #: src/sshpilot/window_dialogs.py:2641
 msgid "Move"

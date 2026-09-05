@@ -2008,7 +2008,7 @@ class PreferencesWindow(Adw.NavigationPage):
         # Logging group ------------------------------------------------
         logging_group = Adw.PreferencesGroup(title=_("Logging"))
         logging_group.set_description(
-            _("Controls how verbose sshPilot is in the console and the rotated log file. "
+            _("Controls how verbose SSH Pilot is in the console and the rotated log file. "
             "The command-line flags --verbose / --quiet always override this.")
         )
 
@@ -2037,10 +2037,10 @@ class PreferencesWindow(Adw.NavigationPage):
         secrets_group = Adw.PreferencesGroup(
             title=_("Secret Storage"),
             description=_(
-                "Where sshPilot stores passwords and key passphrases. "
+                "Where SSH Pilot stores passwords and key passphrases. "
                 "Switching does not migrate existing secrets.\n"
                 "Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
-                "environment while sshPilot runs, so other programs running as your "
+                "environment while SSH Pilot runs, so other programs running as your "
                 "user can read the vault until you quit."
             ),
         )
@@ -2219,7 +2219,7 @@ class PreferencesWindow(Adw.NavigationPage):
         self.agent_no_store_row = Adw.ActionRow()
         self.agent_no_store_row.set_title(_("No secret storage"))
         self.agent_no_store_row.set_subtitle(_(
-            "Passwords and passphrases are not saved by sshPilot. Use ssh-agent "
+            "Passwords and passphrases are not saved by SSH Pilot. Use ssh-agent "
             "and SSH's own prompts instead."
         ))
         secrets_group.add(self.agent_no_store_row)
@@ -2598,7 +2598,7 @@ class PreferencesWindow(Adw.NavigationPage):
         if has_internal_file_manager():
             file_manager_group = Adw.PreferencesGroup(title=_("File Manager Options"))
             file_manager_group.set_description(
-                _("These preferences only affect sshPilot's built-in SFTP file manager.")
+                _("These preferences only affect SSH Pilot's built-in SFTP file manager.")
             )
 
             self.open_file_manager_externally_row = Adw.SwitchRow()
@@ -2658,7 +2658,7 @@ class PreferencesWindow(Adw.NavigationPage):
 
             sftp_advanced_group = Adw.PreferencesGroup(title=_("Advanced SFTP Settings"))
             sftp_advanced_group.set_description(
-                _("Fine-tune options that only apply to sshPilot's built-in SFTP file manager.")
+                _("Fine-tune options that only apply to SSH Pilot's built-in SFTP file manager.")
             )
 
 
@@ -3146,7 +3146,7 @@ class PreferencesWindow(Adw.NavigationPage):
             if install_path:
                 return _(
                     "The “bw” command was not found.\n\n"
-                    "sshPilot installs the CLI to:\n    {path}"
+                    "SSH Pilot installs the CLI to:\n    {path}"
                 ).format(path=install_path)
             return _("The “bw” command was not found.")
         path_line = ""
@@ -4898,7 +4898,7 @@ class PreferencesWindow(Adw.NavigationPage):
             body.append(lbl)
         note = Gtk.Label(label=_("Permissions are declared by the author for "
                                  "transparency; they are not enforced. Changes "
-                                 "take effect after restarting sshPilot."))
+                                 "take effect after restarting SSH Pilot."))
         note.add_css_class('dim-label')
         note.add_css_class('caption')
         note.set_halign(Gtk.Align.START)

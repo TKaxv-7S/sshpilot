@@ -234,7 +234,7 @@ def download_and_install_bw_binary() -> Tuple[bool, str]:
     if not is_bw_installed(force_refresh=True):
         return False, _(
             "The Bitwarden CLI was installed but could not be verified. "
-            "Try restarting sshPilot."
+            "Try restarting SSH Pilot."
         )
     return True, ""
 
@@ -285,7 +285,7 @@ def run_install(plan: InstallPlan) -> Tuple[bool, str]:
     if not is_bw_installed():
         return False, _(
             "The install command finished but “bw” is still not available. "
-            "Try restarting sshPilot."
+            "Try restarting SSH Pilot."
         )
     from .platform_utils import invalidate_bw_cli_cache
     invalidate_bw_cli_cache()
@@ -1500,7 +1500,7 @@ def _no_cli_dialog(window):
         _("Install the Bitwarden CLI (the “bw” command) and try again. "
           "Use “Set up Bitwarden…” in Preferences to download the official "
           "binary automatically, or get it from:\n\n  {url}\n\n"
-          "sshPilot installs to:\n\n    {path}\n\n"
+          "SSH Pilot installs to:\n\n    {path}\n\n"
           "For self-hosted or EU cloud, set the server in the setup wizard before signing in."
         ).format(url=BW_CLI_DOWNLOAD, path=get_managed_bw_cli_path()),
     )

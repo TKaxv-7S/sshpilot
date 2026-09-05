@@ -77,7 +77,7 @@ _MESSAGE_TEMPLATES = {
         "The chosen Bitwarden backup could not be read"
     ),
     SecretTransferMessageCode.INVALID_SSHPILOT_BACKUP: N_(
-        "The chosen backup is not a valid sshPilot backup"
+        "The chosen backup is not a valid SSH Pilot backup"
     ),
     SecretTransferMessageCode.SSH_BACKUP_LIST_FAILED: N_(
         "Could not list backups on the SSH server"
