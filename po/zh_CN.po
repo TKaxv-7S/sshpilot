@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 11:35+0330\n"
+"POT-Creation-Date: 2026-09-06 01:33+0330\n"
 "PO-Revision-Date: 2026-09-05 11:35+0330\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,7 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-""
 
 #: src/sshpilot/actions.py:36 src/sshpilot/preferences.py:1619
 msgid "Sidebar Toggle Button"
@@ -49,7 +48,7 @@ msgstr "本地终端按钮"
 #: src/sshpilot/window_help.py:213 src/sshpilot/window_session.py:150
 #: src/sshpilot/window_tabs.py:1227 src/sshpilot/window_tabs.py:1361
 #: src/sshpilot/window_tabs.py:1539
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:729
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:734
 msgid "Split View"
 msgstr "分屏视图"
 
@@ -94,9 +93,9 @@ msgstr "打开连接？"
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:311
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:499
 #: src/sshpilot/plugins/builtin/docker_manager/page.py:1331
-#: src/sshpilot/preferences.py:3948 src/sshpilot/preferences.py:4060
-#: src/sshpilot/preferences.py:4935 src/sshpilot/preferences.py:5086
-#: src/sshpilot/preferences.py:5132 src/sshpilot/rbw_setup.py:167
+#: src/sshpilot/preferences.py:3946 src/sshpilot/preferences.py:4058
+#: src/sshpilot/preferences.py:4933 src/sshpilot/preferences.py:5084
+#: src/sshpilot/preferences.py:5130 src/sshpilot/rbw_setup.py:167
 #: src/sshpilot/scp_window.py:170 src/sshpilot/scp_window.py:992
 #: src/sshpilot/shortcut_editor.py:605 src/sshpilot/terminal_manager.py:915
 #: src/sshpilot/terminal_manager.py:1479 src/sshpilot/text_editor.py:1331
@@ -175,9 +174,9 @@ msgstr ""
 #: src/sshpilot/daemon_quit_policy.py:531 src/sshpilot/file_manager/pane.py:56
 #: src/sshpilot/file_manager/pane.py:65 src/sshpilot/file_manager/pane.py:1933
 #: src/sshpilot/file_manager/pane.py:2336
-#: src/sshpilot/known_hosts_editor.py:311 src/sshpilot/preferences.py:3597
-#: src/sshpilot/preferences.py:3720 src/sshpilot/preferences.py:4122
-#: src/sshpilot/preferences.py:4769 src/sshpilot/rbw_setup.py:123
+#: src/sshpilot/known_hosts_editor.py:311 src/sshpilot/preferences.py:3595
+#: src/sshpilot/preferences.py:3718 src/sshpilot/preferences.py:4120
+#: src/sshpilot/preferences.py:4767 src/sshpilot/rbw_setup.py:123
 #: src/sshpilot/rbw_setup.py:129 src/sshpilot/secret_unlock_dialog.py:77
 #: src/sshpilot/secret_unlock_dialog.py:82 src/sshpilot/sshcopyid_window.py:548
 #: src/sshpilot/terminal_manager.py:1014 src/sshpilot/terminal_manager.py:1179
@@ -271,7 +270,8 @@ msgid "Save Session"
 msgstr "保存会话"
 
 #: src/sshpilot/actions.py:659
-msgid "Enter a name for this session. Saving with an existing name overwrites it."
+msgid ""
+"Enter a name for this session. Saving with an existing name overwrites it."
 msgstr "输入此会话的名称。使用已有名称保存将覆盖它。"
 
 #: src/sshpilot/actions.py:662 src/sshpilot/actions.py:663
@@ -327,14 +327,16 @@ msgstr "打开"
 
 #: src/sshpilot/actions.py:782
 #, python-brace-format
-msgid "Replace the current tabs with session \"{name}\", or add it to the current tabs?"
+msgid ""
+"Replace the current tabs with session \"{name}\", or add it to the current "
+"tabs?"
 msgstr "用会话“{name}”替换当前标签页，还是添加到当前标签页？"
 
 #: src/sshpilot/actions.py:785
 msgid "Add to Current"
 msgstr "添加到当前"
 
-#: src/sshpilot/actions.py:786 src/sshpilot/preferences.py:5087
+#: src/sshpilot/actions.py:786 src/sshpilot/preferences.py:5085
 #: src/sshpilot/shortcut_editor.py:606 src/sshpilot/text_editor.py:488
 msgid "Replace"
 msgstr "替换"
@@ -408,7 +410,7 @@ msgstr "安全密钥"
 #: src/sshpilot/daemon_interaction_dialogs.py:367
 #: src/sshpilot/daemon_sessions_dialog.py:35
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:444
-#: src/sshpilot/preferences.py:4877 src/sshpilot/sshcopyid_window.py:559
+#: src/sshpilot/preferences.py:4875 src/sshpilot/sshcopyid_window.py:559
 #: src/sshpilot/terminal.py:1059 src/sshpilot/welcome_page.py:708
 #: src/sshpilot/window.py:2968 src/sshpilot/window.py:6702
 #: src/sshpilot/window_tabs.py:272 src/sshpilot/window_tabs.py:971
@@ -621,7 +623,9 @@ msgid "Could not start reading the public key."
 msgstr "无法开始读取公钥。"
 
 #: src/sshpilot/authorized_keys_window.py:553
-msgid "The public key for the selected key is not available. Generate it with ssh-keygen and try again."
+msgid ""
+"The public key for the selected key is not available. Generate it with ssh-"
+"keygen and try again."
 msgstr "所选密钥的公钥不可用。请使用 ssh-keygen 生成并重试。"
 
 #: src/sshpilot/authorized_keys_window.py:557
@@ -669,8 +673,11 @@ msgid "Restrictions"
 msgstr "限制"
 
 #: src/sshpilot/authorized_keys_window.py:733
-msgid "If ‘restrict’ is on, all forwardings/PTY/user-rc are denied unless re-enabled here."
-msgstr "如果启用了“restrict”，所有转发/PTY/user-rc 都将被拒绝，除非在此重新启用。"
+msgid ""
+"If ‘restrict’ is on, all forwardings/PTY/user-rc are denied unless re-"
+"enabled here."
+msgstr ""
+"如果启用了“restrict”，所有转发/PTY/user-rc 都将被拒绝，除非在此重新启用。"
 
 #: src/sshpilot/authorized_keys_window.py:736
 msgid "Apply ‘restrict’"
@@ -709,8 +716,12 @@ msgid "expiry-time (e.g. YYYYMMDDHHMM or 20260101)"
 msgstr "过期时间 (expiry-time，如 YYYYMMDDHHMM 或 20260101)"
 
 #: src/sshpilot/authorized_keys_window.py:812
-msgid "environment= entries (NAME=value, one per line). Often ignored unless sshd's PermitUserEnvironment is on."
-msgstr "environment= 条目（NAME=value，每行一个）。通常会被忽略，除非 sshd 开启了 PermitUserEnvironment。"
+msgid ""
+"environment= entries (NAME=value, one per line). Often ignored unless sshd's "
+"PermitUserEnvironment is on."
+msgstr ""
+"environment= 条目（NAME=value，每行一个）。通常会被忽略，除非 sshd 开启了 "
+"PermitUserEnvironment。"
 
 #: src/sshpilot/authorized_keys_window.py:831
 msgid "Tunneling"
@@ -754,7 +765,9 @@ msgid "Preserved unknown options"
 msgstr "保留的未知选项"
 
 #: src/sshpilot/authorized_keys_window.py:888
-msgid "These options are not modelled by this editor but will be re-emitted verbatim."
+msgid ""
+"These options are not modelled by this editor but will be re-emitted "
+"verbatim."
 msgstr "此编辑器不支持这些选项，但会原样重新输出。"
 
 #: src/sshpilot/bitwarden_setup.py:100
@@ -779,13 +792,16 @@ msgid "Could not download the Bitwarden CLI."
 msgstr "无法下载 Bitwarden CLI。"
 
 #: src/sshpilot/bitwarden_setup.py:236
-msgid "The Bitwarden CLI was installed but could not be verified. Try restarting sshPilot."
+msgid ""
+"The Bitwarden CLI was installed but could not be verified. Try restarting "
+"sshPilot."
 msgstr "已安装 Bitwarden CLI，但无法通过验证。请尝试重启 sshPilot。"
 
 #: src/sshpilot/bitwarden_setup.py:252
 #, python-brace-format
 msgid ""
-"The CLI will be downloaded on your system (outside the Flatpak sandbox) and installed to:\n"
+"The CLI will be downloaded on your system (outside the Flatpak sandbox) and "
+"installed to:\n"
 "\n"
 "    {path}"
 msgstr ""
@@ -822,7 +838,9 @@ msgid "Installation failed."
 msgstr "安装失败。"
 
 #: src/sshpilot/bitwarden_setup.py:287
-msgid "The install command finished but “bw” is still not available. Try restarting sshPilot."
+msgid ""
+"The install command finished but “bw” is still not available. Try restarting "
+"sshPilot."
 msgstr "安装命令已完成，但“bw”仍不可用。请尝试重启 sshPilot。"
 
 #: src/sshpilot/bitwarden_setup.py:663
@@ -830,8 +848,11 @@ msgid "Open a terminal"
 msgstr "打开终端"
 
 #: src/sshpilot/bitwarden_setup.py:664
-msgid "Could not open a built-in terminal from Settings. Open a system terminal manually and run the commands shown in the next dialog."
-msgstr "无法从设置中打开内置终端。请手动打开系统终端并运行下一个对话框中显示的命令。"
+msgid ""
+"Could not open a built-in terminal from Settings. Open a system terminal "
+"manually and run the commands shown in the next dialog."
+msgstr ""
+"无法从设置中打开内置终端。请手动打开系统终端并运行下一个对话框中显示的命令。"
 
 #: src/sshpilot/bitwarden_setup.py:684
 #, python-brace-format
@@ -844,7 +865,7 @@ msgstr ""
 "\n"
 "{method}{note}"
 
-#: src/sshpilot/bitwarden_setup.py:687 src/sshpilot/preferences.py:5102
+#: src/sshpilot/bitwarden_setup.py:687 src/sshpilot/preferences.py:5100
 msgid "Install"
 msgstr "安装"
 
@@ -896,7 +917,8 @@ msgstr "无法安装 Bitwarden CLI。"
 msgid ""
 "{detail}\n"
 "\n"
-"Accounts enrolled in an organization's trusted-device policy cannot access vault data through the Bitwarden CLI."
+"Accounts enrolled in an organization's trusted-device policy cannot access "
+"vault data through the Bitwarden CLI."
 msgstr ""
 "{detail}\n"
 "\n"
@@ -907,11 +929,14 @@ msgstr ""
 msgid ""
 "{detail}\n"
 "\n"
-"If Bitwarden asked for additional authentication, enter your personal API key client secret in the auth-challenge field (Account Settings → Security → Keys)."
+"If Bitwarden asked for additional authentication, enter your personal API "
+"key client secret in the auth-challenge field (Account Settings → Security → "
+"Keys)."
 msgstr ""
 "{detail}\n"
 "\n"
-"如果 Bitwarden 要求进行额外身份验证，请在身份验证质询字段中输入您的个人 API 密钥客户端密钥 (client secret)（账户设置 → 安全 → 密钥）。"
+"如果 Bitwarden 要求进行额外身份验证，请在身份验证质询字段中输入您的个人 API "
+"密钥客户端密钥 (client secret)（账户设置 → 安全 → 密钥）。"
 
 #: src/sshpilot/bitwarden_setup.py:795
 #: src/sshpilot/gtk/secret_status_messages.py:35
@@ -924,13 +949,17 @@ msgstr "Bitwarden 服务器"
 
 #: src/sshpilot/bitwarden_setup.py:809
 msgid ""
-"Choose which Bitwarden server to use before signing in. Self-hosted Vaultwarden URLs are supported.\n"
+"Choose which Bitwarden server to use before signing in. Self-hosted "
+"Vaultwarden URLs are supported.\n"
 "\n"
-"CAs from the system trust store are trusted automatically. For a CA outside it, set NODE_EXTRA_CA_CERTS to your bundle in the environment before signing in."
+"CAs from the system trust store are trusted automatically. For a CA outside "
+"it, set NODE_EXTRA_CA_CERTS to your bundle in the environment before signing "
+"in."
 msgstr ""
 "登录前选择要使用的 Bitwarden 服务器。支持自建 Vaultwarden URL。\n"
 "\n"
-"系统信任存储中的 CA 会自动信任。对于信任存储外的 CA，请在登录前将环境中的 NODE_EXTRA_CA_CERTS 设置为您的证书捆绑包。"
+"系统信任存储中的 CA 会自动信任。对于信任存储外的 CA，请在登录前将环境中的 "
+"NODE_EXTRA_CA_CERTS 设置为您的证书捆绑包。"
 
 #: src/sshpilot/bitwarden_setup.py:817
 msgid "Bitwarden Cloud (US — default)"
@@ -950,7 +979,7 @@ msgstr "返回"
 
 #: src/sshpilot/bitwarden_setup.py:1001 src/sshpilot/bitwarden_setup.py:1239
 #: src/sshpilot/bitwarden_setup.py:1383 src/sshpilot/bitwarden_setup.py:1456
-#: src/sshpilot/preferences.py:3432 src/sshpilot/preferences.py:3568
+#: src/sshpilot/preferences.py:3430 src/sshpilot/preferences.py:3566
 #: src/sshpilot/window_dialogs.py:831
 msgid "Bitwarden"
 msgstr "Bitwarden"
@@ -1009,7 +1038,9 @@ msgid "Two-step login"
 msgstr "两步登录"
 
 #: src/sshpilot/bitwarden_setup.py:1077
-msgid "Choose your two-step login method. The verification code is requested securely by the daemon."
+msgid ""
+"Choose your two-step login method. The verification code is requested "
+"securely by the daemon."
 msgstr "选择您的两步登录方式。验证码由守护进程安全请求。"
 
 #: src/sshpilot/bitwarden_setup.py:1080
@@ -1025,7 +1056,9 @@ msgid "Sign in with API key"
 msgstr "使用 API 密钥登录"
 
 #: src/sshpilot/bitwarden_setup.py:1137
-msgid "Enter your personal API key client ID. The client secret is requested securely by the daemon."
+msgid ""
+"Enter your personal API key client ID. The client secret is requested "
+"securely by the daemon."
 msgstr "输入您的个人 API 密钥客户端 ID。客户端密钥由守护进程安全请求。"
 
 #: src/sshpilot/bitwarden_setup.py:1139
@@ -1037,7 +1070,9 @@ msgid "Sign in with SSO"
 msgstr "使用 SSO 登录"
 
 #: src/sshpilot/bitwarden_setup.py:1180
-msgid "SSO opens in your web browser. Leave the organization identifier empty for the default SSO flow."
+msgid ""
+"SSO opens in your web browser. Leave the organization identifier empty for "
+"the default SSO flow."
 msgstr "SSO 将在您的网络浏览器中打开。留空组织标识符可使用默认 SSO 流程。"
 
 #: src/sshpilot/bitwarden_setup.py:1182
@@ -1065,7 +1100,8 @@ msgid "Server configuration failed"
 msgstr "服务器配置失败"
 
 #: src/sshpilot/bitwarden_setup.py:1261
-msgid "Could not set the Bitwarden server URL. Check the address and try again."
+msgid ""
+"Could not set the Bitwarden server URL. Check the address and try again."
 msgstr "无法设置 Bitwarden 服务器 URL。请检查地址后重试。"
 
 #: src/sshpilot/bitwarden_setup.py:1308
@@ -1074,8 +1110,11 @@ msgstr "Bitwarden 已就绪"
 
 #: src/sshpilot/bitwarden_setup.py:1309
 #, python-brace-format
-msgid "The Bitwarden CLI is installed, you are signed in, and your vault is unlocked. No further setup is needed.{source}"
-msgstr "Bitwarden CLI 已安装，您已登录，且保管库已解锁。无需进一步设置。{source}"
+msgid ""
+"The Bitwarden CLI is installed, you are signed in, and your vault is "
+"unlocked. No further setup is needed.{source}"
+msgstr ""
+"Bitwarden CLI 已安装，您已登录，且保管库已解锁。无需进一步设置。{source}"
 
 #: src/sshpilot/bitwarden_setup.py:1321
 msgid "Vault locked"
@@ -1095,7 +1134,9 @@ msgid "Not signed in"
 msgstr "未登录"
 
 #: src/sshpilot/bitwarden_setup.py:1342
-msgid "The Bitwarden CLI is installed but you are not signed in. Continue to sign in?"
+msgid ""
+"The Bitwarden CLI is installed but you are not signed in. Continue to sign "
+"in?"
 msgstr "Bitwarden CLI 已安装，但您尚未登录。是否继续登录？"
 
 #: src/sshpilot/bitwarden_setup.py:1370 src/sshpilot/bitwarden_setup.py:1439
@@ -1103,7 +1144,7 @@ msgid "Bitwarden unavailable"
 msgstr "Bitwarden 不可用"
 
 #: src/sshpilot/bitwarden_setup.py:1371 src/sshpilot/bitwarden_setup.py:1440
-#: src/sshpilot/preferences.py:3771 src/sshpilot/rbw_setup.py:286
+#: src/sshpilot/preferences.py:3769 src/sshpilot/rbw_setup.py:286
 #: src/sshpilot/rbw_setup.py:322
 msgid "The secret-backend daemon service is not available."
 msgstr "机密后端守护进程服务不可用。"
@@ -1112,7 +1153,7 @@ msgstr "机密后端守护进程服务不可用。"
 msgid "Connecting to Bitwarden…"
 msgstr "正在连接到 Bitwarden…"
 
-#: src/sshpilot/bitwarden_setup.py:1456 src/sshpilot/preferences.py:3432
+#: src/sshpilot/bitwarden_setup.py:1456 src/sshpilot/preferences.py:3430
 msgid "Checking Bitwarden…"
 msgstr "正在检查 Bitwarden…"
 
@@ -1124,7 +1165,9 @@ msgstr "未找到 Bitwarden CLI"
 #: src/sshpilot/bitwarden_setup.py:1500
 #, python-brace-format
 msgid ""
-"Install the Bitwarden CLI (the “bw” command) and try again. Use “Set up Bitwarden…” in Preferences to download the official binary automatically, or get it from:\n"
+"Install the Bitwarden CLI (the “bw” command) and try again. Use “Set up "
+"Bitwarden…” in Preferences to download the official binary automatically, or "
+"get it from:\n"
 "\n"
 "  {url}\n"
 "\n"
@@ -1132,9 +1175,11 @@ msgid ""
 "\n"
 "    {path}\n"
 "\n"
-"For self-hosted or EU cloud, set the server in the setup wizard before signing in."
+"For self-hosted or EU cloud, set the server in the setup wizard before "
+"signing in."
 msgstr ""
-"请安装 Bitwarden CLI（“bw”命令）后重试。使用首选项中的“设置 Bitwarden…”自动下载官方二进制文件，或从此处获取：\n"
+"请安装 Bitwarden CLI（“bw”命令）后重试。使用首选项中的“设置 Bitwarden…”自动下"
+"载官方二进制文件，或从此处获取：\n"
 "\n"
 "  {url}\n"
 "\n"
@@ -1230,7 +1275,7 @@ msgstr "交互式终端"
 msgid "Open terminal sessions for commands that require a PTY or Ctrl+C"
 msgstr "为需要 PTY 或 Ctrl+C 的命令打开终端会话"
 
-#: src/sshpilot/command_blocks.py:1158 src/sshpilot/preferences.py:2765
+#: src/sshpilot/command_blocks.py:1158 src/sshpilot/preferences.py:2763
 #: src/sshpilot/shortcut_editor.py:72 src/sshpilot/welcome_page.py:110
 #: src/sshpilot/window.py:3531 src/sshpilot/window_help.py:170
 msgid "Command Snippets"
@@ -1484,7 +1529,7 @@ msgid "Added"
 msgstr "已添加"
 
 #: src/sshpilot/connection_dialog.py:1364
-#: src/sshpilot/connection_dialog.py:1514 src/sshpilot/preferences.py:5133
+#: src/sshpilot/connection_dialog.py:1514 src/sshpilot/preferences.py:5131
 msgid "Remove"
 msgstr "移除"
 
@@ -1527,8 +1572,8 @@ msgid "Commands"
 msgstr "命令"
 
 #: src/sshpilot/connection_dialog.py:1980
-#: src/sshpilot/connection_dialog.py:4130 src/sshpilot/preferences.py:2303
-#: src/sshpilot/preferences.py:2766
+#: src/sshpilot/connection_dialog.py:4130 src/sshpilot/preferences.py:2301
+#: src/sshpilot/preferences.py:2764
 msgid "Advanced"
 msgstr "高级"
 
@@ -1640,7 +1685,7 @@ msgstr "认证方式"
 msgid "Key-based"
 msgstr "基于密钥"
 
-#: src/sshpilot/connection_dialog.py:3463 src/sshpilot/preferences.py:2902
+#: src/sshpilot/connection_dialog.py:3463 src/sshpilot/preferences.py:2900
 msgid "Automatic"
 msgstr "自动"
 
@@ -1839,8 +1884,12 @@ msgid "Pick from existing tags"
 msgstr "从已有标签中选择"
 
 #: src/sshpilot/connection_dialog.py:3746
-msgid "Optional. Set MAC address to wake this host from the context menu. Host must be on the same subnet for detection."
-msgstr "可选。设置 MAC 地址以便从上下文菜单中唤醒此主机。主机必须位于同一子网中以进行检测。"
+msgid ""
+"Optional. Set MAC address to wake this host from the context menu. Host must "
+"be on the same subnet for detection."
+msgstr ""
+"可选。设置 MAC 地址以便从上下文菜单中唤醒此主机。主机必须位于同一子网中以进行"
+"检测。"
 
 #: src/sshpilot/connection_dialog.py:3748
 msgid "MAC address"
@@ -1984,8 +2033,10 @@ msgid ""
 "Run a command automatically on connect.\n"
 "\n"
 "• Pre-Connection Command: Runs locally before connecting.\n"
-"• Local Command: Runs on your machine after connection (requires PermitLocalCommand).\n"
-"• Remote Command: Runs on the remote host (RequestTTY is configured separately)."
+"• Local Command: Runs on your machine after connection (requires "
+"PermitLocalCommand).\n"
+"• Remote Command: Runs on the remote host (RequestTTY is configured "
+"separately)."
 msgstr ""
 "在连接时自动运行命令。\n"
 "\n"
@@ -2059,19 +2110,30 @@ msgid "Saving passwords and passphrases to secure storage…"
 msgstr "正在将密码和口令保存到安全存储…"
 
 #: src/sshpilot/connection_dialog.py:4768
-msgid "The connection settings were saved, but secure storage did not answer in time. The password may have been stored anyway — reopen the connection to check before saving it again."
-msgstr "连接设置已保存，但安全存储未及时响应。密码可能仍已保存 — 请在重新保存前重新打开连接进行检查。"
+msgid ""
+"The connection settings were saved, but secure storage did not answer in "
+"time. The password may have been stored anyway — reopen the connection to "
+"check before saving it again."
+msgstr ""
+"连接设置已保存，但安全存储未及时响应。密码可能仍已保存 — 请在重新保存前重新打"
+"开连接进行检查。"
 
 #: src/sshpilot/connection_dialog.py:4832
-msgid "The connection settings were saved, but secure storage rejected a password or passphrase. Please try saving again."
+msgid ""
+"The connection settings were saved, but secure storage rejected a password "
+"or passphrase. Please try saving again."
 msgstr "连接设置已保存，但安全存储拒绝了密码或口令。请尝试重新保存。"
 
 #: src/sshpilot/connection_dialog.py:4924
-msgid "The connection could not be loaded from the service. You can retry or close the editor."
+msgid ""
+"The connection could not be loaded from the service. You can retry or close "
+"the editor."
 msgstr "无法从服务加载连接。您可以重试或关闭编辑器。"
 
 #: src/sshpilot/connection_dialog.py:4927
-msgid "The connection could not be loaded from the service. Please close the editor and try again."
+msgid ""
+"The connection could not be loaded from the service. Please close the editor "
+"and try again."
 msgstr "无法从服务加载连接。请关闭编辑器并重试。"
 
 #: src/sshpilot/connection_dialog.py:4931
@@ -2557,7 +2619,8 @@ msgstr ""
 
 #: src/sshpilot/daemon_terminal_policy.py:277
 msgid ""
-"The running SSH Pilot service is incompatible with this application version.\n"
+"The running SSH Pilot service is incompatible with this application "
+"version.\n"
 "Restart or upgrade the service.\n"
 "The connection was not opened in legacy mode."
 msgstr ""
@@ -2702,12 +2765,21 @@ msgstr ""
 "ssh 二进制程序可能不可用，或者连接尚未保存。"
 
 #: src/sshpilot/effective_config_dialog.py:229
-msgid "No differences — what this connection's Host block resolves to matches what SSH will actually use. Choose “Show full configuration” to inspect every setting."
-msgstr "无差异 — 此连接的 Host 块解析结果与 SSH 实际使用的设置相匹配。选择“显示完整配置”可检查每项设置。"
+msgid ""
+"No differences — what this connection's Host block resolves to matches what "
+"SSH will actually use. Choose “Show full configuration” to inspect every "
+"setting."
+msgstr ""
+"无差异 — 此连接的 Host 块解析结果与 SSH 实际使用的设置相匹配。选择“显示完整配"
+"置”可检查每项设置。"
 
 #: src/sshpilot/effective_config_dialog.py:241
-msgid "What this connection's Host block resolves to differs from what SSH will actually use. SSH applies the effective values shown below."
-msgstr "此连接的 Host 块解析结果与 SSH 实际使用的设置不同。SSH 将应用下方显示的有效值。"
+msgid ""
+"What this connection's Host block resolves to differs from what SSH will "
+"actually use. SSH applies the effective values shown below."
+msgstr ""
+"此连接的 Host 块解析结果与 SSH 实际使用的设置不同。SSH 将应用下方显示的有效"
+"值。"
 
 #: src/sshpilot/effective_config_dialog.py:245
 msgid "Settings that differ"
@@ -2922,7 +2994,7 @@ msgid "Created"
 msgstr "创建时间"
 
 #: src/sshpilot/file_manager/properties_dialog.py:353
-#: src/sshpilot/preferences.py:4797 src/sshpilot/preferences.py:4866
+#: src/sshpilot/preferences.py:4795 src/sshpilot/preferences.py:4864
 msgid "Permissions"
 msgstr "权限"
 
@@ -3035,7 +3107,9 @@ msgstr "未为此连接配置容器。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:19
 #, python-brace-format
-msgid "The '{runtime}' program is not installed. Install it to use container connections."
+msgid ""
+"The '{runtime}' program is not installed. Install it to use container "
+"connections."
 msgstr "未安装“{runtime}”程序。请安装它以使用容器连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:22
@@ -3044,13 +3118,19 @@ msgstr "未为此连接配置 Pod。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:25
 #, python-brace-format
-msgid "The '{program}' program is not installed. Install it to use Kubernetes connections."
+msgid ""
+"The '{program}' program is not installed. Install it to use Kubernetes "
+"connections."
 msgstr "未安装“{program}”程序。请安装它以使用 Kubernetes 连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:28
 #, python-brace-format
-msgid "The '{client_program}' program is not installed. Install it (and '{server_program}' on the host) to use Mosh connections."
-msgstr "未安装“{client_program}”程序。请安装它（以及主机上的“{server_program}”）以使用 Mosh 连接。"
+msgid ""
+"The '{client_program}' program is not installed. Install it (and "
+"'{server_program}' on the host) to use Mosh connections."
+msgstr ""
+"未安装“{client_program}”程序。请安装它（以及主机上的“{server_program}”）以使"
+"用 Mosh 连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:32
 msgid "No host is configured for this connection."
@@ -3071,23 +3151,39 @@ msgstr "未为此连接配置串口设备。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:44
 #, python-brace-format
-msgid "Only '{fallback_program}' is available, which cannot set hardware ({flow}) flow control. Install '{preferred_program}' to use this connection."
-msgstr "仅“{fallback_program}”可用，它无法设置硬件 ({flow}) 流控。请安装“{preferred_program}”以使用此连接。"
+msgid ""
+"Only '{fallback_program}' is available, which cannot set hardware ({flow}) "
+"flow control. Install '{preferred_program}' to use this connection."
+msgstr ""
+"仅“{fallback_program}”可用，它无法设置硬件 ({flow}) 流控。请安"
+"装“{preferred_program}”以使用此连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:48
 #, python-brace-format
-msgid "Only '{fallback_program}' is available, which cannot set {databits} data bits. Install '{preferred_program}' to use this connection."
-msgstr "仅“{fallback_program}”可用，它无法设置 {databits} 位数据位。请安装“{preferred_program}”以使用此连接。"
+msgid ""
+"Only '{fallback_program}' is available, which cannot set {databits} data "
+"bits. Install '{preferred_program}' to use this connection."
+msgstr ""
+"仅“{fallback_program}”可用，它无法设置 {databits} 位数据位。请安"
+"装“{preferred_program}”以使用此连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:52
 #, python-brace-format
-msgid "Only '{fallback_program}' is available, which cannot set hardware ({flow}) flow control or {databits} data bits. Install '{preferred_program}' to use this connection."
-msgstr "仅“{fallback_program}”可用，它无法设置硬件 ({flow}) 流控或 {databits} 位数据位。请安装“{preferred_program}”以使用此连接。"
+msgid ""
+"Only '{fallback_program}' is available, which cannot set hardware ({flow}) "
+"flow control or {databits} data bits. Install '{preferred_program}' to use "
+"this connection."
+msgstr ""
+"仅“{fallback_program}”可用，它无法设置硬件 ({flow}) 流控或 {databits} 位数据"
+"位。请安装“{preferred_program}”以使用此连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:57
 #, python-brace-format
-msgid "Neither '{preferred_program}' nor '{fallback_program}' is installed. Install one to use serial connections."
-msgstr "未安装“{preferred_program}”和“{fallback_program}”。请安装其一以使用串口连接。"
+msgid ""
+"Neither '{preferred_program}' nor '{fallback_program}' is installed. Install "
+"one to use serial connections."
+msgstr ""
+"未安装“{preferred_program}”和“{fallback_program}”。请安装其一以使用串口连接。"
 
 #: src/sshpilot/gtk/plugin_session_failure_messages.py:64
 #: src/sshpilot/plugins/builtin/mosh_protocol/__init__.py:52
@@ -3125,7 +3221,9 @@ msgid "The SCP process could not be started."
 msgstr "无法启动 SCP 进程。"
 
 #: src/sshpilot/gtk/scp_failure_messages.py:37
-msgid "Could not start an SFTP session on the remote host. The remote SSH server may not have an SFTP server enabled."
+msgid ""
+"Could not start an SFTP session on the remote host. The remote SSH server "
+"may not have an SFTP server enabled."
 msgstr "无法在远程主机上启动 SFTP 会话。远程 SSH 服务器可能未启用 SFTP 服务。"
 
 #: src/sshpilot/gtk/scp_failure_messages.py:41
@@ -3160,7 +3258,9 @@ msgid "Authentication challenge"
 msgstr "认证质询"
 
 #: src/sshpilot/gtk/secrets_interaction_presenter.py:39
-msgid "Enter the Bitwarden API client secret to complete the authentication challenge"
+msgid ""
+"Enter the Bitwarden API client secret to complete the authentication "
+"challenge"
 msgstr "输入 Bitwarden API 客户端密钥以完成认证质询"
 
 #: src/sshpilot/gtk/secrets_interaction_presenter.py:44
@@ -3461,15 +3561,20 @@ msgstr "Bitwarden 不可用于备份"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:26
 #, python-brace-format
-msgid "This backup is {length} characters — larger than the Bitwarden note limit ({limit})."
-msgstr "此备份共有 {length} 个字符 — 超过了 Bitwarden 安全笔记的上限 ({limit})。"
+msgid ""
+"This backup is {length} characters — larger than the Bitwarden note limit "
+"({limit})."
+msgstr ""
+"此备份共有 {length} 个字符 — 超过了 Bitwarden 安全笔记的上限 ({limit})。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:29
 msgid "The backup is too large for a Bitwarden note."
 msgstr "备份过大，无法存入 Bitwarden 安全笔记。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:32
-msgid "Leaving out the largest part, or exporting fewer connections, may bring it under the limit."
+msgid ""
+"Leaving out the largest part, or exporting fewer connections, may bring it "
+"under the limit."
 msgstr "不包含最大部分，或导出较少的连接，可能会使其符合限制。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:35
@@ -3520,7 +3625,9 @@ msgid "The backup could not be imported"
 msgstr "无法导入备份"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:68
-msgid "The selected secret backend does not persist secrets (agent); no credentials were restored."
+msgid ""
+"The selected secret backend does not persist secrets (agent); no credentials "
+"were restored."
 msgstr "选定的机密后端不持久化机密 (agent)；未恢复任何凭据。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:71
@@ -3578,8 +3685,12 @@ msgstr "无法在服务器上创建或写入 {directory}。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:106
 #, python-brace-format
-msgid "Not enough free space on the server: need ~{required}, only {available} available in {directory}."
-msgstr "服务器上的可用空间不足：需要约 {required}，而在 {directory} 中仅有 {available} 可用。"
+msgid ""
+"Not enough free space on the server: need ~{required}, only {available} "
+"available in {directory}."
+msgstr ""
+"服务器上的可用空间不足：需要约 {required}，而在 {directory} 中仅有 "
+"{available} 可用。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:109
 msgid "Failed to write the backup to the server."
@@ -3644,7 +3755,9 @@ msgid "Could not restore non-SSH connections, groups, or metadata."
 msgstr "无法恢复非 SSH 连接、分组或元数据。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:152
-msgid "The connection data in this backup uses an unsupported version and was skipped."
+msgid ""
+"The connection data in this backup uses an unsupported version and was "
+"skipped."
 msgstr "此备份中的连接数据使用了不受支持的版本，已被跳过。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:155
@@ -3741,14 +3854,20 @@ msgstr[0] "其中大部分是 {label}（{cost} 个字符）。"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:215
 #, python-brace-format
-msgid "{count} SSH config file outside ~/.ssh was not included (system or shared file): {paths}"
-msgid_plural "{count} SSH config files outside ~/.ssh were not included (system or shared files): {paths}"
-msgstr[0] "未包含 ~/.ssh 之外的 {count} 个 SSH 配置文件（系统或共享文件）：{paths}"
+msgid ""
+"{count} SSH config file outside ~/.ssh was not included (system or shared "
+"file): {paths}"
+msgid_plural ""
+"{count} SSH config files outside ~/.ssh were not included (system or shared "
+"files): {paths}"
+msgstr[0] ""
+"未包含 ~/.ssh 之外的 {count} 个 SSH 配置文件（系统或共享文件）：{paths}"
 
 #: src/sshpilot/gtk/secret_transfer_messages.py:221
 #, python-brace-format
 msgid "{count} referenced key file was missing and not included: {paths}"
-msgid_plural "{count} referenced key files were missing and not included: {paths}"
+msgid_plural ""
+"{count} referenced key files were missing and not included: {paths}"
 msgstr[0] "{count} 个引用的密钥文件缺失且未包含：{paths}"
 
 #: src/sshpilot/host_picker.py:38
@@ -3764,8 +3883,11 @@ msgid "Remove this entry"
 msgstr "移除此条目"
 
 #: src/sshpilot/known_hosts_editor.py:269
-msgid "The known-hosts file changed on disk. Your list has been refreshed — review it before removing entries again."
-msgstr "磁盘上的 known_hosts 文件已更改。您的列表已刷新 — 请在重新移除条目之前核对。"
+msgid ""
+"The known-hosts file changed on disk. Your list has been refreshed — review "
+"it before removing entries again."
+msgstr ""
+"磁盘上的 known_hosts 文件已更改。您的列表已刷新 — 请在重新移除条目之前核对。"
 
 #. Show the message and start exactly one reload; keep the controls
 #. disabled until that reload finishes. Never retry the mutation.
@@ -3829,7 +3951,8 @@ msgstr "切换完整文件"
 msgid ""
 "No log file at {path} yet.\n"
 "\n"
-"Use the app for a moment and refresh — entries will appear as soon as something is logged."
+"Use the app for a moment and refresh — entries will appear as soon as "
+"something is logged."
 msgstr ""
 "{path} 处尚无日志文件。\n"
 "\n"
@@ -3840,7 +3963,9 @@ msgid "(log is empty)"
 msgstr "（日志为空）"
 
 #: src/sshpilot/log_viewer.py:708
-msgid "No lines match the current filters. Try lowering the level filter or clearing the search box."
+msgid ""
+"No lines match the current filters. Try lowering the level filter or "
+"clearing the search box."
 msgstr "没有符合当前过滤条件的行。请尝试降低级别过滤器或清空搜索框。"
 
 #: src/sshpilot/log_viewer.py:743
@@ -3877,7 +4002,9 @@ msgstr "已复制 — 请将其粘贴到您的错误报告中。"
 
 #: src/sshpilot/log_viewer.py:1109
 #: src/sshpilot/resources/ui/log_viewer_window.ui:53
-msgid "Log lines may contain hostnames, usernames, and file paths. Review before sharing."
+msgid ""
+"Log lines may contain hostnames, usernames, and file paths. Review before "
+"sharing."
 msgstr "日志行可能包含主机名、用户名和文件路径。分享前请核对。"
 
 #: src/sshpilot/macos_menubar.py:51 src/sshpilot/sidebar.py:4094
@@ -4037,7 +4164,7 @@ msgid "Help"
 msgstr "帮助"
 
 #: src/sshpilot/omni_search.py:58 src/sshpilot/welcome_page.py:107
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:725
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:730
 msgid "SFTP File Manager"
 msgstr "SFTP 文件管理器"
 
@@ -4145,8 +4272,11 @@ msgid "Command (optional)"
 msgstr "命令（可选）"
 
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:333
-msgid "Parsed like a shell line; quotes are respected and each argument is passed safely (not run through a remote shell)"
-msgstr "像 shell 命令行一样解析；保留引号，安全传递每个参数（不通过远程 shell 运行）"
+msgid ""
+"Parsed like a shell line; quotes are respected and each argument is passed "
+"safely (not run through a remote shell)"
+msgstr ""
+"像 shell 命令行一样解析；保留引号，安全传递每个参数（不通过远程 shell 运行）"
 
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:338
 msgid "Ports (host : container)"
@@ -4378,7 +4508,8 @@ msgid "System prune"
 msgstr "系统清理"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_images.py:34
-msgid "docker system prune -f (dangling images, stopped containers, unused networks)"
+msgid ""
+"docker system prune -f (dangling images, stopped containers, unused networks)"
 msgstr "docker system prune -f（虚悬镜像、已停止的容器、未使用的网络）"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_images.py:38
@@ -4418,8 +4549,12 @@ msgid "Prune unused volumes?"
 msgstr "清理未使用的卷？"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_images.py:213
-msgid "Removes ALL volumes not used by a container — this can delete orphaned database data permanently. Type PRUNE to confirm."
-msgstr "移除所有未被容器使用的卷 — 这可能会永久删除孤立的数据库数据。输入 PRUNE 以确认。"
+msgid ""
+"Removes ALL volumes not used by a container — this can delete orphaned "
+"database data permanently. Type PRUNE to confirm."
+msgstr ""
+"移除所有未被容器使用的卷 — 这可能会永久删除孤立的数据库数据。输入 PRUNE 以确"
+"认。"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_listings.py:97
 msgid "Remove volume?"
@@ -4819,7 +4954,8 @@ msgid "Terminal Shortcut Pass-through"
 msgstr "终端快捷键直通"
 
 #: src/sshpilot/preferences.py:613
-msgid "Disable all keyboard shortcuts, pass all key events directly to terminal"
+msgid ""
+"Disable all keyboard shortcuts, pass all key events directly to terminal"
 msgstr "禁用所有键盘快捷键，将所有按键事件直接传递给终端"
 
 #: src/sshpilot/preferences.py:622
@@ -4835,7 +4971,8 @@ msgid "Suggest from remote history"
 msgstr "从远程历史建议"
 
 #: src/sshpilot/preferences.py:635
-msgid "Also fetch the remote host's shell history over SSH (applies to new tabs)"
+msgid ""
+"Also fetch the remote host's shell history over SSH (applies to new tabs)"
 msgstr "还通过 SSH 获取远程主机的 shell 历史记录（应用于新标签页）"
 
 #: src/sshpilot/preferences.py:650
@@ -4843,7 +4980,9 @@ msgid "Option key character input"
 msgstr "Option 键字符输入"
 
 #: src/sshpilot/preferences.py:652
-msgid "Send Option-generated characters directly without ESC prefix (fixes international keyboard layouts)"
+msgid ""
+"Send Option-generated characters directly without ESC prefix (fixes "
+"international keyboard layouts)"
 msgstr "直接发送 Option 生成的字符而不带 ESC 前缀（修复国际键盘布局）"
 
 #. Mouse behavior group
@@ -4864,8 +5003,12 @@ msgid "Paste on right-click"
 msgstr "右键点击时粘贴"
 
 #: src/sshpilot/preferences.py:681
-msgid "Right-click pastes; Shift+right-click opens the menu. Disabled automatically while a remote app (htop, vim, tmux) is using the mouse."
-msgstr "右键点击粘贴；Shift+右键点击打开菜单。在远程应用（htop、vim、tmux）使用鼠标时自动禁用。"
+msgid ""
+"Right-click pastes; Shift+right-click opens the menu. Disabled automatically "
+"while a remote app (htop, vim, tmux) is using the mouse."
+msgstr ""
+"右键点击粘贴；Shift+右键点击打开菜单。在远程应用（htop、vim、tmux）使用鼠标时"
+"自动禁用。"
 
 #: src/sshpilot/preferences.py:698
 msgid "Preferred Terminal"
@@ -4937,7 +5080,8 @@ msgid "Daemon idle shutdown (seconds)"
 msgstr "守护进程空闲关闭时间（秒）"
 
 #: src/sshpilot/preferences.py:854
-msgid "Exit when idle with no clients or live resources. 0 keeps the daemon running."
+msgid ""
+"Exit when idle with no clients or live resources. 0 keeps the daemon running."
 msgstr "当无客户端或活动资源且空闲时退出。0 表示保持守护进程持续运行。"
 
 #: src/sshpilot/preferences.py:862
@@ -4953,10 +5097,12 @@ msgid "Restart daemon"
 msgstr "重启守护进程"
 
 #: src/sshpilot/preferences.py:873
-msgid "Stops the daemon and reconnects automatically. Live sessions cannot survive a restart."
+msgid ""
+"Stops the daemon and reconnects automatically. Live sessions cannot survive "
+"a restart."
 msgstr "停止守护进程并自动重新连接。活动会话在重启后无法保留。"
 
-#: src/sshpilot/preferences.py:876 src/sshpilot/preferences.py:3949
+#: src/sshpilot/preferences.py:876 src/sshpilot/preferences.py:3947
 msgid "Restart"
 msgstr "重启"
 
@@ -4966,14 +5112,14 @@ msgstr "重启"
 #. According to docs: https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1.2/class.NavigationSplitView.html
 #. Both sidebar and content must be AdwNavigationPage objects
 #. Move the existing terminal out of the main tab_view into pane 0
-#: src/sshpilot/preferences.py:890 src/sshpilot/preferences.py:2757
+#: src/sshpilot/preferences.py:890 src/sshpilot/preferences.py:2755
 #: src/sshpilot/shortcut_editor.py:252 src/sshpilot/split_view.py:411
 #: src/sshpilot/split_view.py:578 src/sshpilot/split_view.py:1078
 #: src/sshpilot/terminal.py:733 src/sshpilot/terminal.py:2908
 #: src/sshpilot/terminal_manager.py:951 src/sshpilot/terminal_manager.py:1459
 #: src/sshpilot/window.py:2346 src/sshpilot/window_tabs.py:1262
 #: src/sshpilot/window_tabs.py:1348
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:721
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:726
 msgid "Terminal"
 msgstr "终端"
 
@@ -5054,7 +5200,7 @@ msgstr "嵌套"
 msgid "Layout Preview"
 msgstr "布局预览"
 
-#: src/sshpilot/preferences.py:1140 src/sshpilot/preferences.py:2760
+#: src/sshpilot/preferences.py:1140 src/sshpilot/preferences.py:2758
 msgid "Groups"
 msgstr "分组"
 
@@ -5269,7 +5415,8 @@ msgid "When a Terminal Opens"
 msgstr "打开终端时"
 
 #: src/sshpilot/preferences.py:1503
-msgid "What happens to the sidebar when any session opens, including local terminals"
+msgid ""
+"What happens to the sidebar when any session opens, including local terminals"
 msgstr "打开任何会话（包括本地终端）时对侧边栏执行的操作"
 
 #: src/sshpilot/preferences.py:1505
@@ -5314,7 +5461,8 @@ msgid "Header Bar Buttons"
 msgstr "顶栏按钮"
 
 #: src/sshpilot/preferences.py:1620
-msgid "Show the button that hides/shows the sidebar (F9 still works when hidden)"
+msgid ""
+"Show the button that hides/shows the sidebar (F9 still works when hidden)"
 msgstr "显示隐藏/显示侧边栏的按钮（隐藏时 F9 仍有效）"
 
 #: src/sshpilot/preferences.py:1626
@@ -5351,11 +5499,11 @@ msgstr "显示提示"
 msgid "Show usage tips in a banner at the top of the window"
 msgstr "在窗口顶部横幅中显示使用提示"
 
-#: src/sshpilot/preferences.py:1671 src/sshpilot/preferences.py:2756
+#: src/sshpilot/preferences.py:1671 src/sshpilot/preferences.py:2754
 msgid "Interface"
 msgstr "界面"
 
-#: src/sshpilot/preferences.py:1687 src/sshpilot/preferences.py:2759
+#: src/sshpilot/preferences.py:1687 src/sshpilot/preferences.py:2757
 msgid "Shortcuts"
 msgstr "快捷键"
 
@@ -5379,7 +5527,8 @@ msgid "Shortcut Editor Unavailable"
 msgstr "快捷键编辑器不可用"
 
 #: src/sshpilot/preferences.py:1787
-msgid "The shortcut editor could not be loaded. Please check the logs for details."
+msgid ""
+"The shortcut editor could not be loaded. Please check the logs for details."
 msgstr "无法加载快捷键编辑器。请查看日志获取详细信息。"
 
 #. Operation mode selection
@@ -5400,8 +5549,11 @@ msgid "Isolated Mode"
 msgstr "隔离模式"
 
 #: src/sshpilot/preferences.py:1812
-msgid "SSH Pilot uses its own SSH configuration, connections, folders and host keys. Saved passwords are shared."
-msgstr "SSH Pilot 使用其自身的 SSH 配置、连接、文件夹和主机密钥。保存的密码是共享的。"
+msgid ""
+"SSH Pilot uses its own SSH configuration, connections, folders and host "
+"keys. Saved passwords are shared."
+msgstr ""
+"SSH Pilot 使用其自身的 SSH 配置、连接、文件夹和主机密钥。保存的密码是共享的。"
 
 #: src/sshpilot/preferences.py:1864
 msgid "Configuration file"
@@ -5443,15 +5595,21 @@ msgid "Logging"
 msgstr "日志记录"
 
 #: src/sshpilot/preferences.py:2011
-msgid "Controls how verbose sshPilot is in the console and the rotated log file. The command-line flags --verbose / --quiet always override this."
-msgstr "控制 sshPilot 在控制台和轮换日志文件中的详细程度。命令行选项 --verbose / --quiet 始终优先于此设置。"
+msgid ""
+"Controls how verbose sshPilot is in the console and the rotated log file. "
+"The command-line flags --verbose / --quiet always override this."
+msgstr ""
+"控制 sshPilot 在控制台和轮换日志文件中的详细程度。命令行选项 --verbose / --"
+"quiet 始终优先于此设置。"
 
 #: src/sshpilot/preferences.py:2016
 msgid "Log Level"
 msgstr "日志级别"
 
 #: src/sshpilot/preferences.py:2018
-msgid "Default is concise; switch to Debug if you're filing a bug or chasing an issue"
+msgid ""
+"Default is concise; switch to Debug if you're filing a bug or chasing an "
+"issue"
 msgstr "默认为简洁；若要报告错误或排查问题，请切换至调试"
 
 #: src/sshpilot/preferences.py:2038
@@ -5460,11 +5618,15 @@ msgstr "密码与密钥存储"
 
 #: src/sshpilot/preferences.py:2040
 msgid ""
-"Where sshPilot stores passwords and key passphrases. Switching does not migrate existing secrets.\n"
-"Note: Bitwarden/Vaultwarden keep the unlocked session token in the environment while sshPilot runs, so other programs running as your user can read the vault until you quit."
+"Where sshPilot stores passwords and key passphrases. Switching does not "
+"migrate existing secrets.\n"
+"Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
+"environment while sshPilot runs, so other programs running as your user can "
+"read the vault until you quit."
 msgstr ""
 "sshPilot 存储密码和密钥口令的位置。切换存储后端不会迁移现有保密数据。\n"
-"注意：当 sshPilot 运行时，Bitwarden/Vaultwarden 会在环境中保留已解锁的会话令牌，因此以您用户身份运行的其他程序在您退出前均可读取密码库。"
+"注意：当 sshPilot 运行时，Bitwarden/Vaultwarden 会在环境中保留已解锁的会话令"
+"牌，因此以您用户身份运行的其他程序在您退出前均可读取密码库。"
 
 #: src/sshpilot/preferences.py:2048
 msgid "Secret storage backend"
@@ -5509,7 +5671,7 @@ msgid "Checking…"
 msgstr "正在检查…"
 
 #: src/sshpilot/preferences.py:2110 src/sshpilot/preferences.py:2125
-#: src/sshpilot/preferences.py:3071 src/sshpilot/preferences.py:3190
+#: src/sshpilot/preferences.py:3069 src/sshpilot/preferences.py:3188
 msgid "Set up…"
 msgstr "设置…"
 
@@ -5533,13 +5695,22 @@ msgid "bw data directory (account/profile)"
 msgstr "bw 数据目录 (账户/配置文件)"
 
 #: src/sshpilot/preferences.py:2143
-msgid " Under Flatpak, use the host path (e.g. /home/you/.config/Bitwarden CLI) or leave empty for the host default — the app runs `bw` on the host."
-msgstr " 在 Flatpak 环境下，使用主机路径（例如 /home/you/.config/Bitwarden CLI）或留空以使用主机默认值——该应用在主机上运行 `bw`。"
+msgid ""
+" Under Flatpak, use the host path (e.g. /home/you/.config/Bitwarden CLI) or "
+"leave empty for the host default — the app runs `bw` on the host."
+msgstr ""
+" 在 Flatpak 环境下，使用主机路径（例如 /home/you/.config/Bitwarden CLI）或留"
+"空以使用主机默认值——该应用在主机上运行 `bw`。"
 
 #: src/sshpilot/preferences.py:2147
 #, python-brace-format
-msgid "Optional. Path to a `bw` data directory (BITWARDENCLI_APPDATA_DIR) for a specific account. Empty = the default account. Leave empty for a single Bitwarden account.{flatpak_note}"
-msgstr "可选。特定账户的 `bw` 数据目录路径 (BITWARDENCLI_APPDATA_DIR)。留空 = 默认账户。单个 Bitwarden 账户请留空。{flatpak_note}"
+msgid ""
+"Optional. Path to a `bw` data directory (BITWARDENCLI_APPDATA_DIR) for a "
+"specific account. Empty = the default account. Leave empty for a single "
+"Bitwarden account.{flatpak_note}"
+msgstr ""
+"可选。特定账户的 `bw` 数据目录路径 (BITWARDENCLI_APPDATA_DIR)。留空 = 默认账"
+"户。单个 Bitwarden 账户请留空。{flatpak_note}"
 
 #: src/sshpilot/preferences.py:2156
 msgid "Choose data directory"
@@ -5557,7 +5728,7 @@ msgstr "选择数据库文件"
 msgid "Key file (optional)"
 msgstr "密钥文件（可选）"
 
-#: src/sshpilot/preferences.py:2186 src/sshpilot/preferences.py:3716
+#: src/sshpilot/preferences.py:2186 src/sshpilot/preferences.py:3714
 msgid "Choose key file"
 msgstr "选择密钥文件"
 
@@ -5566,7 +5737,8 @@ msgid "Vault lock timeout (minutes)"
 msgstr "密码库锁定超时（分钟）"
 
 #: src/sshpilot/preferences.py:2197
-msgid "Re-ask for the master password after this idle time. 0 = until app exits."
+msgid ""
+"Re-ask for the master password after this idle time. 0 = until app exits."
 msgstr "在此空闲时间后重新索取主密码。0 = 直到应用程序退出。"
 
 #. Forget a remembered master password (saved in the OS keyring via the unlock
@@ -5585,7 +5757,9 @@ msgid "No secret storage"
 msgstr "无密码与密钥存储"
 
 #: src/sshpilot/preferences.py:2222
-msgid "Passwords and passphrases are not saved by sshPilot. Use ssh-agent and SSH's own prompts instead."
+msgid ""
+"Passwords and passphrases are not saved by sshPilot. Use ssh-agent and SSH's "
+"own prompts instead."
 msgstr "sshPilot 不保存密码和口令。请改用 ssh-agent 和 SSH 自身的提示。"
 
 #: src/sshpilot/preferences.py:2239
@@ -5593,242 +5767,256 @@ msgid "SSH Identity"
 msgstr "SSH 身份"
 
 #: src/sshpilot/preferences.py:2241
-msgid "Default identity provider whose agent/keys are offered to connections. The per-connection key is set on each connection (IdentityFile); this is the global default."
-msgstr "为连接提供代理/密钥的默认身份提供程序。每个连接的特定密钥在各连接中设置 (IdentityFile)；此为全局默认设置。"
+msgid "Default identity provider."
+msgstr "默认身份提供程序。"
 
-#: src/sshpilot/preferences.py:2247
+#: src/sshpilot/preferences.py:2245
 msgid "Default SSH agent"
 msgstr "默认 SSH 代理"
 
-#: src/sshpilot/preferences.py:2256
+#: src/sshpilot/preferences.py:2254
 msgid "1Password"
 msgstr "1Password"
 
-#: src/sshpilot/preferences.py:2266
+#: src/sshpilot/preferences.py:2264
 msgid "Automatic (system ssh-agent)"
 msgstr "自动（系统 ssh-agent）"
 
-#: src/sshpilot/preferences.py:2270 src/sshpilot/preferences.py:2275
+#: src/sshpilot/preferences.py:2268 src/sshpilot/preferences.py:2273
 #, python-brace-format
 msgid "{provider} (unavailable)"
 msgstr "{provider}（不可用）"
 
-#: src/sshpilot/preferences.py:2272
+#: src/sshpilot/preferences.py:2270
 msgid "Custom socket…"
 msgstr "自定义套接字…"
 
-#: src/sshpilot/preferences.py:2290
+#: src/sshpilot/preferences.py:2288
 msgid "Custom agent socket (IdentityAgent)"
 msgstr "自定义代理套接字 (IdentityAgent)"
 
-#: src/sshpilot/preferences.py:2314 src/sshpilot/preferences.py:2762
+#: src/sshpilot/preferences.py:2312 src/sshpilot/preferences.py:2760
 msgid "Security & Credentials"
 msgstr "安全与凭据"
 
-#: src/sshpilot/preferences.py:2426
+#: src/sshpilot/preferences.py:2424
 msgid "Custom SSH Options"
 msgstr "自定义 SSH 选项"
 
-#: src/sshpilot/preferences.py:2428
-msgid "These settings apply to all connections and override values from ~/.ssh/config. Explicit per-connection settings always win."
-msgstr "这些设置适用于所有连接，并会覆盖 ~/.ssh/config 中的值。显式针对每个连接的设置始终优先。"
+#: src/sshpilot/preferences.py:2426
+msgid ""
+"These settings apply to all connections and override values from ~/.ssh/"
+"config. Explicit per-connection settings always win."
+msgstr ""
+"这些设置适用于所有连接，并会覆盖 ~/.ssh/config 中的值。显式针对每个连接的设置"
+"始终优先。"
 
-#: src/sshpilot/preferences.py:2432
+#: src/sshpilot/preferences.py:2430
 msgid "SSH Settings"
 msgstr "SSH 设置"
 
-#: src/sshpilot/preferences.py:2438
+#: src/sshpilot/preferences.py:2436
 msgid "Connect Timeout (s)"
 msgstr "连接超时（秒）"
 
-#: src/sshpilot/preferences.py:2444
+#: src/sshpilot/preferences.py:2442
 msgid "Connection Attempts"
 msgstr "连接尝试次数"
 
-#: src/sshpilot/preferences.py:2452
+#: src/sshpilot/preferences.py:2450
 msgid "Apply default keepalive"
 msgstr "应用默认保持活动状态 (keepalive)"
 
-#: src/sshpilot/preferences.py:2454
-msgid "Detect dropped connections automatically when no ServerAlive value is set here or in ~/.ssh/config. Explicit values always win."
-msgstr "当此处或 ~/.ssh/config 中未设置 ServerAlive 值时，自动检测断开的连接。显式设置的值始终优先。"
+#: src/sshpilot/preferences.py:2452
+msgid ""
+"Detect dropped connections automatically when no ServerAlive value is set "
+"here or in ~/.ssh/config. Explicit values always win."
+msgstr ""
+"当此处或 ~/.ssh/config 中未设置 ServerAlive 值时，自动检测断开的连接。显式设"
+"置的值始终优先。"
 
-#: src/sshpilot/preferences.py:2464
+#: src/sshpilot/preferences.py:2462
 msgid "ServerAlive Interval (s)"
 msgstr "ServerAlive 间隔（秒）"
 
-#: src/sshpilot/preferences.py:2470
+#: src/sshpilot/preferences.py:2468
 msgid "ServerAlive CountMax"
 msgstr "ServerAlive 最大计数"
 
-#: src/sshpilot/preferences.py:2476
+#: src/sshpilot/preferences.py:2474
 msgid "StrictHostKeyChecking"
 msgstr "StrictHostKeyChecking"
 
-#: src/sshpilot/preferences.py:2492
+#: src/sshpilot/preferences.py:2490
 msgid "BatchMode (disable prompts)"
 msgstr "批处理模式（禁用提示）(BatchMode)"
 
-#: src/sshpilot/preferences.py:2498
+#: src/sshpilot/preferences.py:2496
 msgid "Enable Compression (-C)"
 msgstr "启用压缩 (-C)"
 
-#: src/sshpilot/preferences.py:2506
+#: src/sshpilot/preferences.py:2504
 msgid "Enable SSH connection multiplexing"
 msgstr "启用 SSH 连接复用"
 
-#: src/sshpilot/preferences.py:2508
+#: src/sshpilot/preferences.py:2506
 msgid "Reuse one connection per host (ControlMaster) for faster reconnects"
 msgstr "每个主机复用一个连接 (ControlMaster) 以实现更快的重新连接"
 
-#: src/sshpilot/preferences.py:2515
+#: src/sshpilot/preferences.py:2513
 msgid "SSH Verbosity (-v)"
 msgstr "SSH 详细输出级别 (-v)"
 
-#: src/sshpilot/preferences.py:2521
+#: src/sshpilot/preferences.py:2519
 msgid "Enable SSH Debug Logging"
 msgstr "启用 SSH 调试日志记录"
 
-#: src/sshpilot/preferences.py:2532
+#: src/sshpilot/preferences.py:2530
 msgid "Reset Advanced SSH Settings"
 msgstr "重置高级 SSH 设置"
 
-#: src/sshpilot/preferences.py:2533
+#: src/sshpilot/preferences.py:2531
 msgid "Restore all advanced SSH settings to their default values"
 msgstr "将所有高级 SSH 设置恢复为其默认值"
 
-#: src/sshpilot/preferences.py:2596 src/sshpilot/preferences.py:2758
+#: src/sshpilot/preferences.py:2594 src/sshpilot/preferences.py:2756
 msgid "File Management"
 msgstr "文件管理"
 
-#: src/sshpilot/preferences.py:2601
+#: src/sshpilot/preferences.py:2599
 msgid "File Manager Options"
 msgstr "文件管理器选项"
 
-#: src/sshpilot/preferences.py:2603
+#: src/sshpilot/preferences.py:2601
 msgid "These preferences only affect sshPilot's built-in SFTP file manager."
 msgstr "这些首选项仅影响 sshPilot 内置的 SFTP 文件管理器。"
 
-#: src/sshpilot/preferences.py:2607
+#: src/sshpilot/preferences.py:2605
 msgid "Open File Manager in Separate Window"
 msgstr "在单独窗口中打开文件管理器"
 
-#: src/sshpilot/preferences.py:2609
+#: src/sshpilot/preferences.py:2607
 msgid "Show the built-in file manager in its own window instead of a tab"
 msgstr "在独立窗口而非标签页中显示内置文件管理器"
 
-#: src/sshpilot/preferences.py:2661
+#: src/sshpilot/preferences.py:2659
 msgid "Advanced SFTP Settings"
 msgstr "高级 SFTP 设置"
 
-#: src/sshpilot/preferences.py:2663
-msgid "Fine-tune options that only apply to sshPilot's built-in SFTP file manager."
+#: src/sshpilot/preferences.py:2661
+msgid ""
+"Fine-tune options that only apply to sshPilot's built-in SFTP file manager."
 msgstr "微调仅适用于 sshPilot 内置 SFTP 文件管理器的选项。"
 
-#: src/sshpilot/preferences.py:2668
+#: src/sshpilot/preferences.py:2666
 msgid "SFTP Keepalive Interval (seconds)"
 msgstr "SFTP 保持活动间隔（秒）"
 
-#: src/sshpilot/preferences.py:2670
-msgid "How often the built-in file manager sends keepalives. Set to 0 to disable."
+#: src/sshpilot/preferences.py:2668
+msgid ""
+"How often the built-in file manager sends keepalives. Set to 0 to disable."
 msgstr "内置文件管理器发送 keepalive 的频率。设为 0 可禁用。"
 
-#: src/sshpilot/preferences.py:2685
+#: src/sshpilot/preferences.py:2683
 msgid "SFTP Keepalive Retry Limit"
 msgstr "SFTP 保持活动重试上限"
 
-#: src/sshpilot/preferences.py:2687
-msgid "Number of failed keepalives tolerated by the built-in file manager before raising an error."
+#: src/sshpilot/preferences.py:2685
+msgid ""
+"Number of failed keepalives tolerated by the built-in file manager before "
+"raising an error."
 msgstr "内置文件管理器在报错前允许失败的保持活动请求数。"
 
-#: src/sshpilot/preferences.py:2702
+#: src/sshpilot/preferences.py:2700
 msgid "SFTP Connection Timeout (seconds)"
 msgstr "SFTP 连接超时（秒）"
 
-#: src/sshpilot/preferences.py:2704
-msgid "Time allowed for the built-in file manager to establish a session; 0 uses the default."
+#: src/sshpilot/preferences.py:2702
+msgid ""
+"Time allowed for the built-in file manager to establish a session; 0 uses "
+"the default."
 msgstr "内置文件管理器建立会话所允许的时间；0 使用默认值。"
 
 #. If no internal file manager, create empty page with message
-#: src/sshpilot/preferences.py:2719
+#: src/sshpilot/preferences.py:2717
 msgid "File Manager"
 msgstr "文件管理器"
 
-#: src/sshpilot/preferences.py:2721
+#: src/sshpilot/preferences.py:2719
 msgid "File Manager Not Available"
 msgstr "文件管理器不可用"
 
-#: src/sshpilot/preferences.py:2722
+#: src/sshpilot/preferences.py:2720
 msgid "Built-in file manager is not available on this system"
 msgstr "内置文件管理器在此系统上不可用"
 
-#: src/sshpilot/preferences.py:2731 src/sshpilot/preferences.py:2763
+#: src/sshpilot/preferences.py:2729 src/sshpilot/preferences.py:2761
 msgid "Updates"
 msgstr "更新"
 
-#: src/sshpilot/preferences.py:2734
+#: src/sshpilot/preferences.py:2732
 msgid "Update Notifications"
 msgstr "更新通知"
 
-#: src/sshpilot/preferences.py:2735
+#: src/sshpilot/preferences.py:2733
 msgid "Configure how SSH Pilot checks for updates"
 msgstr "配置 SSH Pilot 如何检查更新"
 
-#: src/sshpilot/preferences.py:2739
+#: src/sshpilot/preferences.py:2737
 msgid "Check for updates on startup"
 msgstr "启动时检查更新"
 
-#: src/sshpilot/preferences.py:2740
+#: src/sshpilot/preferences.py:2738
 msgid "Automatically check for new versions when the application starts"
 msgstr "应用程序启动时自动检查新版本"
 
-#: src/sshpilot/preferences.py:2761
+#: src/sshpilot/preferences.py:2759
 msgid "SSH Options"
 msgstr "SSH 选项"
 
-#: src/sshpilot/preferences.py:2764
+#: src/sshpilot/preferences.py:2762
 msgid "Plugins"
 msgstr "插件"
 
-#: src/sshpilot/preferences.py:2906
+#: src/sshpilot/preferences.py:2904
 #, python-brace-format
 msgid "{backend} (unavailable)"
 msgstr "{backend}（不可用）"
 
-#: src/sshpilot/preferences.py:3043
+#: src/sshpilot/preferences.py:3041
 msgid "Checking rbw status…"
 msgstr "正在检查 rbw 状态…"
 
-#: src/sshpilot/preferences.py:3045
+#: src/sshpilot/preferences.py:3043
 msgid "The “rbw” command was not found."
 msgstr "未找到 “rbw” 命令。"
 
-#: src/sshpilot/preferences.py:3047
+#: src/sshpilot/preferences.py:3045
 #, python-brace-format
 msgid "Configured and unlocked as {email}."
 msgstr "已配置并作为 {email} 解锁。"
 
-#: src/sshpilot/preferences.py:3048 src/sshpilot/rbw_setup.py:138
+#: src/sshpilot/preferences.py:3046 src/sshpilot/rbw_setup.py:138
 msgid "your account"
 msgstr "您的账户"
 
-#: src/sshpilot/preferences.py:3050
+#: src/sshpilot/preferences.py:3048
 msgid "Installed but no account configured."
 msgstr "已安装但未配置账户。"
 
-#: src/sshpilot/preferences.py:3051
+#: src/sshpilot/preferences.py:3049
 msgid "Configured but the vault is locked."
 msgstr "已配置但密码库处于锁定状态。"
 
-#: src/sshpilot/preferences.py:3071 src/sshpilot/preferences.py:3194
+#: src/sshpilot/preferences.py:3069 src/sshpilot/preferences.py:3192
 msgid "Unlock…"
 msgstr "解锁…"
 
-#: src/sshpilot/preferences.py:3139
+#: src/sshpilot/preferences.py:3137
 msgid "Checking Bitwarden status…"
 msgstr "正在检查 Bitwarden 状态…"
 
-#: src/sshpilot/preferences.py:3150
+#: src/sshpilot/preferences.py:3148
 #, python-brace-format
 msgid ""
 "The “bw” command was not found.\n"
@@ -5841,107 +6029,113 @@ msgstr ""
 "sshPilot 会将 CLI 安装到：\n"
 "    {path}"
 
-#: src/sshpilot/preferences.py:3153
+#: src/sshpilot/preferences.py:3151
 msgid "The “bw” command was not found."
 msgstr "未找到 “bw” 命令。"
 
-#: src/sshpilot/preferences.py:3156
+#: src/sshpilot/preferences.py:3154
 #, python-brace-format
 msgid "Using: {path}"
 msgstr "使用：{path}"
 
-#: src/sshpilot/preferences.py:3158
+#: src/sshpilot/preferences.py:3156
 #, python-brace-format
 msgid "Signed in and vault unlocked.{path}"
 msgstr "已登录且密码库已解锁。{path}"
 
-#: src/sshpilot/preferences.py:3160
+#: src/sshpilot/preferences.py:3158
 #, python-brace-format
 msgid "CLI found but you are not signed in.{path}"
 msgstr "找到 CLI 但您尚未登录。{path}"
 
-#: src/sshpilot/preferences.py:3161
+#: src/sshpilot/preferences.py:3159
 #, python-brace-format
 msgid "CLI found but the vault is locked.{path}"
 msgstr "找到 CLI 但密码库已锁定。{path}"
 
-#: src/sshpilot/preferences.py:3192 src/sshpilot/secret_unlock_dialog.py:218
+#: src/sshpilot/preferences.py:3190 src/sshpilot/secret_unlock_dialog.py:218
 msgid "Sign in…"
 msgstr "登录…"
 
-#: src/sshpilot/preferences.py:3241
-msgid "Credentials are not persisted — ssh-agent and SSH handle authentication."
+#: src/sshpilot/preferences.py:3239
+msgid ""
+"Credentials are not persisted — ssh-agent and SSH handle authentication."
 msgstr "凭据不会持久化——由 ssh-agent 和 SSH 处理身份验证。"
 
-#: src/sshpilot/preferences.py:3245
+#: src/sshpilot/preferences.py:3243
 msgid "Uses the bw CLI. See bitwarden.com/help/cli."
 msgstr "使用 bw CLI。参见 bitwarden.com/help/cli。"
 
-#: src/sshpilot/preferences.py:3247
+#: src/sshpilot/preferences.py:3245
 msgid "Uses the rbw CLI + agent. github.com/doy/rbw"
 msgstr "使用 rbw CLI + 代理。github.com/doy/rbw"
 
-#: src/sshpilot/preferences.py:3309
+#: src/sshpilot/preferences.py:3307
 msgid "Remembered in your system keyring."
 msgstr "已在您的系统密钥环中记住。"
 
-#: src/sshpilot/preferences.py:3310
+#: src/sshpilot/preferences.py:3308
 msgid "Not saved. Use “Remember master password” when unlocking."
 msgstr "未保存。解锁时请使用“记住主密码”。"
 
-#: src/sshpilot/preferences.py:3568
+#: src/sshpilot/preferences.py:3566
 msgid "Signing out of Bitwarden…"
 msgstr "正在注销 Bitwarden…"
 
-#: src/sshpilot/preferences.py:3591
+#: src/sshpilot/preferences.py:3589
 msgid "Log out failed"
 msgstr "注销失败"
 
-#: src/sshpilot/preferences.py:3593
+#: src/sshpilot/preferences.py:3591
 msgid "Could not sign out of Bitwarden. Try running “bw logout” in a terminal."
 msgstr "无法注销 Bitwarden。请尝试在终端中运行 “bw logout”。"
 
-#: src/sshpilot/preferences.py:3638
+#: src/sshpilot/preferences.py:3636
 msgid "Choose bw data directory"
 msgstr "选择 bw 数据目录"
 
-#: src/sshpilot/preferences.py:3713
+#: src/sshpilot/preferences.py:3711
 msgid "Choose KeePass database"
 msgstr "选择 KeePass 数据库"
 
-#: src/sshpilot/preferences.py:3727 src/sshpilot/preferences.py:3779
+#: src/sshpilot/preferences.py:3725 src/sshpilot/preferences.py:3777
 msgid "Create KeePass Database"
 msgstr "创建 KeePass 数据库"
 
-#: src/sshpilot/preferences.py:3730
+#: src/sshpilot/preferences.py:3728
 msgid "KeePass database (*.kdbx)"
 msgstr "KeePass 数据库 (*.kdbx)"
 
-#: src/sshpilot/preferences.py:3751
+#: src/sshpilot/preferences.py:3749
 msgid "File already exists"
 msgstr "文件已存在"
 
-#: src/sshpilot/preferences.py:3752
-msgid "A file already exists at that path. Use the open button to use it, or choose a new name."
+#: src/sshpilot/preferences.py:3750
+msgid ""
+"A file already exists at that path. Use the open button to use it, or choose "
+"a new name."
 msgstr "该路径已存在文件。请使用打开按钮使用该文件，或选择新名称。"
 
-#: src/sshpilot/preferences.py:3770 src/sshpilot/preferences.py:3805
+#: src/sshpilot/preferences.py:3768 src/sshpilot/preferences.py:3803
 msgid "Cannot Create Database"
 msgstr "无法创建数据库"
 
-#: src/sshpilot/preferences.py:3780
-msgid "Creating the database… the master password prompt is shown by the daemon."
+#: src/sshpilot/preferences.py:3778
+msgid ""
+"Creating the database… the master password prompt is shown by the daemon."
 msgstr "正在创建数据库… 主密码提示将由守护进程显示。"
 
-#: src/sshpilot/preferences.py:3806
-msgid "Failed to create the database. Make sure pykeepass is installed and the location is writable."
+#: src/sshpilot/preferences.py:3804
+msgid ""
+"Failed to create the database. Make sure pykeepass is installed and the "
+"location is writable."
 msgstr "创建数据库失败。请确保已安装 pykeepass 且该位置可写。"
 
-#: src/sshpilot/preferences.py:3816
+#: src/sshpilot/preferences.py:3814
 msgid "Database Created"
 msgstr "数据库已创建"
 
-#: src/sshpilot/preferences.py:3817
+#: src/sshpilot/preferences.py:3815
 #, python-brace-format
 msgid ""
 "Created and unlocked:\n"
@@ -5950,79 +6144,87 @@ msgstr ""
 "已创建并解锁：\n"
 "{path}"
 
-#: src/sshpilot/preferences.py:3918
+#: src/sshpilot/preferences.py:3916
 msgid "Running a different app version — restart required"
 msgstr "正在运行不同版本的应用程序 — 需要重启"
 
-#: src/sshpilot/preferences.py:3925
+#: src/sshpilot/preferences.py:3923
 #, python-brace-format
 msgid "{state} · instance {instance} · {sessions} sessions · {clients} clients"
 msgstr "{state} · 实例 {instance} · {sessions} 个会话 · {clients} 个客户端"
 
-#: src/sshpilot/preferences.py:3937
+#: src/sshpilot/preferences.py:3935
 #, python-brace-format
 msgid "Unavailable ({error})"
 msgstr "不可用（{error}）"
 
-#: src/sshpilot/preferences.py:3942
+#: src/sshpilot/preferences.py:3940
 msgid "Restart the local daemon?"
 msgstr "重启本地守护进程？"
 
-#: src/sshpilot/preferences.py:3944
-msgid "Live terminal sessions, SFTP services, transfers, and forwards owned by this daemon will be lost. They cannot survive a restart."
-msgstr "该守护进程拥有的活动终端会话、SFTP 服务、传输和转发都将丢失。它们无法在重启后保留。"
+#: src/sshpilot/preferences.py:3942
+msgid ""
+"Live terminal sessions, SFTP services, transfers, and forwards owned by this "
+"daemon will be lost. They cannot survive a restart."
+msgstr ""
+"该守护进程拥有的活动终端会话、SFTP 服务、传输和转发都将丢失。它们无法在重启后"
+"保留。"
 
-#: src/sshpilot/preferences.py:3968
+#: src/sshpilot/preferences.py:3966
 msgid "your open terminal sessions"
 msgstr "您打开的终端会话"
 
-#: src/sshpilot/preferences.py:3969
+#: src/sshpilot/preferences.py:3967
 msgid "open file browser connections"
 msgstr "打开的文件浏览器连接"
 
-#: src/sshpilot/preferences.py:3970
+#: src/sshpilot/preferences.py:3968
 msgid "file transfers in progress"
 msgstr "正在进行的文件传输"
 
-#: src/sshpilot/preferences.py:3971
+#: src/sshpilot/preferences.py:3969
 msgid "active port forwards"
 msgstr "活动端口转发"
 
-#: src/sshpilot/preferences.py:3972
+#: src/sshpilot/preferences.py:3970
 msgid "pending prompts (passwords or verification codes)"
 msgstr "待处理的提示（密码或验证码）"
 
-#: src/sshpilot/preferences.py:3976
+#: src/sshpilot/preferences.py:3974
 msgid "unsaved live connections"
 msgstr "未保存的活动连接"
 
-#: src/sshpilot/preferences.py:3979
+#: src/sshpilot/preferences.py:3977
 #, python-brace-format
 msgid "{most}, and {last}"
 msgstr "{most}，以及 {last}"
 
-#: src/sshpilot/preferences.py:4000
+#: src/sshpilot/preferences.py:3998
 msgid "Restart SSH Pilot?"
 msgstr "重启 SSH Pilot？"
 
-#: src/sshpilot/preferences.py:4002
-msgid "The operation mode has changed. Restart to open the new configuration cleanly; until then, tabs and editors still show the previous one."
-msgstr "运行模式已更改。请重启以完全加载新配置；在此之前，标签页和编辑器仍显示之前的配置。"
+#: src/sshpilot/preferences.py:4000
+msgid ""
+"The operation mode has changed. Restart to open the new configuration "
+"cleanly; until then, tabs and editors still show the previous one."
+msgstr ""
+"运行模式已更改。请重启以完全加载新配置；在此之前，标签页和编辑器仍显示之前的"
+"配置。"
 
-#: src/sshpilot/preferences.py:4007 src/sshpilot/preferences.py:4775
+#: src/sshpilot/preferences.py:4005 src/sshpilot/preferences.py:4773
 msgid "Later"
 msgstr "稍后"
 
-#: src/sshpilot/preferences.py:4008 src/sshpilot/preferences.py:4061
-#: src/sshpilot/preferences.py:4776
+#: src/sshpilot/preferences.py:4006 src/sshpilot/preferences.py:4059
+#: src/sshpilot/preferences.py:4774
 msgid "Restart Now"
 msgstr "立即重启"
 
-#: src/sshpilot/preferences.py:4052 src/sshpilot/preferences.py:4774
+#: src/sshpilot/preferences.py:4050 src/sshpilot/preferences.py:4772
 msgid "Restart Required"
 msgstr "需要重启"
 
-#: src/sshpilot/preferences.py:4054
+#: src/sshpilot/preferences.py:4052
 #, python-brace-format
 msgid ""
 "Restarting the background service will close: {resources}.\n"
@@ -6033,367 +6235,365 @@ msgstr ""
 "\n"
 "此操作无法撤销。是否立即重启？"
 
-#: src/sshpilot/preferences.py:4084 src/sshpilot/preferences.py:4096
+#: src/sshpilot/preferences.py:4082 src/sshpilot/preferences.py:4094
 msgid "The daemon rejected the forced restart."
 msgstr "守护进程拒绝了强制重启。"
 
-#: src/sshpilot/preferences.py:4119
+#: src/sshpilot/preferences.py:4117
 msgid "Could not restart daemon"
 msgstr "无法重启守护进程"
 
-#: src/sshpilot/preferences.py:4230
+#: src/sshpilot/preferences.py:4228
 msgid "The interface language changes the next time SSH Pilot starts."
 msgstr "界面语言将在下次启动 SSH Pilot 时生效。"
 
-#: src/sshpilot/preferences.py:4483 src/sshpilot/preferences.py:4689
+#: src/sshpilot/preferences.py:4481 src/sshpilot/preferences.py:4687
 #, python-brace-format
 msgid "Incompatible (targets API v{version})"
 msgstr "不兼容（目标 API v{version}）"
 
-#: src/sshpilot/preferences.py:4485
+#: src/sshpilot/preferences.py:4483
 msgid "Required — always enabled"
 msgstr "必需 — 始终启用"
 
-#: src/sshpilot/preferences.py:4487
+#: src/sshpilot/preferences.py:4485
 msgid "Active"
 msgstr "活动"
 
-#: src/sshpilot/preferences.py:4488
+#: src/sshpilot/preferences.py:4486
 msgid "Inactive"
 msgstr "未激活"
 
-#: src/sshpilot/preferences.py:4490
+#: src/sshpilot/preferences.py:4488
 msgid "Built-in Plugins"
 msgstr "内置插件"
 
-#: src/sshpilot/preferences.py:4491
+#: src/sshpilot/preferences.py:4489
 msgid "Changes take effect after restarting SSH Pilot"
 msgstr "更改将在重启 SSH Pilot 后生效"
 
-#: src/sshpilot/preferences.py:4515
+#: src/sshpilot/preferences.py:4513
 msgid "User Plugins"
 msgstr "用户插件"
 
-#: src/sshpilot/preferences.py:4517
-msgid "Third-party plugins run with full application privileges; only enable plugins you trust. Restart required."
+#: src/sshpilot/preferences.py:4515
+msgid ""
+"Third-party plugins run with full application privileges; only enable "
+"plugins you trust. Restart required."
 msgstr "第三方插件以完整的应用程序权限运行；请仅启用您信任的插件。需要重启。"
 
-#: src/sshpilot/preferences.py:4557
+#: src/sshpilot/preferences.py:4555
 msgid "Remove plugin"
 msgstr "移除插件"
 
-#: src/sshpilot/preferences.py:4564
+#: src/sshpilot/preferences.py:4562
 msgid "No user plugins installed"
 msgstr "未安装用户插件"
 
-#: src/sshpilot/preferences.py:4573
+#: src/sshpilot/preferences.py:4571
 msgid "Available Plugins"
 msgstr "可用插件"
 
-#: src/sshpilot/preferences.py:4575
-msgid "From the SSH Pilot plugin registry. Toggling one on downloads, verifies, and installs it (restart to load)."
-msgstr "来自 SSH Pilot 插件注册表。开启插件将下载、验证并安装它（重启后加载）。"
+#: src/sshpilot/preferences.py:4573
+msgid ""
+"From the SSH Pilot plugin registry. Toggling one on downloads, verifies, and "
+"installs it (restart to load)."
+msgstr ""
+"来自 SSH Pilot 插件注册表。开启插件将下载、验证并安装它（重启后加载）。"
 
-#: src/sshpilot/preferences.py:4577
+#: src/sshpilot/preferences.py:4575
 msgid "Checking the plugin registry…"
 msgstr "正在检查插件注册表…"
 
-#: src/sshpilot/preferences.py:4625
+#: src/sshpilot/preferences.py:4623
 msgid "Couldn't reach the plugin registry"
 msgstr "无法访问插件注册表"
 
-#: src/sshpilot/preferences.py:4634
+#: src/sshpilot/preferences.py:4632
 msgid "No new plugins available"
 msgstr "没有可用的新插件"
 
-#: src/sshpilot/preferences.py:4657
+#: src/sshpilot/preferences.py:4655
 #, python-brace-format
 msgid "Update available (v{installed} → v{latest})"
 msgstr "有可用更新 (v{installed} → v{latest})"
 
-#: src/sshpilot/preferences.py:4667
+#: src/sshpilot/preferences.py:4665
 msgid "Updating…"
 msgstr "正在更新…"
 
-#: src/sshpilot/preferences.py:4671
+#: src/sshpilot/preferences.py:4669
 msgid "Update available"
 msgstr "有可用更新"
 
-#: src/sshpilot/preferences.py:4677
+#: src/sshpilot/preferences.py:4675
 #, python-brace-format
 msgid "by {author}"
 msgstr "作者：{author}"
 
-#: src/sshpilot/preferences.py:4711
+#: src/sshpilot/preferences.py:4709
 msgid "Fetching…"
 msgstr "正在获取…"
 
-#: src/sshpilot/preferences.py:4732
+#: src/sshpilot/preferences.py:4730
 msgid "Download failed"
 msgstr "下载失败"
 
-#: src/sshpilot/preferences.py:4747
+#: src/sshpilot/preferences.py:4745
 msgid "Install a plugin"
 msgstr "安装插件"
 
-#: src/sshpilot/preferences.py:4755
+#: src/sshpilot/preferences.py:4753
 msgid "From folder…"
 msgstr "来自文件夹…"
 
-#: src/sshpilot/preferences.py:4756
+#: src/sshpilot/preferences.py:4754
 msgid "From ZIP file…"
 msgstr "来自 ZIP 文件…"
 
-#: src/sshpilot/preferences.py:4802
+#: src/sshpilot/preferences.py:4800
 msgid "Declared permissions"
 msgstr "声明的权限"
 
-#: src/sshpilot/preferences.py:4844
+#: src/sshpilot/preferences.py:4842
 msgid "Plugin info"
 msgstr "插件信息"
 
-#: src/sshpilot/preferences.py:4862
+#: src/sshpilot/preferences.py:4860
 msgid "Version"
 msgstr "版本"
 
-#: src/sshpilot/preferences.py:4864
+#: src/sshpilot/preferences.py:4862
 msgid "API version"
 msgstr "API 版本"
 
-#: src/sshpilot/preferences.py:4870
+#: src/sshpilot/preferences.py:4868
 msgid "View source ↗"
 msgstr "查看源码 ↗"
 
-#: src/sshpilot/preferences.py:4874
+#: src/sshpilot/preferences.py:4872
 msgid "Source"
 msgstr "来源"
 
-#: src/sshpilot/preferences.py:4874
+#: src/sshpilot/preferences.py:4872
 msgid "unknown"
 msgstr "未知"
 
-#: src/sshpilot/preferences.py:4886
+#: src/sshpilot/preferences.py:4884
 #, python-brace-format
 msgid "{action} “{name}”?"
 msgstr "{action} “{name}”？"
 
-#: src/sshpilot/preferences.py:4887
-msgid "Plugins run with full application privileges and are not sandboxed. Only continue if you trust the source."
+#: src/sshpilot/preferences.py:4885
+msgid ""
+"Plugins run with full application privileges and are not sandboxed. Only "
+"continue if you trust the source."
 msgstr "插件以完整的应用程序权限运行，且未被沙盒化。请仅在信任其来源时继续。"
 
-#: src/sshpilot/preferences.py:4890
+#: src/sshpilot/preferences.py:4888
 msgid "Requested permissions:"
 msgstr "请求的权限："
 
-#: src/sshpilot/preferences.py:4891
+#: src/sshpilot/preferences.py:4889
 msgid "No special permissions declared."
 msgstr "未声明特殊权限。"
 
-#: src/sshpilot/preferences.py:4901
-msgid "Permissions are declared by the author for transparency; they are not enforced. Changes take effect after restarting sshPilot."
-msgstr "权限由作者声明以提高透明度；这些权限并非强制执行。更改将在重启 sshPilot 后生效。"
+#: src/sshpilot/preferences.py:4899
+msgid ""
+"Permissions are declared by the author for transparency; they are not "
+"enforced. Changes take effect after restarting sshPilot."
+msgstr ""
+"权限由作者声明以提高透明度；这些权限并非强制执行。更改将在重启 sshPilot 后生"
+"效。"
 
-#: src/sshpilot/preferences.py:4912
+#: src/sshpilot/preferences.py:4910
 msgid "SHA-256"
 msgstr "SHA-256"
 
-#: src/sshpilot/preferences.py:4925
+#: src/sshpilot/preferences.py:4923
 msgid "✓ Verified against the registry checksum"
 msgstr "✓ 已通过注册表校验和验证"
 
-#: src/sshpilot/preferences.py:4932
+#: src/sshpilot/preferences.py:4930
 msgid "Expected SHA-256 (optional)"
 msgstr "预期的 SHA-256（可选）"
 
-#: src/sshpilot/preferences.py:4947
+#: src/sshpilot/preferences.py:4945
 msgid "Checksum mismatch"
 msgstr "校验和不匹配"
 
-#: src/sshpilot/preferences.py:4948
-msgid "The archive's SHA-256 doesn't match the expected value; install cancelled."
+#: src/sshpilot/preferences.py:4946
+msgid ""
+"The archive's SHA-256 doesn't match the expected value; install cancelled."
 msgstr "归档文件的 SHA-256 与预期值不符；安装已取消。"
 
-#: src/sshpilot/preferences.py:4959
+#: src/sshpilot/preferences.py:4957
 msgid "Select plugin folder"
 msgstr "选择插件文件夹"
 
-#: src/sshpilot/preferences.py:4972
+#: src/sshpilot/preferences.py:4970
 msgid "Select plugin ZIP"
 msgstr "选择插件 ZIP"
 
-#: src/sshpilot/preferences.py:4975
+#: src/sshpilot/preferences.py:4973
 msgid "ZIP archives"
 msgstr "ZIP 归档文件"
 
-#: src/sshpilot/preferences.py:5028 src/sshpilot/preferences.py:5039
-#: src/sshpilot/preferences.py:5059 src/sshpilot/preferences.py:5063
-#: src/sshpilot/preferences.py:5066 src/sshpilot/preferences.py:5072
-#: src/sshpilot/preferences.py:5075 src/sshpilot/preferences.py:5114
+#: src/sshpilot/preferences.py:5026 src/sshpilot/preferences.py:5037
+#: src/sshpilot/preferences.py:5057 src/sshpilot/preferences.py:5061
+#: src/sshpilot/preferences.py:5064 src/sshpilot/preferences.py:5070
+#: src/sshpilot/preferences.py:5073 src/sshpilot/preferences.py:5112
 msgid "Install failed"
 msgstr "安装失败"
 
-#: src/sshpilot/preferences.py:5029
+#: src/sshpilot/preferences.py:5027
 msgid "The archive contains an unsafe path."
 msgstr "归档文件包含不安全路径。"
 
-#: src/sshpilot/preferences.py:5059
+#: src/sshpilot/preferences.py:5057
 msgid "No plugin.json found."
 msgstr "未找到 plugin.json。"
 
-#: src/sshpilot/preferences.py:5063
+#: src/sshpilot/preferences.py:5061
 #, python-brace-format
 msgid "Invalid plugin.json: {error}"
 msgstr "无效的 plugin.json：{error}"
 
-#: src/sshpilot/preferences.py:5066
+#: src/sshpilot/preferences.py:5064
 msgid "plugin.json has no 'id'."
 msgstr "plugin.json 中没有 “id”。"
 
-#: src/sshpilot/preferences.py:5068
+#: src/sshpilot/preferences.py:5066
 msgid "Incompatible plugin"
 msgstr "不兼容的插件"
 
-#: src/sshpilot/preferences.py:5069
+#: src/sshpilot/preferences.py:5067
 #, python-brace-format
 msgid "This plugin targets API v{required}, but this app provides v{provided}."
 msgstr "此插件的目标 API 为 v{required}，但此应用提供 v{provided}。"
 
-#: src/sshpilot/preferences.py:5072
+#: src/sshpilot/preferences.py:5070
 msgid "The plugin has no __init__.py."
 msgstr "该插件没有 __init__.py。"
 
-#: src/sshpilot/preferences.py:5076
+#: src/sshpilot/preferences.py:5074
 #, python-brace-format
 msgid "'{plugin}' conflicts with a built-in plugin."
 msgstr "“{plugin}” 与内置插件冲突。"
 
-#: src/sshpilot/preferences.py:5084
+#: src/sshpilot/preferences.py:5082
 msgid "Replace plugin?"
 msgstr "替换插件？"
 
-#: src/sshpilot/preferences.py:5085
+#: src/sshpilot/preferences.py:5083
 #, python-brace-format
 msgid "A plugin '{plugin}' is already installed. Replace it?"
 msgstr "已安装插件 “{plugin}”。是否替换？"
 
-#: src/sshpilot/preferences.py:5124
+#: src/sshpilot/preferences.py:5122
 msgid "Plugin installed"
 msgstr "插件已安装"
 
-#: src/sshpilot/preferences.py:5125
+#: src/sshpilot/preferences.py:5123
 #, python-brace-format
 msgid "Installed '{plugin}'. Restart SSH Pilot to load it."
 msgstr "已安装 “{plugin}”。重启 SSH Pilot 以加载它。"
 
-#: src/sshpilot/preferences.py:5130
+#: src/sshpilot/preferences.py:5128
 msgid "Remove plugin?"
 msgstr "移除插件？"
 
-#: src/sshpilot/preferences.py:5131
+#: src/sshpilot/preferences.py:5129
 #, python-brace-format
 msgid "Delete '{name}' from disk? This cannot be undone."
 msgstr "是否从磁盘中删除 “{name}”？此操作无法撤销。"
 
-#: src/sshpilot/preferences.py:5144
+#: src/sshpilot/preferences.py:5142
 msgid "Remove failed"
 msgstr "移除失败"
 
-#: src/sshpilot/preferences.py:5152
+#: src/sshpilot/preferences.py:5150
 msgid "Plugin removed"
 msgstr "插件已移除"
 
-#: src/sshpilot/preferences.py:5153
+#: src/sshpilot/preferences.py:5151
 #, python-brace-format
 msgid "Removed '{name}'. Restart SSH Pilot to unload it if it was active."
 msgstr "已移除 “{name}”。若其处于激活状态，请重启 SSH Pilot 以卸载它。"
 
-#: src/sshpilot/preferences.py:5172
+#: src/sshpilot/preferences.py:5170
 msgid "Open plugin page"
 msgstr "打开插件页面"
 
-#: src/sshpilot/preferences.py:5190
+#: src/sshpilot/preferences.py:5188
 msgid "Restart SSH Pilot to apply"
 msgstr "重启 SSH Pilot 以应用"
 
-#: src/sshpilot/preferences.py:5192
+#: src/sshpilot/preferences.py:5190
 msgid "Plugins load and unload only after restarting SSH Pilot."
 msgstr "插件仅在重启 SSH Pilot 后加载和卸载。"
 
-#: src/sshpilot/preferences.py:5234
+#: src/sshpilot/preferences.py:5232
 msgid "Enable"
 msgstr "启用"
 
-#: src/sshpilot/preferences.py:5240
+#: src/sshpilot/preferences.py:5238
 msgid "Behavior"
 msgstr "行为"
 
-#: src/sshpilot/preferences.py:5243
-msgid "Open on Startup"
-msgstr "启动时打开"
-
-#: src/sshpilot/preferences.py:5244
-msgid "Open Command Snippets when the window starts"
-msgstr "窗口启动时打开命令片段"
-
-#: src/sshpilot/preferences.py:5250
+#: src/sshpilot/preferences.py:5241
 msgid "Insert Only (no execute)"
 msgstr "仅插入（不执行）"
 
-#: src/sshpilot/preferences.py:5251
+#: src/sshpilot/preferences.py:5242
 msgid "Paste the command into the terminal without running it"
 msgstr "将命令粘贴至终端而不运行"
 
-#: src/sshpilot/preferences.py:5257
-msgid "Close After Sending"
-msgstr "发送后关闭"
-
-#: src/sshpilot/preferences.py:5258
-msgid "Close Command Snippets after sending a command"
-msgstr "发送命令后关闭命令片段"
-
-#: src/sshpilot/preferences.py:5295
+#: src/sshpilot/preferences.py:5275
 msgid "Production Servers"
 msgstr "生产服务器"
 
-#: src/sshpilot/preferences.py:5300
+#: src/sshpilot/preferences.py:5280
 msgid "3 connections"
 msgstr "3 个连接"
 
-#: src/sshpilot/preferences.py:5547
+#: src/sshpilot/preferences.py:5527
 msgid "Using system accent color"
 msgstr "使用系统强调色"
 
-#: src/sshpilot/preferences.py:6094
+#: src/sshpilot/preferences.py:6074
 msgid "Encoding"
 msgstr "编码"
 
-#: src/sshpilot/preferences.py:6095
+#: src/sshpilot/preferences.py:6075
 msgid "Character encoding for the integrated terminal"
 msgstr "集成终端的字符编码"
 
-#: src/sshpilot/preferences.py:6232
+#: src/sshpilot/preferences.py:6212
 msgid "Could not save SSH settings. Please check the values and try again."
 msgstr "无法保存 SSH 设置。请检查设置值并重试。"
 
-#: src/sshpilot/preferences.py:6436
+#: src/sshpilot/preferences.py:6416
 msgid "Terminal Backend Change"
 msgstr "终端后端变更"
 
-#: src/sshpilot/preferences.py:6439
-msgid ""
-"This change will only apply to new terminal tabs.\n"
-""
-msgstr ""
-"此更改仅适用于新的终端标签页。\n"
-""
+#: src/sshpilot/preferences.py:6419
+msgid "This change will only apply to new terminal tabs.\n"
+msgstr "此更改仅适用于新的终端标签页。\n"
 
 #: src/sshpilot/rbw_setup.py:111
 msgid "rbw not found"
 msgstr "未找到 rbw"
 
 #: src/sshpilot/rbw_setup.py:113
-msgid "SSH Pilot is set to use rbw — an unofficial Bitwarden client — for secret storage, but the “rbw” command was not found. Install it, then restart SSH Pilot or retry from Preferences ▸ Secret Storage."
-msgstr "SSH Pilot 设置为使用 rbw（非官方 Bitwarden 客户端）进行密码与密钥存储，但未找到 “rbw” 命令。请安装它，然后重启 SSH Pilot 或在“首选项 ▸ 密码与密钥存储”中重试。"
+msgid ""
+"SSH Pilot is set to use rbw — an unofficial Bitwarden client — for secret "
+"storage, but the “rbw” command was not found. Install it, then restart SSH "
+"Pilot or retry from Preferences ▸ Secret Storage."
+msgstr ""
+"SSH Pilot 设置为使用 rbw（非官方 Bitwarden 客户端）进行密码与密钥存储，但未找"
+"到 “rbw” 命令。请安装它，然后重启 SSH Pilot 或在“首选项 ▸ 密码与密钥存储”中重"
+"试。"
 
 #: src/sshpilot/rbw_setup.py:118
 msgid "View rbw on GitHub"
@@ -6412,11 +6612,13 @@ msgstr "已登录并作为 {email} 解锁。"
 msgid ""
 "rbw could not be unlocked.\n"
 "\n"
-"Check that a pinentry program is configured (`rbw config set pinentry …`) and try again, or run `rbw login` in a terminal."
+"Check that a pinentry program is configured (`rbw config set pinentry …`) "
+"and try again, or run `rbw login` in a terminal."
 msgstr ""
 "无法解锁 rbw。\n"
 "\n"
-"请检查是否配置了 pinentry 程序 (`rbw config set pinentry …`) 并重试，或在终端中运行 `rbw login`。"
+"请检查是否配置了 pinentry 程序 (`rbw config set pinentry …`) 并重试，或在终端"
+"中运行 `rbw login`。"
 
 #: src/sshpilot/rbw_setup.py:152
 msgid "rbw setup failed"
@@ -6427,8 +6629,12 @@ msgid "Configure rbw"
 msgstr "配置 rbw"
 
 #: src/sshpilot/rbw_setup.py:165
-msgid "Enter your Bitwarden account email. For a self-hosted Vaultwarden, also set the server URL (leave empty for the official bitwarden.com)."
-msgstr "输入您的 Bitwarden 账户电子邮件。对于自托管的 Vaultwarden，还需设置服务器 URL（官方 bitwarden.com 请留空）。"
+msgid ""
+"Enter your Bitwarden account email. For a self-hosted Vaultwarden, also set "
+"the server URL (leave empty for the official bitwarden.com)."
+msgstr ""
+"输入您的 Bitwarden 账户电子邮件。对于自托管的 Vaultwarden，还需设置服务器 URL"
+"（官方 bitwarden.com 请留空）。"
 
 #: src/sshpilot/rbw_setup.py:175
 msgid "Account email"
@@ -6607,7 +6813,9 @@ msgid "Remote destination"
 msgstr "远程目标"
 
 #: src/sshpilot/scp_window.py:985
-msgid "Enter a remote directory (e.g., ~/ or /var/tmp). Files will be uploaded using scp."
+msgid ""
+"Enter a remote directory (e.g., ~/ or /var/tmp). Files will be uploaded "
+"using scp."
 msgstr "输入远程目录（例如 ~/ 或 /var/tmp）。文件将通过 scp 上传。"
 
 #: src/sshpilot/scp_window.py:1096
@@ -6668,11 +6876,15 @@ msgstr "密码库"
 
 #: src/sshpilot/secret_unlock_dialog.py:165
 msgid ""
-"Bitwarden is selected for secret storage, but the “bw” command was not found. Passwords and passphrases will not be stored or autofilled until the CLI is installed.\n"
+"Bitwarden is selected for secret storage, but the “bw” command was not "
+"found. Passwords and passphrases will not be stored or autofilled until the "
+"CLI is installed.\n"
 "\n"
-"Open Settings ▸ Security & Credentials to change the backend, or set up Bitwarden now."
+"Open Settings ▸ Security & Credentials to change the backend, or set up "
+"Bitwarden now."
 msgstr ""
-"已选择 Bitwarden 进行密码与密钥存储，但未找到 “bw” 命令。在安装该 CLI 之前，密码和口令将不会被存储或自动填充。\n"
+"已选择 Bitwarden 进行密码与密钥存储，但未找到 “bw” 命令。在安装该 CLI 之前，"
+"密码和口令将不会被存储或自动填充。\n"
 "\n"
 "打开“设置 ▸ 安全与凭据”以更改后端，或立即设置 Bitwarden。"
 
@@ -6692,32 +6904,41 @@ msgstr "密码与密钥存储后端不可用"
 #: src/sshpilot/secret_unlock_dialog.py:189
 #, python-brace-format
 msgid ""
-"{name} is selected for secret storage but is not available on this system. Passwords and passphrases will not be stored or autofilled until it is available.\n"
+"{name} is selected for secret storage but is not available on this system. "
+"Passwords and passphrases will not be stored or autofilled until it is "
+"available.\n"
 "\n"
-"Open Settings ▸ Security & Credentials to fix the setup or choose another backend."
+"Open Settings ▸ Security & Credentials to fix the setup or choose another "
+"backend."
 msgstr ""
-"已选择 {name} 进行密码与密钥存储，但其在此系统上不可用。在可用之前，密码和口令将不会被存储或自动填充。\n"
+"已选择 {name} 进行密码与密钥存储，但其在此系统上不可用。在可用之前，密码和口"
+"令将不会被存储或自动填充。\n"
 "\n"
 "打开“设置 ▸ 安全与凭据”以修复设置或选择其他后端。"
 
 #: src/sshpilot/secret_unlock_dialog.py:210
 msgid ""
-"Bitwarden is selected for secret storage, but you are not signed in. Passwords and passphrases will not be stored or autofilled until you sign in and unlock your vault.\n"
+"Bitwarden is selected for secret storage, but you are not signed in. "
+"Passwords and passphrases will not be stored or autofilled until you sign in "
+"and unlock your vault.\n"
 "\n"
 "Open Settings ▸ Security & Credentials to change the backend, or sign in now."
 msgstr ""
-"已选择 Bitwarden 进行密码与密钥存储，但您尚未登录。在您登录并解锁密码库之前，密码和口令将不会被存储或自动填充。\n"
+"已选择 Bitwarden 进行密码与密钥存储，但您尚未登录。在您登录并解锁密码库之前，"
+"密码和口令将不会被存储或自动填充。\n"
 "\n"
 "打开“设置 ▸ 安全与凭据”以更改后端，或立即登录。"
 
 #: src/sshpilot/secret_unlock_dialog.py:234
 #, python-brace-format
 msgid ""
-"{name} is selected for secret storage but you are not signed in. Passwords and passphrases will not be stored or autofilled until you sign in.\n"
+"{name} is selected for secret storage but you are not signed in. Passwords "
+"and passphrases will not be stored or autofilled until you sign in.\n"
 "\n"
 "Open Settings ▸ Security & Credentials to fix the setup."
 msgstr ""
-"已选择 {name} 进行密码与密钥存储，但您尚未登录。在您登录之前，密码和口令将不会被存储或自动填充。\n"
+"已选择 {name} 进行密码与密钥存储，但您尚未登录。在您登录之前，密码和口令将不"
+"会被存储或自动填充。\n"
 "\n"
 "打开“设置 ▸ 安全与凭据”以修复设置。"
 
@@ -6866,7 +7087,9 @@ msgstr "快捷键已被占用"
 
 #: src/sshpilot/shortcut_editor.py:601
 #, python-brace-format
-msgid "This shortcut is already assigned to “{action}”. Replacing it will disable that assignment."
+msgid ""
+"This shortcut is already assigned to “{action}”. Replacing it will disable "
+"that assignment."
 msgstr "此快捷键已分配给“{action}”。替换它将禁用该分配。"
 
 #: src/sshpilot/shutdown.py:160
@@ -7322,7 +7545,9 @@ msgid "Key May Have Been Generated"
 msgstr "密钥可能已生成"
 
 #: src/sshpilot/sshcopyid_window.py:784
-msgid "The connection was lost while generating the key. The key may have been created. Check the key list; generation was not retried."
+msgid ""
+"The connection was lost while generating the key. The key may have been "
+"created. Check the key list; generation was not retried."
 msgstr "生成密钥时连接丢失。密钥可能已创建。请检查密钥列表；未重试生成。"
 
 #: src/sshpilot/sshcopyid_window.py:804
@@ -7372,7 +7597,9 @@ msgid "Public-key deployment failed."
 msgstr "公钥部署失败。"
 
 #: src/sshpilot/terminal.py:148
-msgid "Nothing selected — the remote app is using the mouse; hold Shift while dragging to select text"
+msgid ""
+"Nothing selected — the remote app is using the mouse; hold Shift while "
+"dragging to select text"
 msgstr "未选择任何内容——远程应用程序正在使用鼠标；按住 Shift 拖动即可选择文本"
 
 #: src/sshpilot/terminal.py:151
@@ -7479,68 +7706,68 @@ msgid "Copy Link"
 msgstr "复制链接"
 
 #: src/sshpilot/terminal.py:3382
-msgid "Copy	⌘C"
-msgstr "复制	⌘C"
+msgid "Copy\t⌘C"
+msgstr "复制\t⌘C"
 
 #: src/sshpilot/terminal.py:3385 src/sshpilot/terminal.py:3402
 msgid "Copy as HTML"
 msgstr "复制为 HTML"
 
 #: src/sshpilot/terminal.py:3386
-msgid "Paste	⌘V"
-msgstr "粘贴	⌘V"
+msgid "Paste\t⌘V"
+msgstr "粘贴\t⌘V"
 
 #: src/sshpilot/terminal.py:3387
-msgid "Select All	⌘A"
-msgstr "全选	⌘A"
+msgid "Select All\t⌘A"
+msgstr "全选\t⌘A"
 
 #: src/sshpilot/terminal.py:3389
-msgid "Zoom In	⌘="
-msgstr "放大	⌘="
+msgid "Zoom In\t⌘="
+msgstr "放大\t⌘="
 
 #: src/sshpilot/terminal.py:3390
-msgid "Zoom Out	⌘-"
-msgstr "缩小	⌘-"
+msgid "Zoom Out\t⌘-"
+msgstr "缩小\t⌘-"
 
 #: src/sshpilot/terminal.py:3391
-msgid "Reset Zoom	⌘0"
-msgstr "重置缩放	⌘0"
+msgid "Reset Zoom\t⌘0"
+msgstr "重置缩放\t⌘0"
 
 #: src/sshpilot/terminal.py:3394
-msgid "Search	⌘F"
-msgstr "搜索	⌘F"
+msgid "Search\t⌘F"
+msgstr "搜索\t⌘F"
 
 #: src/sshpilot/terminal.py:3395 src/sshpilot/terminal.py:3413
 msgid "Save Output…"
 msgstr "保存输出…"
 
 #: src/sshpilot/terminal.py:3399
-msgid "Copy	Ctrl+Shift+C"
-msgstr "复制	Ctrl+Shift+C"
+msgid "Copy\tCtrl+Shift+C"
+msgstr "复制\tCtrl+Shift+C"
 
 #: src/sshpilot/terminal.py:3404
-msgid "Paste	Ctrl+Shift+V"
-msgstr "粘贴	Ctrl+Shift+V"
+msgid "Paste\tCtrl+Shift+V"
+msgstr "粘贴\tCtrl+Shift+V"
 
 #: src/sshpilot/terminal.py:3405
-msgid "Select All	Ctrl+Shift+A"
-msgstr "全选	Ctrl+Shift+A"
+msgid "Select All\tCtrl+Shift+A"
+msgstr "全选\tCtrl+Shift+A"
 
 #: src/sshpilot/terminal.py:3407
-msgid "Zoom In	Ctrl++"
-msgstr "放大	Ctrl++"
+msgid "Zoom In\tCtrl++"
+msgstr "放大\tCtrl++"
 
 #: src/sshpilot/terminal.py:3408
-msgid "Zoom Out	Ctrl+-"
-msgstr "缩小	Ctrl+-"
+msgid "Zoom Out\tCtrl+-"
+msgstr "缩小\tCtrl+-"
 
 #: src/sshpilot/terminal.py:3409
-msgid "Reset Zoom	Ctrl+0"
-msgstr "重置缩放	Ctrl+0"
+msgid "Reset Zoom\tCtrl+0"
+msgstr "重置缩放\tCtrl+0"
 
 #: src/sshpilot/terminal.py:3412
-msgid "Search	Ctrl+Shift+F"
-msgstr "搜索	Ctrl+Shift+F"
+msgid "Search\tCtrl+Shift+F"
+msgstr "搜索\tCtrl+Shift+F"
 
 #: src/sshpilot/terminal_manager.py:363
 msgid ""
@@ -7605,7 +7832,9 @@ msgid "Reconnection Failed"
 msgstr "重新连接失败"
 
 #: src/sshpilot/terminal_manager.py:1536 src/sshpilot/terminal_manager.py:1681
-msgid "Failed to reconnect with the new settings. Please try connecting again manually."
+msgid ""
+"Failed to reconnect with the new settings. Please try connecting again "
+"manually."
 msgstr "使用新设置重新连接失败。请尝试手动重新连接。"
 
 #: src/sshpilot/terminal_search.py:59
@@ -7800,7 +8029,9 @@ msgid "Discard changes?"
 msgstr "放弃更改？"
 
 #: src/sshpilot/text_editor.py:1620
-msgid "Editing as root re-reads the file from the host and discards your unsaved changes."
+msgid ""
+"Editing as root re-reads the file from the host and discards your unsaved "
+"changes."
 msgstr "以 root 身份编辑将从主机重新读取文件并放弃未保存的更改。"
 
 #: src/sshpilot/text_editor.py:1624
@@ -7917,8 +8148,11 @@ msgstr "插件已禁用"
 
 #: src/sshpilot/welcome_page.py:704
 #, python-format
-msgid "The %s plugin is disabled. Enable it from Settings ▸ Plugins, then restart SSH Pilot to use this feature."
-msgstr "%s 插件已被禁用。请在“设置 ▸ 插件”中启用它，然后重启 SSH Pilot 以使用此功能。"
+msgid ""
+"The %s plugin is disabled. Enable it from Settings ▸ Plugins, then restart "
+"SSH Pilot to use this feature."
+msgstr ""
+"%s 插件已被禁用。请在“设置 ▸ 插件”中启用它，然后重启 SSH Pilot 以使用此功能。"
 
 #: src/sshpilot/welcome_page.py:709
 msgid "Open Settings"
@@ -7957,7 +8191,9 @@ msgid "A running background service uses an incompatible protocol version."
 msgstr "运行中的后台服务使用了不兼容的协议版本。"
 
 #: src/sshpilot/window.py:146
-msgid "A background service from a different app version is running and could not be replaced."
+msgid ""
+"A background service from a different app version is running and could not "
+"be replaced."
 msgstr "来自不同应用版本的后台服务正在运行且无法被替换。"
 
 #: src/sshpilot/window.py:150
@@ -7974,7 +8210,9 @@ msgstr "无法启动后台服务。"
 
 #: src/sshpilot/window.py:906
 #, python-format
-msgid "SSH Pilot requires its background service. %s Retry, restart the service, inspect diagnostics, or exit."
+msgid ""
+"SSH Pilot requires its background service. %s Retry, restart the service, "
+"inspect diagnostics, or exit."
 msgstr "SSH Pilot 需要其后台服务。%s 重试、重启服务、检查诊断信息或退出。"
 
 #: src/sshpilot/window.py:997
@@ -7982,8 +8220,11 @@ msgid "Restore Daemon Sessions?"
 msgstr "恢复守护进程会话？"
 
 #: src/sshpilot/window.py:999
-msgid "One or more SSH sessions are still running in the local service. Restore them into tabs now?"
-msgstr "本地服务中仍有一个或多个 SSH 会话在运行。是否立即将它们恢复到标签页中？"
+msgid ""
+"One or more SSH sessions are still running in the local service. Restore "
+"them into tabs now?"
+msgstr ""
+"本地服务中仍有一个或多个 SSH 会话在运行。是否立即将它们恢复到标签页中？"
 
 #: src/sshpilot/window.py:1003 src/sshpilot/window.py:1232
 msgid "Not Now"
@@ -7999,7 +8240,9 @@ msgid "SSH Pilot closed unexpectedly"
 msgstr "SSH Pilot 意外关闭"
 
 #: src/sshpilot/window.py:1222
-msgid "An error report from your previous session was saved. Sending it helps us find and fix the problem."
+msgid ""
+"An error report from your previous session was saved. Sending it helps us "
+"find and fix the problem."
 msgstr "上一次会话的错误报告已保存。发送该报告有助于我们发现并解决问题。"
 
 #: src/sshpilot/window.py:1282
@@ -8017,7 +8260,9 @@ msgstr ""
 "按“确定”打开问题反馈页面，然后将其粘贴 (Ctrl+V) 到报告中。"
 
 #: src/sshpilot/window.py:1291
-msgid "Press OK to open the issue page. You can attach your logs from Help ▸ View Logs."
+msgid ""
+"Press OK to open the issue page. You can attach your logs from Help ▸ View "
+"Logs."
 msgstr "按“确定”打开问题反馈页面。您可以通过“帮助 ▸ 查看日志”附加日志。"
 
 #: src/sshpilot/window.py:1371 src/sshpilot/window.py:1386
@@ -8025,8 +8270,11 @@ msgid "Daemon Sessions Unavailable"
 msgstr "守护进程会话不可用"
 
 #: src/sshpilot/window.py:1373
-msgid "Daemon sessions are not available. Enable daemon-backed SSH terminals and ensure the local service is running."
-msgstr "守护进程会话不可用。请启用由守护进程支持的 SSH 终端，并确保本地服务正在运行。"
+msgid ""
+"Daemon sessions are not available. Enable daemon-backed SSH terminals and "
+"ensure the local service is running."
+msgstr ""
+"守护进程会话不可用。请启用由守护进程支持的 SSH 终端，并确保本地服务正在运行。"
 
 #: src/sshpilot/window.py:1387
 msgid "The local SSH Pilot service bridge is unavailable."
@@ -8046,7 +8294,8 @@ msgid ""
 "Saved to:\n"
 "{path}\n"
 "\n"
-"Secrets are redacted. Your saved connections and SSH config are not included; a maintainer can request them separately if needed."
+"Secrets are redacted. Your saved connections and SSH config are not "
+"included; a maintainer can request them separately if needed."
 msgstr ""
 "已保存至：\n"
 "{path}\n"
@@ -8265,7 +8514,9 @@ msgstr "开始"
 
 #: src/sshpilot/window.py:4608
 #, python-brace-format
-msgid "Switched to connection list — ↑/↓ navigate, Enter open, {modifier}+Enter new tab"
+msgid ""
+"Switched to connection list — ↑/↓ navigate, Enter open, {modifier}+Enter new "
+"tab"
 msgstr "已切换到连接列表 — ↑/↓ 导航，Enter 打开，{modifier}+Enter 新标签页"
 
 #: src/sshpilot/window.py:4685 src/sshpilot/window.py:4836
@@ -8279,8 +8530,11 @@ msgstr "搜索已隐藏 — 按 {modifier}+F 重新搜索"
 
 #: src/sshpilot/window.py:5299
 #, python-brace-format
-msgid "\"{host}\" is part of a configuration block with [{count}] other hosts. How would you like to apply your changes?"
-msgstr "“{host}” 是包含 [{count}] 个其他主机的配置块的一部分。您希望如何应用更改？"
+msgid ""
+"\"{host}\" is part of a configuration block with [{count}] other hosts. How "
+"would you like to apply your changes?"
+msgstr ""
+"“{host}” 是包含 [{count}] 个其他主机的配置块的一部分。您希望如何应用更改？"
 
 #: src/sshpilot/window.py:5301
 msgid "Warning"
@@ -8295,7 +8549,8 @@ msgid "Edit as Separate Connection"
 msgstr "作为独立连接编辑"
 
 #: src/sshpilot/window.py:5352
-msgid "SSH config editing requires the background service. Start it and try again."
+msgid ""
+"SSH config editing requires the background service. Start it and try again."
 msgstr "编辑 SSH 配置需要后台服务。请启动服务并重试。"
 
 #. the daemon resolves the active config file
@@ -8334,15 +8589,21 @@ msgid "Operation mode recovery required"
 msgstr "需要恢复运行模式"
 
 #: src/sshpilot/window.py:5439
-msgid "The daemon could not restore a consistent SSH configuration mode. Do not start new operations until the daemon is restarted or the reported state is repaired."
-msgstr "守护进程无法恢复一致的 SSH 配置模式。在重启守护进程或修复所报告的状态之前，请勿启动新操作。"
+msgid ""
+"The daemon could not restore a consistent SSH configuration mode. Do not "
+"start new operations until the daemon is restarted or the reported state is "
+"repaired."
+msgstr ""
+"守护进程无法恢复一致的 SSH 配置模式。在重启守护进程或修复所报告的状态之前，请"
+"勿启动新操作。"
 
 #: src/sshpilot/window.py:5464
 msgid "Key Service Unavailable"
 msgstr "密钥服务不可用"
 
 #: src/sshpilot/window.py:5466
-msgid "SSH keys require the background service. Restart the service and try again."
+msgid ""
+"SSH keys require the background service. Restart the service and try again."
 msgstr "SSH 密钥需要后台服务。请重启服务并重试。"
 
 #: src/sshpilot/window.py:5487
@@ -8502,8 +8763,12 @@ msgid "No Terminal Found"
 msgstr "未找到终端"
 
 #: src/sshpilot/window.py:7398
-msgid "Could not find a suitable terminal application. Please install a terminal like gnome-terminal, konsole, or xterm."
-msgstr "找不到合适的终端应用程序。请安装诸如 gnome-terminal、konsole 或 xterm 等终端。"
+msgid ""
+"Could not find a suitable terminal application. Please install a terminal "
+"like gnome-terminal, konsole, or xterm."
+msgstr ""
+"找不到合适的终端应用程序。请安装诸如 gnome-terminal、konsole 或 xterm 等终"
+"端。"
 
 #: src/sshpilot/window.py:7417
 msgid "SSH Connection Failed"
@@ -8563,7 +8828,9 @@ msgid "Failed to save connection"
 msgstr "保存连接失败"
 
 #: src/sshpilot/window.py:8234
-msgid "The daemon could not resolve or compare this connection's effective SSH configuration."
+msgid ""
+"The daemon could not resolve or compare this connection's effective SSH "
+"configuration."
 msgstr "守护进程无法解析或对比此连接的生效 SSH 配置。"
 
 #: src/sshpilot/window_broadcast.py:181
@@ -8622,7 +8889,9 @@ msgid "Store password"
 msgstr "存储密码"
 
 #: src/sshpilot/window_dialogs.py:456
-msgid "Secret storage is set to SSH Agent Only — passwords and passphrases are not saved by sshPilot."
+msgid ""
+"Secret storage is set to SSH Agent Only — passwords and passphrases are not "
+"saved by sshPilot."
 msgstr "密码与密钥存储设置为“仅使用 ssh-agent” — sshPilot 不保存密码和口令。"
 
 #: src/sshpilot/window_dialogs.py:555
@@ -8659,7 +8928,8 @@ msgid "Private key files"
 msgstr "私钥文件"
 
 #: src/sshpilot/window_dialogs.py:697
-msgid "Not recommended — protect the backup with a passphrase if you include keys."
+msgid ""
+"Not recommended — protect the backup with a passphrase if you include keys."
 msgstr "不推荐 — 如果包含密钥，请使用口令保护备份。"
 
 #: src/sshpilot/window_dialogs.py:706 src/sshpilot/window_dialogs.py:1899
@@ -8695,7 +8965,8 @@ msgid "Also copy saved secrets as Bitwarden login items"
 msgstr "同时将保存的机密复制为 Bitwarden 登录项"
 
 #: src/sshpilot/window_dialogs.py:845
-msgid "Creates normal login entries in your vault in addition to the backup note."
+msgid ""
+"Creates normal login entries in your vault in addition to the backup note."
 msgstr "除了备份备忘录外，还在您的密码库中创建普通的登录条目。"
 
 #: src/sshpilot/window_dialogs.py:871 src/sshpilot/window_dialogs.py:1649
@@ -8728,7 +8999,9 @@ msgid "Bitwarden encrypts the backup with your vault credentials."
 msgstr "Bitwarden 使用您的密码库凭据加密备份。"
 
 #: src/sshpilot/window_dialogs.py:995
-msgid "Select at least one connection to include its saved passwords or private keys."
+msgid ""
+"Select at least one connection to include its saved passwords or private "
+"keys."
 msgstr "请选择至少一个连接以包含其保存的密码或私钥。"
 
 #: src/sshpilot/window_dialogs.py:1009
@@ -8740,8 +9013,11 @@ msgid "Private Key Files"
 msgstr "私钥文件"
 
 #: src/sshpilot/window_dialogs.py:1043
-msgid "It is not recommended to move your private keys to another machine. If you still want to do this, make sure to protect the backup with a passphrase."
-msgstr "不建议将您的私钥转移到另一台机器。如果您仍想这样做，请务必使用口令保护备份。"
+msgid ""
+"It is not recommended to move your private keys to another machine. If you "
+"still want to do this, make sure to protect the backup with a passphrase."
+msgstr ""
+"不建议将您的私钥转移到另一台机器。如果您仍想这样做，请务必使用口令保护备份。"
 
 #: src/sshpilot/window_dialogs.py:1083
 msgid "Export to Bitwarden"
@@ -8776,7 +9052,8 @@ msgid "Export Cancelled"
 msgstr "导出已取消"
 
 #: src/sshpilot/window_dialogs.py:1152
-msgid "Secret storage is managed by the sshPilot daemon, which is not connected."
+msgid ""
+"Secret storage is managed by the sshPilot daemon, which is not connected."
 msgstr "密码与密钥存储由 sshPilot 守护进程管理，该守护进程尚未连接。"
 
 #: src/sshpilot/window_dialogs.py:1181
@@ -8828,7 +9105,9 @@ msgstr "是否不加密导出？"
 
 #: src/sshpilot/window_dialogs.py:1242
 #, python-brace-format
-msgid "{items} will be written in PLAIN TEXT and readable by anyone with the file. Continue?"
+msgid ""
+"{items} will be written in PLAIN TEXT and readable by anyone with the file. "
+"Continue?"
 msgstr "{items} 将以明文形式写入，任何拥有该文件的人都可以读取。是否继续？"
 
 #: src/sshpilot/window_dialogs.py:1244
@@ -9013,23 +9292,36 @@ msgid "Replace your global SSH config?"
 msgstr "替换全局 SSH 配置？"
 
 #: src/sshpilot/window_dialogs.py:1991
-msgid "Replace mode will overwrite the Default user SSH configuration entirely. That configuration is shared with ssh, scp, git and other SSH tools; unmanaged Host, Include and Match rules may be lost. Choose Merge instead to add hosts without overwriting."
-msgstr "替换模式将完全覆盖默认用户 SSH 配置。该配置与 ssh、scp、git 及其他 SSH 工具共享；未管理的主机 (Host)、包含 (Include) 和匹配 (Match) 规则可能会丢失。请选择“合并”以添加主机而不覆盖。"
+msgid ""
+"Replace mode will overwrite the Default user SSH configuration entirely. "
+"That configuration is shared with ssh, scp, git and other SSH tools; "
+"unmanaged Host, Include and Match rules may be lost. Choose Merge instead to "
+"add hosts without overwriting."
+msgstr ""
+"替换模式将完全覆盖默认用户 SSH 配置。该配置与 ssh、scp、git 及其他 SSH 工具共"
+"享；未管理的主机 (Host)、包含 (Include) 和匹配 (Match) 规则可能会丢失。请选择"
+"“合并”以添加主机而不覆盖。"
 
 #: src/sshpilot/window_dialogs.py:1998
 msgid "Replace Anyway"
 msgstr "仍然替换"
 
 #: src/sshpilot/window_dialogs.py:2028
-msgid "Secret storage is managed by the sshPilot daemon, which is not connected, so the operation was cancelled."
+msgid ""
+"Secret storage is managed by the sshPilot daemon, which is not connected, so "
+"the operation was cancelled."
 msgstr "密码与密钥存储由 sshPilot 守护进程管理，该进程未连接，因此操作已取消。"
 
 #: src/sshpilot/window_dialogs.py:2039
-msgid "Could not verify the secret vault, so the operation was cancelled to avoid leaving saved credentials out. Try again."
+msgid ""
+"Could not verify the secret vault, so the operation was cancelled to avoid "
+"leaving saved credentials out. Try again."
 msgstr "无法验证密码库，因此操作已取消以避免遗漏已保存的凭据。请重试。"
 
 #: src/sshpilot/window_dialogs.py:2053
-msgid "Your secret vault must be unlocked to include or restore saved credentials. Unlock it and try again."
+msgid ""
+"Your secret vault must be unlocked to include or restore saved credentials. "
+"Unlock it and try again."
 msgstr "您的密码库必须已解锁才能包含或恢复已保存的凭据。请将其解锁并重试。"
 
 #: src/sshpilot/window_dialogs.py:2068 src/sshpilot/window_dialogs.py:2079
@@ -9065,20 +9357,32 @@ msgid ", "
 msgstr "，"
 
 #: src/sshpilot/window_dialogs.py:2173
-msgid "{} credential(s) already existed and were left untouched — sshPilot never overwrites a saved secret."
+msgid ""
+"{} credential(s) already existed and were left untouched — sshPilot never "
+"overwrites a saved secret."
 msgstr "{} 个凭据已存在且未作改动 — sshPilot 绝不覆盖已保存的保密数据。"
 
 #: src/sshpilot/window_dialogs.py:2176
-msgid "{} private key(s) already existed and were left untouched — sshPilot never overwrites a private key."
+msgid ""
+"{} private key(s) already existed and were left untouched — sshPilot never "
+"overwrites a private key."
 msgstr "{} 个私钥已存在且未作改动 — sshPilot 绝不覆盖私钥。"
 
 #: src/sshpilot/window_dialogs.py:2179
-msgid "{} saved password(s)/key(s) in this .json file were not imported — legacy JSON backups can't restore secrets. Use an encrypted .spbk backup to include them."
-msgstr "此 .json 文件中的 {} 个已保存密码/密钥未导入 — 传统的 JSON 备份无法恢复保密数据。请使用加密的 .spbk 备份来包含它们。"
+msgid ""
+"{} saved password(s)/key(s) in this .json file were not imported — legacy "
+"JSON backups can't restore secrets. Use an encrypted .spbk backup to include "
+"them."
+msgstr ""
+"此 .json 文件中的 {} 个已保存密码/密钥未导入 — 传统的 JSON 备份无法恢复保密数"
+"据。请使用加密的 .spbk 备份来包含它们。"
 
 #: src/sshpilot/window_dialogs.py:2186
-msgid "Reload now to apply the imported configuration. Some settings may still need a full restart of sshPilot to take effect."
-msgstr "立即重新载入以应用导入的配置。某些设置可能仍需完全重启 sshPilot 才能生效。"
+msgid ""
+"Reload now to apply the imported configuration. Some settings may still need "
+"a full restart of sshPilot to take effect."
+msgstr ""
+"立即重新载入以应用导入的配置。某些设置可能仍需完全重启 sshPilot 才能生效。"
 
 #: src/sshpilot/window_dialogs.py:2191
 msgid "Import Successful"
@@ -9390,15 +9694,22 @@ msgid "Manage your servers with ease"
 msgstr "轻松管理您的服务器"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:10
-msgid "SSH Pilot is a user-friendly SSH connection manager featuring built-in tabbed terminal, remote file management, key transfer, port forwarding and more. It's an alternative to Putty, Termius and Mobaxterm."
-msgstr "SSH Pilot 是一款简单易用的 SSH 连接管理器，具有内置标签式终端、远程文件管理、密钥传输、端口转发等功能。它是 Putty、Termius 和 Mobaxterm 的优秀替代品。"
+msgid ""
+"SSH Pilot is a user-friendly SSH connection manager featuring built-in "
+"tabbed terminal, remote file management, key transfer, port forwarding and "
+"more. It's an alternative to Putty, Termius and Mobaxterm."
+msgstr ""
+"SSH Pilot 是一款简单易用的 SSH 连接管理器，具有内置标签式终端、远程文件管理、"
+"密钥传输、端口转发等功能。它是 Putty、Termius 和 Mobaxterm 的优秀替代品。"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:12
 msgid "Manage multiple machines from a unified, clean interface"
 msgstr "通过统一简洁的界面管理多台机器"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:13
-msgid "Transfer files to and from servers using the built-in file manager (SFTP and SCP)"
+msgid ""
+"Transfer files to and from servers using the built-in file manager (SFTP and "
+"SCP)"
 msgstr "使用内置文件管理器（SFTP 和 SCP）在本地与服务器之间传输文件"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:14
@@ -9410,7 +9721,8 @@ msgid "Easily generate and transfer SSH keys to servers"
 msgstr "轻松生成 SSH 密钥并将其传输到服务器"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:16
-msgid "Loads existing ~/.ssh/config and works with standard SSH keys and settings"
+msgid ""
+"Loads existing ~/.ssh/config and works with standard SSH keys and settings"
 msgstr "加载现有的 ~/.ssh/config，并与标准 SSH 密钥和设置协同工作"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:17
@@ -9426,742 +9738,802 @@ msgid "mFat"
 msgstr "mFat"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:66
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:171
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:183
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:254
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:71
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:176
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:188
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:259
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:264
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:269
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:312
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:318
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:274
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:317
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:323
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:331
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:359
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:328
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:336
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:364
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:371
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:405
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:417
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:423
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:369
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:376
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:410
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:422
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:428
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:443
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:433
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:448
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:475
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:495
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:453
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:480
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:500
 msgid "Bug fixes"
 msgstr "错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:71
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:77
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:76
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:82
 msgid "Improvements to isolated workspace mode"
 msgstr "改进隔离工作区模式"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:72
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:78
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:77
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:83
 msgid "Middle-click a group to open all connections in splitview"
 msgstr "中键点击分组可在分屏视图中打开所有连接"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:83
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:88
 msgid "Improvements to non-SSH protocol plugins"
 msgstr "改进非 SSH 协议插件"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:84
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:89
 msgid "Fixes text selection when using remote apps such as tmux and htop"
 msgstr "修复使用 tmux 和 htop 等远程应用时的文本选择问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:85
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:90
 msgid "Fixes SFTP File Manager retry/reconnect flow"
 msgstr "修复 SFTP 文件管理器的重试/重新连接流程"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:90
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:95
 msgid "New \"Copy SSH Command\" context-menu action"
 msgstr "上下文菜单新增“复制 SSH 命令”操作"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:91
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:96
 msgid "Fixes rbw secret backend"
 msgstr "修复 rbw 机密存储后端"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:92
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:97
 msgid "Other bug fixes and improvements"
 msgstr "其他错误修复与改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:97
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:102
 msgid "Fixed Bitwarden login issue"
 msgstr "修复 Bitwarden 登录问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:102
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:107
 msgid "Faster startup"
 msgstr "更快的启动速度"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:103
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:108
 msgid "Vault unlock prompt now displayed on startup"
 msgstr "启动时显示密码库解锁提示"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:104
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:109
 msgid "Privacy toggle hides hostnames and IP addresses in start page too"
 msgstr "隐私开关在起始页中同样隐藏主机名和 IP 地址"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:109
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:114
 msgid "Fixed subgroups not inheriting parent group color"
 msgstr "修复子分组未继承父分组颜色的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:110
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:115
 msgid "Added option to remember passwords to password prompts"
 msgstr "密码提示中添加了记住密码的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:111
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:116
 msgid "Minor fixes to DnD in sidebar"
 msgstr "侧边栏拖放操作的小修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:116
-msgid "Added new terminal theme selector, added option to access it from tab bar"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:121
+msgid ""
+"Added new terminal theme selector, added option to access it from tab bar"
 msgstr "添加新的终端主题选择器，并添加从标签栏访问它的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:117
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:122
 msgid "Fixed vault unlock issue"
 msgstr "修复密码库解锁问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:118
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:123
 msgid "Fixed backup encryption issue"
 msgstr "修复备份加密问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:119
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:702
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:124
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:707
 msgid "Minor UI fixes"
 msgstr "细微界面修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:124
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:129
 msgid "Improved drag & drop for connections across groups"
 msgstr "改进跨分组连接的拖放操作"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:125
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:130
 msgid "Improved connection status reporting"
 msgstr "改进连接状态报告"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:126
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:131
 msgid "Minor bug fixes"
 msgstr "细微错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:131
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:244
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:136
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:249
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:433
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:254
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:438
 msgid "Bug fixes and UI improvements"
 msgstr "错误修复和界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:136
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:141
 msgid "Fixes drag and drop reordering not working"
 msgstr "修复拖放重新排序不起作用的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:137
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:142
 msgid "Adds manual sorting option"
 msgstr "添加手动排序选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:142
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:147
 msgid "Added French translation"
 msgstr "添加法语翻译"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:143
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:152
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:148
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:157
 msgid "Minor UI improvements"
 msgstr "细微界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:148
-msgid "Integrated tab bar into header for a cleaner, more minimal user interface"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:153
+msgid ""
+"Integrated tab bar into header for a cleaner, more minimal user interface"
 msgstr "将标签栏整合到顶栏中，打造更简洁、更小巧的用户界面"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:149
-msgid "Revamped Command Snippets panel - the snippets are now displayed in a floating panel"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:154
+msgid ""
+"Revamped Command Snippets panel - the snippets are now displayed in a "
+"floating panel"
 msgstr "改进命令片段面板 — 片段现在显示在浮动面板中"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:150
-msgid "Added keyboard support to Snippets - you can assign your desired shortcut for the popup"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:155
+msgid ""
+"Added keyboard support to Snippets - you can assign your desired shortcut "
+"for the popup"
 msgstr "为命令片段添加键盘支持 — 您可以为弹窗分配所需的快捷键"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:151
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:156
 msgid "Added theme selector to main menu, inspired by Ptyxis"
 msgstr "受 Ptyxis 启发，在主菜单中添加了主题选择器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:157
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:166
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:176
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:188
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:162
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:171
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:181
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:193
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:198
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:203
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:468
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:208
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:473
 msgid "Bug fixes and improvements"
 msgstr "错误修复与改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:162
-msgid "Improved full-screen experience (activated with F11 on linux, Cmd+Ctrl+F on macOS)"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:167
+msgid ""
+"Improved full-screen experience (activated with F11 on linux, Cmd+Ctrl+F on "
+"macOS)"
 msgstr "改进全屏体验（Linux 上按 F11 激活，macOS 上按 Cmd+Ctrl+F 激活）"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:163
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:168
 msgid "Improved app menu on macOS"
 msgstr "改进 macOS 上的应用程序菜单"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:164
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:169
 msgid "Added animated effect to omnisearch"
 msgstr "为全局搜索 (Omnisearch) 添加动画效果"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:165
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:170
 msgid "Added workaround for French keyboard layout on macOS"
 msgstr "添加针对 macOS 法语键盘布局的临时解决方案"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:181
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:186
 msgid "Improved effective config diff tool"
 msgstr "改进生效配置差异对比工具"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:182
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:187
 msgid "Improved experience when switching operation mode"
 msgstr "改进切换运行模式时的体验"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:208
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:213
 msgid "Migrated the code base to a new daemon-based system"
 msgstr "将代码库迁移到全新的基于守护进程的系统"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:209
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:214
 msgid "Introducing SSH Pilot API"
 msgstr "引入 SSH Pilot API"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:214
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:225
-msgid "Introducing Omnisearch—a powerful, versatile pop-up search box accessible from anywhere by double-pressing the Shift key"
-msgstr "引入 Omnisearch — 一个功能强大、用途广泛的弹出式搜索框，双击 Shift 键即可随处访问"
-
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:215
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:226
-msgid "Added a minimal sidebar mode that uses a narrow, icon-only strip to free up horizontal screen space"
-msgstr "添加极简侧边栏模式，使用狭窄的纯图标栏释放水平屏幕空间"
-
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:216
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:227
-msgid "Added an option to open the file manager in SSH terminal panes from the tab context menu"
-msgstr "在标签页上下文菜单中添加在 SSH 终端窗格中打开文件管理器的选项"
-
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:217
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:228
-msgid "Added an option to open a terminal in file manager tabs"
-msgstr "添加在文件管理器标签页中打开终端的选项"
-
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:218
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:229
-msgid "Improved the appearance and overall experience of the SFTP file manager"
-msgstr "改进 SFTP 文件管理器的外观和整体体验"
-
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:219
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:230
-msgid "Fixed an issue that delayed application shutdown when local terminal tabs were open"
-msgstr "修复在打开本地终端标签页时导致应用程序关闭延迟的问题"
+msgid ""
+"Introducing Omnisearch—a powerful, versatile pop-up search box accessible "
+"from anywhere by double-pressing the Shift key"
+msgstr ""
+"引入 Omnisearch — 一个功能强大、用途广泛的弹出式搜索框，双击 Shift 键即可随处"
+"访问"
 
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:220
 #: data/io.github.mfat.sshpilot.metainfo.xml.in:231
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:485
+msgid ""
+"Added a minimal sidebar mode that uses a narrow, icon-only strip to free up "
+"horizontal screen space"
+msgstr "添加极简侧边栏模式，使用狭窄的纯图标栏释放水平屏幕空间"
+
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:221
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:232
+msgid ""
+"Added an option to open the file manager in SSH terminal panes from the tab "
+"context menu"
+msgstr "在标签页上下文菜单中添加在 SSH 终端窗格中打开文件管理器的选项"
+
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:222
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:233
+msgid "Added an option to open a terminal in file manager tabs"
+msgstr "添加在文件管理器标签页中打开终端的选项"
+
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:223
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:234
+msgid "Improved the appearance and overall experience of the SFTP file manager"
+msgstr "改进 SFTP 文件管理器的外观和整体体验"
+
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:224
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:235
+msgid ""
+"Fixed an issue that delayed application shutdown when local terminal tabs "
+"were open"
+msgstr "修复在打开本地终端标签页时导致应用程序关闭延迟的问题"
+
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:225
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:236
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:490
 msgid "Various bug fixes and UI improvements"
 msgstr "各种错误修复和界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:236
-msgid "Introducing Omnisearch - a powerful, versatile pop-up search box you can activate from anywhere by double-pressing the Shift key"
-msgstr "引入 Omnisearch — 一个功能强大的弹出式搜索框，双击 Shift 键即可随处唤出"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:241
+msgid ""
+"Introducing Omnisearch - a powerful, versatile pop-up search box you can "
+"activate from anywhere by double-pressing the Shift key"
+msgstr ""
+"引入 Omnisearch — 一个功能强大的弹出式搜索框，双击 Shift 键即可随处唤出"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:237
-msgid "Introducing a minimal mode for the sidebar - use a narrow, icon-only strip instead of the default full sidebar to reclaim more horizontal screen space"
-msgstr "引入极简侧边栏模式 — 使用狭窄的纯图标栏代替默认的完整侧边栏，以节省更多水平屏幕空间"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:242
+msgid ""
+"Introducing a minimal mode for the sidebar - use a narrow, icon-only strip "
+"instead of the default full sidebar to reclaim more horizontal screen space"
+msgstr ""
+"引入极简侧边栏模式 — 使用狭窄的纯图标栏代替默认的完整侧边栏，以节省更多水平屏"
+"幕空间"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:238
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:275
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:243
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:280
 msgid "Various bug fixes and improvements"
 msgstr "各种错误修复与改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:243
-msgid "Enhanced CLI interface - start sshpilot from commandline like \"sshpilot user@host\", use --sftp to open the file manager"
-msgstr "增强命令行界面 — 通过类似 “sshpilot user@host” 的命令行启动 sshpilot，使用 --sftp 打开文件管理器"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:248
+msgid ""
+"Enhanced CLI interface - start sshpilot from commandline like \"sshpilot "
+"user@host\", use --sftp to open the file manager"
+msgstr ""
+"增强命令行界面 — 通过类似 “sshpilot user@host” 的命令行启动 sshpilot，使用 --"
+"sftp 打开文件管理器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:274
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:279
 msgid "German translation"
 msgstr "德语翻译"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:280
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:285
 msgid "Meson build system"
 msgstr "Meson 构建系统"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:281
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:286
 msgid "Migrated to GNOME rcommended project structure"
 msgstr "迁移至 GNOME 推荐的项目结构"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:286
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:291
 msgid "Migrated to meson build system"
 msgstr "迁移至 Meson 构建系统"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:291
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:296
 msgid "Enhanced support for multi-step authentication challenges"
 msgstr "增强对多步身份验证质询的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:292
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:300
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:297
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:305
 msgid "Better support for FIDO hardware keys"
 msgstr "更好地支持 FIDO 硬件密钥"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:293
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:301
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:298
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:306
 msgid "More robust password autofill flow"
 msgstr "更健壮的密码自动填充流程"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:294
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:299
 msgid "Redesigned SCP dialog"
 msgstr "重新设计 SCP 对话框"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:299
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:304
 msgid "Enhanced suppot for multi-sttep authentication challenges"
 msgstr "增强对多步身份验证质询的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:302
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:307
 msgid "Revamped SCP dialogs"
 msgstr "改进 SCP 对话框"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:307
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:312
 msgid "Bug fixes and minor UI improvements"
 msgstr "错误修复和细微界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:317
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:322
 msgid "Improvements for Xterm.js terminal backend"
 msgstr "Xterm.js 终端后端的改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:328
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:333
 msgid "Docker Console UI improvements"
 msgstr "Docker 控制台界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:329
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:334
 msgid "File manager UI improvements"
 msgstr "文件管理器界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:330
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:335
 msgid "Reorganized main menu"
 msgstr "重新组织主菜单"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:336
-msgid "Backup settings and credentials to Bitwarden/Vaultwarden right from SSH Pilot and restore on other devices"
-msgstr "直接在 SSH Pilot 中将设置和凭据备份到 Bitwarden/Vaultwarden，并在其他设备上恢复"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:341
+msgid ""
+"Backup settings and credentials to Bitwarden/Vaultwarden right from SSH "
+"Pilot and restore on other devices"
+msgstr ""
+"直接在 SSH Pilot 中将设置和凭据备份到 Bitwarden/Vaultwarden，并在其他设备上恢"
+"复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:337
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:342
 msgid "More credential storage backends including Keepass, Bitwarden and rbw"
 msgstr "更多凭据存储后端，包括 KeePass、Bitwarden 和 rbw"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:338
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:343
 msgid "Improvements to Pyxtermjs terminal backend"
 msgstr "Pyxtermjs 终端后端的改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:339
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:344
 msgid "Various bug fixes and performance improvements"
 msgstr "各种错误修复和性能改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:344
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:349
 msgid "Fixes SCP bug in Flatpak"
 msgstr "修复 Flatpak 中的 SCP 错误"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:345
-msgid "Adds \"Edit as Root\" button to text editor. Edit eny remote files with sudo"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:350
+msgid ""
+"Adds \"Edit as Root\" button to text editor. Edit eny remote files with sudo"
 msgstr "文本编辑器中添加“以 Root 身份编辑”按钮。使用 sudo 编辑任何远程文件"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:346
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:351
 msgid "Better logging and diagnostics suite"
 msgstr "更完善的日志记录与诊断套件"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:351
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:356
 msgid "Improved drag and drop and group nesting experience"
 msgstr "改进拖放和分组嵌套体验"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:356
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:361
 msgid "Added support for nested groups"
 msgstr "添加对嵌套分组的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:357
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:362
 msgid "Improvements to Drag & Drop experience in connection list"
 msgstr "改进连接列表中的拖放体验"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:358
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:363
 msgid "Fixed scp failing to download directories"
 msgstr "修复 scp 无法下载目录的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:365
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:370
 msgid "Performance improvements for SFTP file manager"
 msgstr "SFTP 文件管理器的性能改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:366
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:371
 msgid "Added option to copy text on select"
 msgstr "添加选择文本时自动复制的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:376
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:381
 msgid "New Docker/Podman management console"
 msgstr "新增 Docker/Podman 管理控制台"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:377
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:382
 msgid "New plugin feature + plugin SDk with a bunch of experimental plugins"
 msgstr "全新插件功能 + 插件 SDK，附带一系列实验性插件"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:378
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:383
 msgid "Support for additional protocols (mosh, serial, etc.)"
 msgstr "支持其他协议（mosh、串口等）"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:379
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:388
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:384
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:393
 msgid "UI fixes and improvements"
 msgstr "界面修复与改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:384
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:389
 msgid "Docker/Podman container management console"
 msgstr "Docker/Podman 容器管理控制台"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:385
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:390
 msgid "New plugin framework and SDK"
 msgstr "新的插件框架与 SDK"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:386
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:391
 msgid "New plugin settings to install and manage plugins"
 msgstr "用于安装和管理插件的新插件设置"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:387
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:392
 msgid "Improved SSH config editor"
 msgstr "改进的 SSH 配置编辑器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:389
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:394
 msgid "Additional protocols"
 msgstr "其他协议"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:394
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:399
 msgid "New \"Tags\" feature: add tags to connections"
 msgstr "新增“标签”功能：为连接添加标签"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:395
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:400
 msgid "Search now supports tags"
 msgstr "搜索现在支持标签"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:396
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:401
 msgid "New tags view for the connection list"
 msgstr "连接列表的新标签视图"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:397
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:402
 msgid "Drag and drop a connection on a tag group to apply tag"
 msgstr "将连接拖放到标签分组以应用标签"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:398
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:403
 msgid "Added inline autocompletion for tags"
 msgstr "为标签添加内联自动补全"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:399
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:404
 msgid "Added inline autocompletion for jump hosts"
 msgstr "为跳板主机添加内联自动补全"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:400
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:405
 msgid "Added support for selecting connections with space key"
 msgstr "添加对使用空格键选择连接的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:410
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:415
 msgid "Updated ssh-copy-id dialog"
 msgstr "更新 ssh-copy-id 对话框"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:411
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:416
 msgid "Fixes macOS keychain prompting repeatedly"
 msgstr "修复 macOS 钥匙串重复提示的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:412
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:417
 msgid "Minor UI improvements and bug fixes"
 msgstr "细微界面改进和错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:422
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:427
 msgid "Improved connection editor"
 msgstr "改进的连接编辑器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:438
-msgid "Added fallback for older libadwaita versions failing to load connection editor"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:443
+msgid ""
+"Added fallback for older libadwaita versions failing to load connection "
+"editor"
 msgstr "为无法加载连接编辑器的旧版本 libadwaita 添加回退方案"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:453
-msgid "Drag and drop a connection on an existing terminal to create a split view"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:458
+msgid ""
+"Drag and drop a connection on an existing terminal to create a split view"
 msgstr "将连接拖放到现有终端以创建分屏视图"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:454
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:459
 msgid "New first-run dialog and option to back up .ssh/config"
 msgstr "新的首次运行对话框和备份 .ssh/config 的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:455
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:460
 msgid "Updated connection status indicators"
 msgstr "更新的连接状态指示器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:456
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:461
 msgid "Updated port forwarding indicators"
 msgstr "更新的端口转发指示器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:457
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:462
 msgid "New sidebar behavior options — configure autohide from Settings"
 msgstr "新的侧边栏行为选项 — 在“设置”中配置自动隐藏"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:458
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:463
 msgid "Improvements to Split View"
 msgstr "分屏视图改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:459
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:464
 msgid "Added local terminal button to the headerbar"
 msgstr "在顶栏添加本地终端按钮"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:460
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:465
 msgid "New toggles for headerbar buttons"
 msgstr "顶栏按钮的新切换开关"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:461
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:466
 msgid "More improvements for the command sidebar"
 msgstr "命令侧边栏的更多改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:462
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:467
 msgid "New option to add multiple private keys and certificates"
 msgstr "添加多个私钥和证书的新选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:463
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:468
 msgid "Improved .ssh/config parsing logic"
 msgstr "改进的 .ssh/config 解析逻辑"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:473
-msgid "Added type-ahead search - open the app, start typing and press enter. The first matching host will be connected"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:478
+msgid ""
+"Added type-ahead search - open the app, start typing and press enter. The "
+"first matching host will be connected"
 msgstr "添加即键即搜 — 打开应用，直接键入并按回车即可连接第一个匹配的主机"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:474
-msgid "Made it easier to switch between the terminal and connection list with Ctrl+Shift+L"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:479
+msgid ""
+"Made it easier to switch between the terminal and connection list with "
+"Ctrl+Shift+L"
 msgstr "更轻松地使用 Ctrl+Shift+L 在终端和连接列表之间切换"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:480
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:490
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:485
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:495
 msgid "Better look and feel for built-in file manager"
 msgstr "内置文件管理器拥有更好的外观与体验"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:481
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:486
 msgid "Zoom control for file manager"
 msgstr "文件管理器的缩放控件"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:482
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:487
 msgid "New option to always show Commands sidebar"
 msgstr "始终显示命令侧边栏的新选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:483
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:488
 msgid "More reliable SFTP file transfers"
 msgstr "更可靠的 SFTP 文件传输"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:484
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:489
 msgid "Changed default connection list shortcut to Ctrl+Shift+L"
 msgstr "将默认的连接列表快捷键更改为 Ctrl+Shift+L"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:500
-msgid "Introducing Command Blocks - Organize your favorite commands in folders, insert them into terminal with a simple double-click"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:505
+msgid ""
+"Introducing Command Blocks - Organize your favorite commands in folders, "
+"insert them into terminal with a simple double-click"
 msgstr "引入命令块 — 在文件夹中组织您喜爱的命令，双击即可轻松插入终端"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:501
-msgid "Choose a command from your command snippet intventory to run on a single host or a group of machines"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:506
+msgid ""
+"Choose a command from your command snippet intventory to run on a single "
+"host or a group of machines"
 msgstr "从命令片段清单中选择命令，以在单个主机或一组机器上运行"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:502
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:507
 msgid "More improvements to Split View"
 msgstr "分屏视图的更多改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:507
-msgid "New \"Sessions\" feature — Save, open, rename, and delete snapshots of your open tabs and restore them automatically"
-msgstr "新增“会话”功能 — 保存、打开、重命名和删除已打开标签页的快照，并自动恢复它们"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:512
+msgid ""
+"New \"Sessions\" feature — Save, open, rename, and delete snapshots of your "
+"open tabs and restore them automatically"
+msgstr ""
+"新增“会话”功能 — 保存、打开、重命名和删除已打开标签页的快照，并自动恢复它们"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:508
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:513
 msgid "Pin saved sessions to the start page for one-click restore"
 msgstr "将保存的会话固定到起始页，一键恢复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:509
-msgid "Copy to group — Add a connection to another group without removing it from its current group(s). Same connection can appear in multiple groups."
-msgstr "复制到分组 — 将连接添加到另一个分组，而不从当前分组中移除。同一个连接可以出现在多个分组中。"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:514
+msgid ""
+"Copy to group — Add a connection to another group without removing it from "
+"its current group(s). Same connection can appear in multiple groups."
+msgstr ""
+"复制到分组 — 将连接添加到另一个分组，而不从当前分组中移除。同一个连接可以出现"
+"在多个分组中。"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:510
-msgid "Jump host picker — Pick jump hosts from your saved connections when editing a connection."
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:515
+msgid ""
+"Jump host picker — Pick jump hosts from your saved connections when editing "
+"a connection."
 msgstr "跳板主机选择器 — 编辑连接时可从保存的连接中挑选跳板主机。"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:511
-msgid "Better Split View - Resize terminal panes freely, drag and drop an entire group onto a Split View"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:516
+msgid ""
+"Better Split View - Resize terminal panes freely, drag and drop an entire "
+"group onto a Split View"
 msgstr "更出色的分屏视图 — 自由调整终端窗格大小，将整个分组拖放到分屏视图中"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:512
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:517
 msgid "Minor UI fixes and improvements"
 msgstr "细微界面修复与改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:518
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:538
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:544
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:566
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:587
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:607
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:630
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:682
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:523
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:543
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:549
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:571
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:592
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:612
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:635
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:687
 msgid "- Bug fixes"
 msgstr "- 错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:524
-msgid "- New \"Splt View\" feature - view terminals side by side inside any terminal tab"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:529
+msgid ""
+"- New \"Splt View\" feature - view terminals side by side inside any "
+"terminal tab"
 msgstr "- 新增“分屏视图”功能 — 在任意终端标签页内并排查看终端"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:525
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:530
 msgid "- New context menu item to copy host address"
 msgstr "- 上下文菜单新增复制主机地址项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:531
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:536
 msgid "- Updated flatpak to GNOME Platform 50"
 msgstr "- 将 Flatpak 更新到 GNOME Platform 50"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:537
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:542
 msgid "- Added URL support to terminal"
 msgstr "- 终端添加 URL 支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:550
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:555
 msgid "- Fixes for Quick Connect function"
 msgstr "- 修复快速连接功能"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:551
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:556
 msgid "- Add option to save Quick Connect host"
 msgstr "- 添加保存快速连接主机的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:552
-msgid "- Added option to rename a tab - Double-click any terminal tab to rename"
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:557
+msgid ""
+"- Added option to rename a tab - Double-click any terminal tab to rename"
 msgstr "- 添加重命名标签页的选项 — 双击任意终端标签页即可重命名"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:553
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:558
 msgid "- Added support for Wake on Lan"
 msgstr "- 添加对局域网唤醒 (Wake on LAN) 的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:554
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:559
 msgid "- Added pre-connection command support"
 msgstr "- 添加对连接前命令的支持"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:560
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:565
 msgid "- Minor bug fixes"
 msgstr "- 细微错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:572
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:577
 msgid "- Fixed saved secrets not used for login"
 msgstr "- 修复保存的机密未用于登录的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:578
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:583
 msgid "- Support for sidebar resizing"
 msgstr "- 支持调整侧边栏大小"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:579
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:584
 msgid "- Toggles for info labels in sidebar"
 msgstr "- 侧边栏信息标签切换开关"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:580
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:585
 msgid "- Updated color badges"
 msgstr "- 更新颜色标记"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:581
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:586
 msgid "- Various bug fixes and UI improvements"
 msgstr "- 各种错误修复和界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:593
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:598
 msgid "- Added option to resize sidebar"
 msgstr "- 添加调整侧边栏大小的选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:594
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:599
 msgid "- Fixed long host values making sidebar too wide"
 msgstr "- 修复较长的主机名导致侧边栏过宽的问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:595
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:600
 msgid "- Bug fixes and UI improvements"
 msgstr "- 错误修复和界面改进"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:601
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:606
 msgid "- Drag and drop files and folders on terminal to upload via SCP"
 msgstr "- 拖放文件和文件夹到终端以通过 SCP 上传"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:613
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:622
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:618
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:627
 msgid "- Make terminal fullscreen with F11"
 msgstr "- 按 F11 使终端全屏"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:614
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:619
 msgid "- Improvements for SCP file transfers"
 msgstr "- 改进 SCP 文件传输"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:615
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:620
 msgid "- Drag and drop files and folders directly on terminal widget"
 msgstr "- 直接在终端部件上拖放文件和文件夹"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:616
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:621
 msgid "- Updated password/passphrase prompts with option to store secrets"
 msgstr "- 更新密码/口令提示，附带存储机密选项"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:623
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:628
 msgid "- Added xterm.js as an alternative terminal backend"
 msgstr "- 添加 xterm.js 作为备选终端后端"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:624
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:629
 msgid "- Added graphical prompts for passwords/passphrases"
 msgstr "- 为密码/口令添加图形提示"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:636
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:641
 msgid "- Fixed black toolbar in file manager"
 msgstr "- 修复文件管理器中的黑色工具栏问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:637
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:642
 msgid "- Fixed nano editor issue when run under KDE Plasma desktop"
 msgstr "- 修复在 KDE Plasma 桌面下运行时的 nano 编辑器问题"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:643
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:648
 msgid "- Enhanced text editor for built-in file manager"
 msgstr "- 增强内置文件管理器的文本编辑器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:649
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:654
 msgid "- Bug fixes for SFTP file manager"
 msgstr "- SFTP 文件管理器的错误修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:655
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:660
 msgid "- Improvements to built-in file manager, new text editor"
 msgstr "- 改进内置文件管理器，全新文本编辑器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:656
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:661
 msgid "- Added file mmanager button to connection rows"
 msgstr "- 在连接行中添加文件管理器按钮"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:657
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:662
 msgid "- Sort button now sorts groups too"
 msgstr "- 排序按钮现在也对分组进行排序"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:663
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:668
 msgid "- Fixed file manager bug when password authentication is selected"
 msgstr "- 修复选择密码身份验证时的文件管理器错误"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:669
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:674
 msgid "- Redesigned start page, with card and list layouts"
 msgstr "- 重新设计的起始页，支持卡片和列表布局"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:670
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:675
 msgid "- Minor UI fixes"
 msgstr "- 细微界面修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:676
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:681
 msgid "- Update notifier fixes"
 msgstr "- 更新通知器修复"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:688
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:693
 msgid "- Added update notifier"
 msgstr "- 添加更新通知器"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:694
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:699
 msgid "- New feature: Import/Export configuration"
 msgstr "- 新功能：导入/导出配置"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:695
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:700
 msgid "- Better log output"
 msgstr "- 更好的日志输出"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:701
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:706
 msgid "Added sorting to connection list"
 msgstr "连接列表新增排序功能"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:717
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:722
 msgid "Main Window"
 msgstr "主窗口"
 
-#: data/io.github.mfat.sshpilot.metainfo.xml.in:733
+#: data/io.github.mfat.sshpilot.metainfo.xml.in:738
 msgid "Transfer SSH Keys"
 msgstr "传输 SSH 密钥"
 
@@ -10211,8 +10583,12 @@ msgid "Copy log output"
 msgstr "复制日志输出"
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:33
-msgid "Copy platform info and recent frontend, daemon, askpass, and crash diagnostics to the clipboard for a bug report."
-msgstr "复制平台信息以及最近的前端、守护进程、askpass 和崩溃诊断信息至剪贴板，用于提交错误报告。"
+msgid ""
+"Copy platform info and recent frontend, daemon, askpass, and crash "
+"diagnostics to the clipboard for a bug report."
+msgstr ""
+"复制平台信息以及最近的前端、守护进程、askpass 和崩溃诊断信息至剪贴板，用于提"
+"交错误报告。"
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:42
 msgid "More log actions"
@@ -10227,7 +10603,9 @@ msgid "Category:"
 msgstr "类别："
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:114
-msgid "Which local process log to view. Bug-report output keeps each process in a labelled section."
+msgid ""
+"Which local process log to view. Bug-report output keeps each process in a "
+"labelled section."
 msgstr "要查看的本地进程日志。错误报告输出将各进程分别归类在带标签的区域中。"
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:124
@@ -10235,8 +10613,12 @@ msgid "Level:"
 msgstr "级别："
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:134
-msgid "Show lines at the selected level and above (display only). What is actually written to the log files is controlled in Preferences → Advanced → Logging."
-msgstr "显示选定级别及以上的行（仅供显示）。实际写入日志文件的内容在“首选项 → 高级 → 日志记录”中控制。"
+msgid ""
+"Show lines at the selected level and above (display only). What is actually "
+"written to the log files is controlled in Preferences → Advanced → Logging."
+msgstr ""
+"显示选定级别及以上的行（仅供显示）。实际写入日志文件的内容在“首选项 → 高级 → "
+"日志记录”中控制。"
 
 #: src/sshpilot/resources/ui/log_viewer_window.ui:149
 msgid "Search visible lines (case-insensitive)"
@@ -10340,3 +10722,22 @@ msgstr "直通"
 msgid "Copy key to Server"
 msgstr "复制密钥到服务器"
 
+#~ msgid ""
+#~ "Default identity provider whose agent/keys are offered to connections. "
+#~ "The per-connection key is set on each connection (IdentityFile); this is "
+#~ "the global default."
+#~ msgstr ""
+#~ "为连接提供代理/密钥的默认身份提供程序。每个连接的特定密钥在各连接中设置 "
+#~ "(IdentityFile)；此为全局默认设置。"
+
+#~ msgid "Open on Startup"
+#~ msgstr "启动时打开"
+
+#~ msgid "Open Command Snippets when the window starts"
+#~ msgstr "窗口启动时打开命令片段"
+
+#~ msgid "Close After Sending"
+#~ msgstr "发送后关闭"
+
+#~ msgid "Close Command Snippets after sending a command"
+#~ msgstr "发送命令后关闭命令片段"
