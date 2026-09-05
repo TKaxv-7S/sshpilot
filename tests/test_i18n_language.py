@@ -13,6 +13,26 @@ import pytest
 from sshpilot import i18n
 
 
+@pytest.fixture(autouse=True)
+def _isolate_language_env():
+    """Restore the language variables around every test.
+
+    ``apply_language`` writes ``os.environ`` directly -- both ``LANGUAGE`` and
+    the variable it parks the original in -- so without this a test that sets a
+    language leaks it into the ones that follow.
+    """
+    saved = {k: os.environ.get(k)
+             for k in ("LANGUAGE", i18n._ORIGINAL_LANGUAGE_VAR)}
+    try:
+        yield
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
 def _install_catalogue(root, code):
     d = root / code / "LC_MESSAGES"
     d.mkdir(parents=True)
@@ -140,10 +160,58 @@ def test_apply_language_exports_language(monkeypatch):
 def test_system_default_leaves_the_environment_alone(monkeypatch):
     """Empty setting must not pin a language — that is the whole point of it."""
     monkeypatch.setenv("LANGUAGE", "fr")
+    os.environ.pop(i18n._ORIGINAL_LANGUAGE_VAR, None)
 
     assert i18n.apply_language("") == ""
 
     assert os.environ["LANGUAGE"] == "fr"
+
+
+def test_system_default_undoes_an_override_inherited_from_a_restart(monkeypatch):
+    """"Restart Now" re-execs with os.execv, which keeps the environment.
+
+    So the next process starts with the *previous* choice still exported. An
+    empty setting has to clear it, or going back to "System Default" does
+    nothing and the old language survives every restart.
+    """
+    monkeypatch.setenv("LANGUAGE", "")
+    os.environ.pop("LANGUAGE", None)
+    os.environ.pop(i18n._ORIGINAL_LANGUAGE_VAR, None)
+
+    i18n.apply_language("fa")                      # the instance being replaced
+    assert os.environ["LANGUAGE"] == "fa"
+
+    assert i18n.apply_language("") == ""           # the instance replacing it
+
+    assert "LANGUAGE" not in os.environ
+    assert i18n._ORIGINAL_LANGUAGE_VAR not in os.environ
+
+
+def test_system_default_restores_the_sessions_own_language(monkeypatch):
+    """Undoing our override must not swallow what the session set itself."""
+    monkeypatch.setenv("LANGUAGE", "de:en")
+    os.environ.pop(i18n._ORIGINAL_LANGUAGE_VAR, None)
+
+    i18n.apply_language("fa")
+    assert os.environ["LANGUAGE"] == "fa"
+
+    i18n.apply_language("")
+
+    assert os.environ["LANGUAGE"] == "de:en"
+
+
+def test_only_the_first_override_records_the_original(monkeypatch):
+    """Switching between languages must not overwrite the stashed original."""
+    monkeypatch.setenv("LANGUAGE", "de:en")
+    os.environ.pop(i18n._ORIGINAL_LANGUAGE_VAR, None)
+
+    i18n.apply_language("fa")
+    i18n.apply_language("ru")
+    assert os.environ[i18n._ORIGINAL_LANGUAGE_VAR] == "de:en"
+
+    i18n.apply_language("")
+
+    assert os.environ["LANGUAGE"] == "de:en"
 
 
 @pytest.mark.parametrize(

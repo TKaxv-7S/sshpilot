@@ -206,14 +206,41 @@ def apply_text_direction() -> Optional[str]:
     return code
 
 
+# Where the session's own ``LANGUAGE`` is parked while an explicit choice
+# overrides it. "Restart Now" re-execs through ``os.execv``, which keeps the
+# environment, so an override outlives the preference that set it: choosing a
+# language and then going back to "System Default" left ``LANGUAGE`` behind and
+# the interface came back up in the old language, which only picking a language
+# explicitly could clear. Stashing the original is what makes the way back work.
+_ORIGINAL_LANGUAGE_VAR = 'SSHPILOT_ORIGINAL_LANGUAGE'
+
+
 def apply_language(code: Optional[str] = None) -> str:
     """Export ``LANGUAGE`` for the chosen code. Returns what was applied.
 
-    Must be called before the first ``_()`` in the process. An empty code (the
-    default setting) leaves the environment untouched.
+    Must be called before the first ``_()`` in the process.
+
+    An empty code means "system default", which has to *undo* any override this
+    application put in the environment -- not merely skip setting one -- because
+    the process may have inherited that override from the instance it replaced.
+    Whatever ``LANGUAGE`` the session itself provided is restored; a session that
+    set none gets none back. An empty code in a process that never overrode
+    anything leaves the environment alone, so the user's own setting stands.
     """
     if code is None:
         code = configured_language()
     if code:
+        # Only the first override records the original: later ones are replacing
+        # our own value, not the session's.
+        os.environ.setdefault(_ORIGINAL_LANGUAGE_VAR, os.environ.get('LANGUAGE', ''))
         os.environ['LANGUAGE'] = code
+        return code
+
+    original = os.environ.pop(_ORIGINAL_LANGUAGE_VAR, None)
+    if original is None:
+        return code
+    if original:
+        os.environ['LANGUAGE'] = original
+    else:
+        os.environ.pop('LANGUAGE', None)
     return code
