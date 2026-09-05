@@ -5237,30 +5237,12 @@ class PreferencesWindow(Adw.NavigationPage):
 
         group = Adw.PreferencesGroup(title=_("Behavior"))
 
-        always_show_row = Adw.SwitchRow()
-        always_show_row.set_title(_("Open on Startup"))
-        always_show_row.set_subtitle(_("Open Command Snippets when the window starts"))
-        always_show_row.set_active(bool(self.config.get_setting('command_blocks.always_show_sidebar', False)))
-        always_show_row.connect('notify::active', lambda r, _: self.config.set_setting('command_blocks.always_show_sidebar', r.get_active()))
-        group.add(always_show_row)
-
         insert_only_row = Adw.SwitchRow()
         insert_only_row.set_title(_("Insert Only (no execute)"))
         insert_only_row.set_subtitle(_("Paste the command into the terminal without running it"))
         insert_only_row.set_active(bool(self.config.get_setting('command_blocks.insert_only', False)))
         insert_only_row.connect('notify::active', lambda r, _: self.config.set_setting('command_blocks.insert_only', r.get_active()))
         group.add(insert_only_row)
-
-        auto_hide_row = Adw.SwitchRow()
-        auto_hide_row.set_title(_("Close After Sending"))
-        auto_hide_row.set_subtitle(_("Close Command Snippets after sending a command"))
-        auto_hide_row.set_active(bool(self.config.get_setting('command_blocks.auto_hide_sidebar', False)))
-        self._cb_auto_hide_row = auto_hide_row
-        auto_hide_row.connect(
-            'notify::active',
-            lambda r, _p: self.config.set_setting('command_blocks.auto_hide_sidebar', r.get_active()),
-        )
-        group.add(auto_hide_row)
 
         page.add(group)
         return page
