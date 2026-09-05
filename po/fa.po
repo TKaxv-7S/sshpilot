@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-05 11:35+0330\n"
-"PO-Revision-Date: 2026-09-05 16:17+0330\n"
+"PO-Revision-Date: 2026-09-06 00:57+0330\n"
 "Last-Translator: mFat <newmfat@gmail.com>\n"
 "Language-Team: Persian\n"
 "Language: fa\n"
@@ -29,7 +29,7 @@ msgstr "دکمه نمایش چند قابی"
 
 #: src/sshpilot/actions.py:38 src/sshpilot/preferences.py:1631
 msgid "Command Snippets Button"
-msgstr "دکمه تکهu200cهای فرمان"
+msgstr "دکمه فرمانهای برگزیده"
 
 #: src/sshpilot/actions.py:39 src/sshpilot/preferences.py:1636
 msgid "Terminal Theme Button"
@@ -4991,7 +4991,7 @@ msgstr "ظاهر"
 
 #: src/sshpilot/preferences.py:531
 msgid "Font"
-msgstr "فونت"
+msgstr "قلم\t"
 
 #: src/sshpilot/preferences.py:536
 msgid "Choose"
@@ -5008,7 +5008,7 @@ msgstr "Backend"
 
 #: src/sshpilot/preferences.py:576
 msgid "Terminal Backend"
-msgstr "پایانه پایانه"
+msgstr "موتور ترمینال"
 
 #: src/sshpilot/preferences.py:577
 msgid "Choose the terminal rendering backend"
@@ -5063,11 +5063,11 @@ msgstr ""
 #. Mouse behavior group
 #: src/sshpilot/preferences.py:666
 msgid "Mouse"
-msgstr "موش"
+msgstr "ماوس"
 
 #: src/sshpilot/preferences.py:669
 msgid "Copy on selection"
-msgstr "در انتخاب کپی کنید"
+msgstr "کپی متن با انتخاب"
 
 #: src/sshpilot/preferences.py:671
 msgid "Automatically copy selected text to the clipboard"
@@ -5075,7 +5075,7 @@ msgstr "متن انتخاب شده را به طور خودکار در کلیپ �
 
 #: src/sshpilot/preferences.py:679
 msgid "Paste on right-click"
-msgstr "چسباندن روی کلیک راست"
+msgstr "چسباندن با کلیک راست"
 
 #: src/sshpilot/preferences.py:681
 msgid ""
@@ -5252,7 +5252,7 @@ msgstr "از رنگ گروهی در پایانه ها استفاده کنید"
 
 #: src/sshpilot/preferences.py:984
 msgid "Use parent group's color as terminal background"
-msgstr "از رنگ گروه والد به عنوان پسu200cزمینه پایانی استفاده کنید"
+msgstr "از رنگ گروه والد به عنوان پسu200cزمینه ترمینال استفاده کنید"
 
 #. Group display layout section (shown after appearance options)
 #: src/sshpilot/preferences.py:1004
@@ -5352,7 +5352,7 @@ msgstr "تاریک"
 #. Color overrides section
 #: src/sshpilot/preferences.py:1301
 msgid "Color Overrides"
-msgstr "لغو رنگ"
+msgstr "تغییر رنگهای پیشفرض"
 
 #: src/sshpilot/preferences.py:1302
 msgid "Override the accent color"
@@ -5518,7 +5518,7 @@ msgstr "نمایش زمانی که هیچ برگه ای باز نیست"
 
 #: src/sshpilot/preferences.py:1523
 msgid "Reveal the sidebar when returning to the welcome screen"
-msgstr "هنگام بازگشت به صفحه خوش آمدگویی، نوار کناری را آشکار کنید"
+msgstr "هنگام بازگشت به صفحه خوش آمدگویی، آشکار کنید"
 
 #: src/sshpilot/preferences.py:1536
 msgid "Minimized Row Style"
@@ -5700,7 +5700,7 @@ msgstr ""
 
 #: src/sshpilot/preferences.py:2038
 msgid "Secret Storage"
-msgstr "ذخیره سازی مخفی"
+msgstr "مخزن رمزها"
 
 #: src/sshpilot/preferences.py:2040
 msgid ""
@@ -5718,7 +5718,7 @@ msgstr ""
 
 #: src/sshpilot/preferences.py:2048
 msgid "Secret storage backend"
-msgstr "باطن ذخیره سازی مخفی"
+msgstr "نوع ذخیره ساز رمزها"
 
 #: src/sshpilot/preferences.py:2069
 msgid "System keyring (libsecret)"
@@ -5730,7 +5730,7 @@ msgstr "کلید سیستم"
 
 #: src/sshpilot/preferences.py:2071
 msgid "pass (password store)"
-msgstr "پاس (فروشگاه رمز عبور)"
+msgstr "پاس (مخزن رمز عبور)"
 
 #: src/sshpilot/preferences.py:2072
 msgid "Bitwarden / Vaultwarden (bw CLI)"
@@ -5866,9 +5866,9 @@ msgid ""
 "per-connection key is set on each connection (IdentityFile); this is the "
 "global default."
 msgstr ""
-"ارائهu200cدهنده هویت پیشu200cفرض که عامل/کلیدهای آن به اتصالات ارائه "
-"میu200cشود. کلید هر اتصال در هر اتصال تنظیم می شود (IdentityFile). این پیش "
-"فرض جهانی است."
+"ارائه دهنده هویت پیشفرض که عامل/کلیدهای آن به اتصالات ارائه میشود. کلید هر "
+"اتصال در هر اتصال تنظیم می شود (IdentityFile). این ارائه دهنده پیش فرض کلی "
+"است."
 
 #: src/sshpilot/preferences.py:2247
 msgid "Default SSH agent"

@@ -3917,7 +3917,7 @@ msgstr "导出配置…"
 
 #: src/sshpilot/macos_menubar.py:68 src/sshpilot/text_editor.py:412
 msgid "Undo"
-msgstr "撤消"
+msgstr "撤销"
 
 #: src/sshpilot/macos_menubar.py:69 src/sshpilot/text_editor.py:418
 msgid "Redo"
@@ -4078,8 +4078,8 @@ msgid "Try: “{name}”  or  “ssh {target}”  or  “sftp {name2}”"
 msgstr "尝试：“{name}” 或 “ssh {target}” 或 “sftp {name2}”"
 
 #: src/sshpilot/omni_search.py:696
-msgid "Try: “ssh root@203.0.113.7”  or  “sftp”  or  “preferences”"
-msgstr "尝试：“ssh root@203.0.113.7” 或 “sftp” 或 “preferences”"
+msgid "Try: “ssh root@203.0.113.7”  or  “sftp”  or  “首选项”"
+msgstr "尝试：“ssh root@203.0.113.7” 或 “sftp” 或 “首选项”"
 
 #. Tools-menu "Docker Console" → sidebar selection, else Local. The page
 #. itself is never opened directly; on_activate handles the click.
@@ -4321,7 +4321,7 @@ msgstr "输入 {word} 以确认"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_compose.py:157
 msgid "Tear down stack?"
-msgstr "销毁技术栈？"
+msgstr "销毁堆栈？"
 
 #: src/sshpilot/plugins/builtin/docker_manager/tab_compose.py:158
 #, python-brace-format
