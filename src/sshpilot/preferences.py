@@ -2238,9 +2238,7 @@ class PreferencesWindow(Adw.NavigationPage):
         identity_group = Adw.PreferencesGroup(
             title=_("SSH Identity"),
             description=_(
-                "Default identity provider whose agent/keys are offered to "
-                "connections. The per-connection key is set on each connection "
-                "(IdentityFile); this is the global default."
+                "Default identity provider."
             ),
         )
         self.identity_provider_row = Adw.ComboRow()
