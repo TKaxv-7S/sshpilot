@@ -79,7 +79,13 @@ class NativeSshCommandRunner:
         started = time.monotonic()
         timed_out = False
         try:
-            while selector.get_map() or process.poll() is None:
+            # Wait for the Popen child to exit while draining ready output.
+            # After exit, non-blocking-drain remaining buffered bytes, then
+            # close any still-open pipes — do not wait for EOF.
+            # ControlPersist's background [mux] master can inherit the capture
+            # write ends (especially with -v), so EOF never arrives even though
+            # the command child is done.
+            while process.poll() is None:
                 if cancel_event.is_set():
                     self._stop(process)
                     raise OperationCancelled()
@@ -88,23 +94,22 @@ class NativeSshCommandRunner:
                 ):
                     timed_out = True
                     self._stop(process)
-                for key, _ in selector.select(0.05):
-                    chunk = key.fileobj.read(_CHUNK_BYTES)
-                    if not chunk:
-                        selector.unregister(key.fileobj)
-                        key.fileobj.close()
-                        continue
-                    if on_output:
-                        on_output(key.data, chunk.decode("utf-8", "replace"))
-                    room = policy.output_limit_bytes - sum(
-                        len(value) for value in retained.values()
-                    )
-                    if room > 0:
-                        retained[key.data].extend(chunk[:room])
-                    if len(chunk) > max(room, 0):
-                        truncated = True
-                if timed_out and process.poll() is not None:
+                truncated = self._drain_ready(
+                    selector,
+                    retained,
+                    truncated,
+                    policy,
+                    on_output,
+                    timeout=0.05,
+                )
+            while selector.get_map():
+                ready = selector.select(0)
+                if not ready:
                     break
+                truncated = self._consume_ready(
+                    selector, retained, truncated, policy, on_output, ready
+                )
+            self._close_remaining_pipes(selector)
             exit_code = process.wait()
         finally:
             selector.close()
@@ -120,6 +125,46 @@ class NativeSshCommandRunner:
             truncated,
             timed_out,
         )
+
+    @classmethod
+    def _drain_ready(cls, selector, retained, truncated, policy, on_output, *, timeout):
+        ready = selector.select(timeout)
+        if not ready:
+            return truncated
+        return cls._consume_ready(
+            selector, retained, truncated, policy, on_output, ready
+        )
+
+    @staticmethod
+    def _consume_ready(selector, retained, truncated, policy, on_output, ready):
+        for key, _ in ready:
+            chunk = key.fileobj.read(_CHUNK_BYTES)
+            if not chunk:
+                selector.unregister(key.fileobj)
+                key.fileobj.close()
+                continue
+            if on_output:
+                on_output(key.data, chunk.decode("utf-8", "replace"))
+            room = policy.output_limit_bytes - sum(
+                len(value) for value in retained.values()
+            )
+            if room > 0:
+                retained[key.data].extend(chunk[:room])
+            if len(chunk) > max(room, 0):
+                truncated = True
+        return truncated
+
+    @staticmethod
+    def _close_remaining_pipes(selector) -> None:
+        for key in list(selector.get_map().values()):
+            try:
+                selector.unregister(key.fileobj)
+            except KeyError:
+                pass
+            try:
+                key.fileobj.close()
+            except OSError:
+                pass
 
     @staticmethod
     def _stop(process) -> None:

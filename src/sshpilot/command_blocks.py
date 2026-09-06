@@ -2064,7 +2064,6 @@ class CommandBlocksPanel(Gtk.Box):
             manager = getattr(self.window, "terminal_manager", None)
             if manager is None:
                 return
-            active = getattr(self.window, "active_terminals", {})
             connection = connections[0]
             existing = self._existing_terminal_for_connection(connection)
             if existing is not None:
@@ -2076,10 +2075,18 @@ class CommandBlocksPanel(Gtk.Box):
                     self.store.record_use(cmd_id)
                 return
             manager.connect_to_host(connection, force_new=True)
-            terminal = active.get(connection)
+            terminal = self._existing_terminal_for_connection(connection)
             if terminal is not None:
                 self._feed_interactive_when_connected(
                     terminal, command_text, insert_only=insert_only
+                )
+            else:
+                # Terminal creation is deferred (secret-vault unlock and
+                # daemon readiness run off the main thread), so the new tab
+                # does not exist yet when connect_to_host() returns. Poll
+                # for its arrival instead of dropping the command.
+                self._feed_interactive_when_available(
+                    connection, command_text, insert_only=insert_only
                 )
         else:
             split = SplitViewTab(self.window)
@@ -2131,6 +2138,52 @@ class CommandBlocksPanel(Gtk.Box):
             return
         window.show_tab_view()
         window.tab_view.set_selected_page(page)
+
+    def _feed_interactive_when_available(
+        self,
+        connection,
+        command_text: str,
+        *,
+        insert_only: bool,
+        _attempt: int = 0,
+        _max_attempts: int = 480,
+    ) -> None:
+        """Feed *command_text* once the just-opened terminal is registered.
+
+        ``TerminalManager.connect_to_host()`` returns before the new tab
+        exists: the secret-vault unlock probe and daemon readiness run off
+        the main thread and the tab is created on retry. Poll for the
+        terminal's arrival, then delegate to
+        ``_feed_interactive_when_connected`` (which itself waits for shell
+        readiness), instead of dropping the command.
+        """
+        terminal = self._existing_terminal_for_connection(connection)
+        if terminal is not None:
+            self._select_terminal_page(terminal)
+            self._feed_interactive_when_connected(
+                terminal, command_text, insert_only=insert_only
+            )
+            return
+        if _attempt >= _max_attempts:
+            logger.warning("Timed out waiting for new terminal to run command")
+            return
+        if getattr(self.window, "_is_quitting", False):
+            return
+
+        def _poll() -> bool:
+            try:
+                self._feed_interactive_when_available(
+                    connection,
+                    command_text,
+                    insert_only=insert_only,
+                    _attempt=_attempt + 1,
+                    _max_attempts=_max_attempts,
+                )
+            except Exception:
+                logger.error("Deferred command feed failed", exc_info=True)
+            return GLib.SOURCE_REMOVE
+
+        GLib.timeout_add(250, _poll)
 
     @staticmethod
     def _feed_interactive_when_connected(

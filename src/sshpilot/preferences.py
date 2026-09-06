@@ -5726,8 +5726,11 @@ class PreferencesWindow(Adw.NavigationPage):
         Returns ``True`` on success.  On a validation, revision-conflict,
         unsupported-capability, or persistence failure the daemon mutation
         failed: the page stays open, the controller snapshot is preserved, and
-        no ControlMaster sessions are expired.
+        no ControlMaster sessions are expired.  The Config-owned rows that the
+        page rolls back on failure are rewound on disk too, so the file and the
+        rows can never disagree about what is applied.
         """
+        config_owned_rollback = {}
         try:
             controller = self.ssh_overrides_controller
             page_built = hasattr(self, 'connect_timeout_row')
@@ -5751,12 +5754,26 @@ class PreferencesWindow(Adw.NavigationPage):
                     return False
 
             # 1. Config-owned rows persist first (each set_setting saves now).
+            #    ``set_setting`` writes the file immediately and has no
+            #    rollback, so the pre-write values are captured here: if the
+            #    daemon mutation below fails, ``_on_advanced_ssh_field_changed``
+            #    rolls these two rows back and the file has to follow, or the
+            #    switch would report a value opposite to the one in effect.
+            #    Only the keys ``_restore_advanced_ssh_rows`` rolls back are
+            #    captured; the file-manager keys are not restored there, so
+            #    rewinding them would create the very divergence this prevents.
             if hasattr(self, 'apply_default_keepalive_row'):
+                config_owned_rollback['ssh.apply_default_keepalive'] = bool(
+                    self.config.get_setting('ssh.apply_default_keepalive', True)
+                )
                 self.config.set_setting(
                     'ssh.apply_default_keepalive',
                     bool(self.apply_default_keepalive_row.get_active()),
                 )
             if hasattr(self, 'controlmaster_row'):
+                config_owned_rollback['ssh.controlmaster'] = bool(
+                    self.config.get_setting('ssh.controlmaster', False)
+                )
                 self.config.set_setting(
                     'ssh.controlmaster',
                     bool(self.controlmaster_row.get_active()),
@@ -5800,6 +5817,7 @@ class PreferencesWindow(Adw.NavigationPage):
                             type(exc).__name__,
                             code,
                         )
+                    self._rollback_config_owned_ssh_rows(config_owned_rollback)
                     return False
 
             # 3. Refresh the legacy cache from the authoritative file so a
@@ -5821,7 +5839,27 @@ class PreferencesWindow(Adw.NavigationPage):
             return True
         except Exception as e:
             logger.error(f"Failed to save advanced SSH settings: {e}")
+            self._rollback_config_owned_ssh_rows(config_owned_rollback)
             return False
+
+    def _rollback_config_owned_ssh_rows(self, previous):
+        """Rewind the Config-owned SSH keys captured before a failed save.
+
+        ``Config.set_setting`` writes the file the moment it is called, so a
+        daemon mutation that fails afterwards leaves the Config-owned keys
+        already persisted while the page rolls its rows back — the switch would
+        then report the opposite of what ``get_ssh_config`` composes into every
+        launch.  Best-effort: a failure to rewind is logged, never raised, so it
+        cannot mask the original save error.
+        """
+        for key, value in (previous or {}).items():
+            try:
+                self.config.set_setting(key, value)
+            except Exception:
+                logger.warning(
+                    "Failed to roll back Config-owned SSH setting %s", key,
+                    exc_info=True,
+                )
 
     def _apply_default_advanced_settings(self):
         """Restore advanced SSH settings to defaults and update the UI.
@@ -5901,6 +5939,7 @@ class PreferencesWindow(Adw.NavigationPage):
                     snapshot = controller.reset()
                 except Exception as exc:
                     logger.error(f"Failed to reset global SSH overrides: {exc}")
+                    self._refresh_advanced_ssh_snapshot()
                     return False
                 self._apply_ssh_override_values_to_rows(snapshot)
                 try:
@@ -5921,14 +5960,45 @@ class PreferencesWindow(Adw.NavigationPage):
             return True
         except Exception as e:
             logger.error(f"Failed to apply default advanced SSH settings: {e}")
+            self._refresh_advanced_ssh_snapshot()
             return False
 
-    def on_reset_advanced_ssh(self, *args):
-        """Reset only advanced SSH keys to defaults and update UI."""
+    def _refresh_advanced_ssh_snapshot(self):
+        """Re-baseline the last-good snapshot to what the rows now show.
+
+        A failed reset still persists the Config-owned keys and still moves
+        their rows, so the rows *are* what is on disk.  Leaving the snapshot
+        at its pre-reset value would make the next failed edit restore that
+        stale value through ``_restore_advanced_ssh_rows`` — under autosave
+        suppression, so nothing writes it — leaving the switch contradicting
+        the file it claims to describe.  Best-effort: a failure to re-baseline
+        is logged, never raised, so it cannot mask the original error.
+        """
+        if not hasattr(self, 'connect_timeout_row'):
+            return
         try:
-            self._apply_default_advanced_settings()
+            self._advanced_ssh_last_good_snapshot = self._snapshot_advanced_ssh_rows()
+        except Exception:
+            logger.warning(
+                "Failed to refresh the advanced SSH last-good snapshot",
+                exc_info=True,
+            )
+
+    def on_reset_advanced_ssh(self, *args):
+        """Reset only advanced SSH keys to defaults and update UI.
+
+        A failed reset is a *partial* reset — the Config-owned keys are
+        already persisted while the nine daemon-owned fields keep their old
+        values — so the failure is surfaced rather than discarded, the same
+        way a failed save is.  Silently swallowing it left the user looking at
+        a page where Reset had visibly worked on half the rows.
+        """
+        try:
+            if not self._apply_default_advanced_settings():
+                self._show_ssh_save_failure()
         except Exception as e:
             logger.error(f"Failed to reset advanced SSH settings: {e}")
+            self._show_ssh_save_failure()
 
     def on_operation_mode_toggled(self, button):
         """Request a daemon-owned live switch between SSH configuration scopes."""

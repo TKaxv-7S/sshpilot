@@ -1,5 +1,5 @@
 Name:           sshpilot
-Version:        %{?version}%{!?version:6.0.5}
+Version:        %{?version}%{!?version:6.0.6}
 Release:        1%{?dist}
 Summary:        Manage your servers with ease
 
@@ -144,6 +144,9 @@ an alternative to Putty, Termius and Mobaxterm.
 %{_mandir}/man1/sshpilot-agent.1*
 
 %changelog
+* Sun Sep 06 2026 mFat <newmfat@gmail.com> - 6.0.6-1
+- Bug fixes
+
 * Sun Sep 06 2026 mFat <newmfat@gmail.com> - 6.0.5-1
 - Introducing "Host Info" - detailed info about any host, available from the context menu
 - New languages: Spanish, Portuguese, Brazilian Portuguese, Chinese, Russian and Persian
