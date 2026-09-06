@@ -6,7 +6,7 @@ import logging
 import math
 import re
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from gettext import gettext as _
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _GATHER_CMD = (
-    'echo "===HOSTNAME==="; hostname 2>/dev/null;'
+    'echo "===HOSTNAME==="; hostname 2>/dev/null || cat /proc/sys/kernel/hostname 2>/dev/null;'
+    'echo "===DEVICE_MODEL==="; cat /tmp/sysinfo/model 2>/dev/null;'
     'echo "===OS_RELEASE==="; cat /etc/os-release 2>/dev/null;'
     'echo "===UNAME==="; uname -srm 2>/dev/null;'
     'echo "===UPTIME==="; cat /proc/uptime 2>/dev/null;'
@@ -32,17 +33,18 @@ _GATHER_CMD = (
     'echo "===BOOT_TIME==="; who -b 2>/dev/null;'
     'echo "===UPTIME_SINCE==="; uptime -s 2>/dev/null;'
     'echo "===LOADAVG==="; cat /proc/loadavg 2>/dev/null;'
-    'echo "===NPROC==="; nproc 2>/dev/null;'
+    'echo "===NPROC==="; nproc 2>/dev/null || grep -c "^processor" /proc/cpuinfo 2>/dev/null;'
     'echo "===LSCPU==="; lscpu 2>/dev/null;'
+    'echo "===CPUINFO==="; cat /proc/cpuinfo 2>/dev/null;'
     'echo "===MEMINFO==="; cat /proc/meminfo 2>/dev/null;'
-    'echo "===DF==="; df -T -B1 -x tmpfs -x devtmpfs -x overlay -x squashfs 2>/dev/null;'
+    'echo "===DF==="; df -T -B1 -x tmpfs -x devtmpfs -x overlay -x squashfs 2>/dev/null || df 2>/dev/null;'
     'echo "===NET_DEV==="; cat /proc/net/dev 2>/dev/null;'
     'echo "===IP_ADDR==="; ip -o addr show 2>/dev/null;'
     'echo "===IP_LINK==="; ip -o link show 2>/dev/null;'
     'echo "===IP_ROUTE==="; ip route show default 2>/dev/null;'
     'echo "===DNS==="; cat /etc/resolv.conf 2>/dev/null;'
-    'echo "===SS_LISTEN==="; ss -tlnp 2>/dev/null;'
-    'echo "===SS_ESTAB==="; ss -tunap state established 2>/dev/null;'
+    'echo "===SS_LISTEN==="; ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null;'
+    'echo "===SS_ESTAB==="; ss -tunap state established 2>/dev/null || netstat -tunap 2>/dev/null;'
     'echo "===WHO==="; who 2>/dev/null;'
     'echo "===W==="; w -h 2>/dev/null;'
     'echo "===TEMPS==="; for f in /sys/class/thermal/thermal_zone*/temp; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
@@ -52,6 +54,7 @@ _GATHER_CMD = (
     'echo "===CPU_STAT==="; head -1 /proc/stat 2>/dev/null;'
     'echo "===APT_UPGRADABLE==="; apt list --upgradable 2>/dev/null | tail -n +2 | wc -l;'
     'echo "===APT_SECURITY==="; apt list --upgradable 2>/dev/null | grep -ci security;'
+    'echo "===OPKG_UPGRADABLE==="; opkg list-upgradable 2>/dev/null | wc -l;'
     'echo "===REBOOT_REQ==="; cat /var/run/reboot-required 2>/dev/null || echo "no";'
     'echo "===APT_STAMP==="; stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null;'
     'echo "===END===";'
@@ -117,22 +120,66 @@ def _parse_lscpu(text: str) -> Dict[str, str]:
     return d
 
 
+def _parse_cpuinfo(text: str) -> Dict[str, str]:
+    """Extract lscpu-like fields from /proc/cpuinfo (ARM/MIPS fallback)."""
+    d: Dict[str, str] = {}
+    processors = 0
+    for line in text.splitlines():
+        if ':' not in line:
+            continue
+        k, _, v = line.partition(':')
+        k, v = k.strip(), v.strip()
+        if k == 'processor':
+            processors += 1
+        elif k in ('model name', 'cpu model', 'system type',
+                    'machine', 'Hardware'):
+            if 'Model name' not in d:
+                d['Model name'] = v
+        elif k == 'cpu MHz' and 'cpu MHz' not in d:
+            d['cpu MHz'] = v
+        elif k == 'BogoMIPS' and 'BogoMIPS' not in d:
+            d['BogoMIPS'] = v
+    if processors:
+        d['_processors'] = str(processors)
+    return d
+
+
 def _parse_df(text: str) -> List[Dict[str, str]]:
+    """Parse df output — handles both coreutils (7-col) and BusyBox (6-col).
+
+    BusyBox ``df`` reports 1K-blocks; coreutils with ``-B1`` reports bytes.
+    All sizes are normalised to bytes in the output dicts.
+    """
     rows: List[Dict[str, str]] = []
     lines = text.strip().splitlines()
     if not lines:
         return rows
+    header = lines[0].lower()
+    has_type = 'type' in header
+    multiplier = 1
+    if '1k-block' in header or '1024-block' in header:
+        multiplier = 1024
     for line in lines[1:]:
         parts = line.split()
-        if len(parts) >= 7:
+        if has_type and len(parts) >= 7:
             rows.append({
                 'fs': parts[0],
                 'type': parts[1],
-                'size': parts[2],
-                'used': parts[3],
-                'avail': parts[4],
+                'size': str(int(parts[2]) * multiplier) if parts[2].isdigit() else parts[2],
+                'used': str(int(parts[3]) * multiplier) if parts[3].isdigit() else parts[3],
+                'avail': str(int(parts[4]) * multiplier) if parts[4].isdigit() else parts[4],
                 'pct': parts[5].rstrip('%'),
                 'mount': ' '.join(parts[6:]),
+            })
+        elif not has_type and len(parts) >= 6:
+            rows.append({
+                'fs': parts[0],
+                'type': '',
+                'size': str(int(parts[1]) * multiplier) if parts[1].isdigit() else parts[1],
+                'used': str(int(parts[2]) * multiplier) if parts[2].isdigit() else parts[2],
+                'avail': str(int(parts[3]) * multiplier) if parts[3].isdigit() else parts[3],
+                'pct': parts[4].rstrip('%'),
+                'mount': ' '.join(parts[5:]),
             })
     return rows
 
@@ -224,15 +271,20 @@ def _parse_w(text: str) -> List[Dict[str, str]]:
 
 
 def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
-    """Extract SSH client sessions from ss established connections."""
+    """Extract SSH client sessions from ss/netstat established connections."""
     rows: List[Dict[str, str]] = []
     seen: set = set()
+    is_netstat = any(l.strip().startswith(('Proto', 'Active'))
+                     for l in ss_text.splitlines()[:2])
     for line in ss_text.splitlines():
         parts = line.split()
-        if len(parts) < 5 or parts[0] in ('Netid', 'State'):
+        if len(parts) < 5 or parts[0] in ('Netid', 'State', 'Proto', 'Active'):
             continue
-        local = parts[4] if len(parts) > 4 else ''
-        peer = parts[5] if len(parts) > 5 else ''
+        if is_netstat:
+            local, peer = (parts[3], parts[4]) if len(parts) > 4 else ('', '')
+        else:
+            local = parts[4] if len(parts) > 4 else ''
+            peer = parts[5] if len(parts) > 5 else ''
         lm = re.search(r':(\d+)$', local)
         if not lm or lm.group(1) != '22':
             continue
@@ -241,10 +293,10 @@ def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
             continue
         seen.add(peer_addr)
         proc = ''
-        rest = ' '.join(parts[6:])
-        proc_m = re.search(r'users:\(\("([^"]+)"', rest)
+        rest = ' '.join(parts[5:])
+        proc_m = re.search(r'users:\(\("([^"]+)"|(\d+)/(\S+)', rest)
         if proc_m:
-            proc = proc_m.group(1)
+            proc = proc_m.group(1) or proc_m.group(3) or ''
         rows.append({
             'user': proc or 'sshd',
             'tty': 'ssh',
@@ -255,21 +307,34 @@ def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
 
 
 def _parse_ss_estab(text: str) -> List[Dict[str, str]]:
+    """Parse ss or netstat established connection output."""
     rows: List[Dict[str, str]] = []
+    is_netstat = any(l.strip().startswith(('Proto', 'Active'))
+                     for l in text.splitlines()[:2])
     for line in text.splitlines():
         parts = line.split()
-        if len(parts) < 5 or parts[0] in ('Netid', 'State'):
+        if len(parts) < 5 or parts[0] in ('Netid', 'State', 'Proto', 'Active'):
             continue
-        row = {
-            'proto': parts[0],
-            'local': parts[3] if len(parts) > 3 else '',
-            'peer': parts[4] if len(parts) > 4 else '',
-        }
-        if len(parts) > 5:
-            proc_m = re.search(r'users:\(\("([^"]+)"', parts[5])
-            row['proc'] = proc_m.group(1) if proc_m else ''
+        if is_netstat:
+            row = {
+                'proto': parts[0],
+                'local': parts[3] if len(parts) > 3 else '',
+                'peer': parts[4] if len(parts) > 4 else '',
+            }
+            pid_prog = parts[6] if len(parts) > 6 else ''
+            pm = re.search(r'/(\S+)', pid_prog)
+            row['proc'] = pm.group(1) if pm else ''
         else:
-            row['proc'] = ''
+            row = {
+                'proto': parts[0],
+                'local': parts[3] if len(parts) > 3 else '',
+                'peer': parts[4] if len(parts) > 4 else '',
+            }
+            if len(parts) > 5:
+                proc_m = re.search(r'users:\(\("([^"]+)"', parts[5])
+                row['proc'] = proc_m.group(1) if proc_m else ''
+            else:
+                row['proc'] = ''
         rows.append(row)
     return rows
 
@@ -949,7 +1014,9 @@ class MachineInfoDialog:
         root_color = _RED if root_frac > 0.85 else _GREEN
         root_dev = ''
         if root_row:
-            root_dev = f"{root_row.get('type', '')} on {root_row.get('fs', '')}"
+            rtype = root_row.get('type', '')
+            rfs = root_row.get('fs', '')
+            root_dev = f"{rtype} on {rfs}" if rtype else rfs
         gauges.append(self._gauge_card(
             root_frac, root_color, _("Root filesystem"),
             f"{root_used_str} / {root_size_str}" if root_used_str else '',
@@ -960,7 +1027,12 @@ class MachineInfoDialog:
         info_card = _card_box()
 
         hostname = self._data.get('HOSTNAME', '').strip()
-        info_card.append(_kv_row(_("Hostname"), hostname, mono=True))
+        info_card.append(_kv_row(_("Hostname"), hostname or _("N/A"),
+                                 mono=bool(hostname)))
+
+        device_model = self._data.get('DEVICE_MODEL', '').strip()
+        if device_model:
+            info_card.append(_kv_row(_("Device"), device_model))
 
         osr = _parse_os_release(self._data.get('OS_RELEASE', ''))
         os_text = osr.get('PRETTY_NAME', '')
@@ -970,18 +1042,46 @@ class MachineInfoDialog:
         info_card.append(_kv_row(_("Kernel"), uname, mono=True))
 
         lscpu = _parse_lscpu(self._data.get('LSCPU', ''))
-        model = lscpu.get('Model name', '')
-        cores = lscpu.get('Core(s) per socket', '?')
+        cpuinfo = _parse_cpuinfo(self._data.get('CPUINFO', ''))
+        model = lscpu.get('Model name', '') or cpuinfo.get('Model name', '')
+        cores = lscpu.get('Core(s) per socket', '')
         threads_per = lscpu.get('Thread(s) per core', '1')
         sockets = lscpu.get('Socket(s)', '1')
-        try:
-            total_threads = int(cores) * int(threads_per) * int(sockets)
-        except ValueError:
-            total_threads = '?'
-        topo_text = (f"{cores} cores · {total_threads} threads"
-                     f" · {sockets} socket{'s' if sockets != '1' else ''}")
-        cpu_text = f"{model}  ({topo_text})" if model else topo_text
-        info_card.append(_kv_row(_("Processor"), cpu_text))
+        if cores:
+            try:
+                total_threads = int(cores) * int(threads_per) * int(sockets)
+            except ValueError:
+                total_threads = '?'
+            topo_text = (f"{cores} cores · {total_threads} threads"
+                         f" · {sockets} socket{'s' if sockets != '1' else ''}")
+        else:
+            nproc_str = self._data.get('NPROC', '').strip()
+            proc_count = cpuinfo.get('_processors', nproc_str)
+            topo_text = f"{proc_count} cores" if proc_count else ''
+        cpu_text = f"{model}  ({topo_text})" if model and topo_text else (model or topo_text)
+        info_card.append(_kv_row(_("Processor"), cpu_text or _("N/A")))
+
+        freq_text = ''
+        freq_line = self._data.get('CPU_FREQ', '')
+        fm = re.search(r'([\d.]+)', freq_line)
+        if fm:
+            try:
+                freq_text = f"{float(fm.group(1)) / 1000:.2f} GHz"
+            except ValueError:
+                freq_text = f"{fm.group(1)} MHz"
+        if not freq_text:
+            mhz = cpuinfo.get('cpu MHz', '')
+            if mhz:
+                try:
+                    freq_text = f"{float(mhz) / 1000:.2f} GHz"
+                except ValueError:
+                    freq_text = f"{mhz} MHz"
+        if not freq_text:
+            bogo = cpuinfo.get('BogoMIPS', '')
+            if bogo:
+                freq_text = f"{bogo} BogoMIPS"
+        info_card.append(_kv_row(_("CPU frequency"), freq_text or _("N/A"),
+                                 mono=bool(freq_text)))
 
         uptime_secs = 0.0
         uptime_raw = self._data.get('UPTIME', '').strip()
@@ -1005,6 +1105,9 @@ class MachineInfoDialog:
                 boot_text = ' '.join(parts[-2:])
         if not boot_text:
             boot_text = self._data.get('UPTIME_SINCE', '').strip()
+        if not boot_text and uptime_secs:
+            boot_dt = datetime.now(timezone.utc) - timedelta(seconds=uptime_secs)
+            boot_text = boot_dt.strftime('%Y-%m-%d %H:%M')
         info_card.append(_kv_row(_("Booted"), boot_text, last=True))
 
         page.append(info_card)
@@ -1296,7 +1399,12 @@ class MachineInfoDialog:
 
         page.append(_section_label(_("Filesystems")))
 
-        df_rows = _parse_df(self._data.get('DF', ''))
+        _pseudo_fs = {'tmpfs', 'devtmpfs', 'overlay', 'squashfs', 'udev',
+                      'none', 'sysfs', 'proc', 'devpts', 'cgroup', 'cgroup2'}
+        df_rows = [r for r in _parse_df(self._data.get('DF', ''))
+                   if r['fs'] not in _pseudo_fs
+                   and r.get('type', '') not in _pseudo_fs
+                   and not r['mount'].startswith('/snap/')]
         card = _card_box()
 
         # Header
@@ -1333,7 +1441,8 @@ class MachineInfoDialog:
             row.append(mount_lbl)
 
             dev_name = r['fs'].split('/')[-1] if '/' in r['fs'] else r['fs']
-            dev_lbl = _mono_label(f"{dev_name} · {r['type']}")
+            dev_text = f"{dev_name} · {r['type']}" if r.get('type') else dev_name
+            dev_lbl = _mono_label(dev_text)
             dev_lbl.set_size_request(190, -1)
             dev_lbl.set_xalign(0)
             dev_lbl.set_opacity(0.7)
@@ -1520,8 +1629,9 @@ class MachineInfoDialog:
         ssh_port = ''
         for line in ss_listen.splitlines():
             if ':22 ' in line or line.strip().endswith(':22'):
-                proc_m = re.search(r'users:\(\("([^"]+)"', line)
-                proc_name = proc_m.group(1) if proc_m else 'sshd'
+                proc_m = re.search(r'users:\(\("([^"]+)"|(\d+)/(\S+)', line)
+                proc_name = (proc_m.group(1) or proc_m.group(3)
+                             if proc_m else 'sshd')
                 ssh_port = f"22/tcp ({proc_name})"
                 break
         route_card.append(_kv_row(
@@ -1929,18 +2039,20 @@ class MachineInfoDialog:
 
         apt_up = self._data.get('APT_UPGRADABLE', '').strip()
         apt_sec = self._data.get('APT_SECURITY', '').strip()
+        opkg_up = self._data.get('OPKG_UPGRADABLE', '').strip()
         reboot = self._data.get('REBOOT_REQ', '').strip()
         apt_stamp = self._data.get('APT_STAMP', '').strip()
 
+        pkg_up = apt_up or opkg_up or '0'
         updates_card.append(_kv_row(
-            _("Upgradable packages"), apt_up or '0', mono=True))
-        updates_card.append(_kv_row(
-            _("Security updates"), apt_sec or '0', mono=True))
+            _("Upgradable packages"), pkg_up, mono=True))
+        if apt_sec:
+            updates_card.append(_kv_row(
+                _("Security updates"), apt_sec, mono=True))
 
         reboot_text = _("No")
         if reboot and reboot != 'no':
             reboot_text = _("Yes — %s") % reboot
-        updates_card.append(_kv_row(_("Reboot required"), reboot_text))
 
         last_update = ''
         if apt_stamp:
@@ -1950,8 +2062,14 @@ class MachineInfoDialog:
                     ts, tz=timezone.utc).strftime('%d %b %Y, %H:%M')
             except (ValueError, OSError):
                 last_update = apt_stamp
-        updates_card.append(_kv_row(
-            _("Last apt update"), last_update, mono=True, last=True))
+
+        if last_update:
+            updates_card.append(_kv_row(_("Reboot required"), reboot_text))
+            updates_card.append(_kv_row(
+                _("Last update check"), last_update, mono=True, last=True))
+        else:
+            updates_card.append(
+                _kv_row(_("Reboot required"), reboot_text, last=True))
 
         page.append(updates_card)
         return page
