@@ -1265,7 +1265,7 @@ class MachineInfoDialog:
                         orientation=Gtk.Orientation.HORIZONTAL))
                 temp_card.append(wrapper)
         else:
-            no_temp = Gtk.Label(label=_("No temperature sensors detected"))
+            no_temp = Gtk.Label(label=_("N/A"))
             no_temp.set_margin_top(16)
             no_temp.set_margin_bottom(16)
             no_temp.add_css_class("dim-label")
@@ -1642,6 +1642,15 @@ class MachineInfoDialog:
             bw_card.append(wrapper)
 
         page.append(bw_card)
+
+        bw_note = Gtk.Label(
+            label=_("Totals are cumulative since boot. Rates update"
+                    " every 2 s while this tab is visible."))
+        bw_note.set_xalign(0)
+        bw_note.add_css_class("caption")
+        bw_note.set_opacity(0.55)
+        bw_note.set_wrap(True)
+        page.append(bw_note)
 
         # Connected SSH clients
         page.append(_section_label(_("Connected SSH clients")))
