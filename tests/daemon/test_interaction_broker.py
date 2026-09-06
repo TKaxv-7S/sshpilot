@@ -1788,3 +1788,219 @@ def test_cancelled_otp_prompt_is_not_replaced_by_openssh_retries(monkeypatch) ->
         )
     finally:
         instance.close()
+
+
+def test_uncommitted_remembered_password_is_logged_when_discarded(
+    monkeypatch,
+    caplog,
+) -> None:
+    """A remembered credential must never be dropped silently.
+
+    ``mark_authenticated`` is what commits ``pending_remember``. When a session
+    never reports authentication, the queued secret is wiped with the askpass
+    context — the user ticked "Remember password" and nothing was stored, so
+    the discard has to leave a log line naming the connection.
+    """
+
+    stored: list[tuple[str, str]] = []
+    instance = InteractionBroker(
+        secret_timeout=1,
+        host_key_timeout=1,
+        password_store=lambda connection_id, value: (
+            stored.append((connection_id, value)) or True
+        ),
+    )
+    monkeypatch.setattr(
+        instance, "_effective_ssh_config", lambda _argv, _environment=None: {}
+    )
+    try:
+        _argv, environment = instance.prepare_launch(
+            SessionLaunchSpec(
+                session_id=SESSION_ID,
+                connection_id=CONNECTION_ID,
+                protocol="ssh",
+                hostname="example.test",
+                username="alice",
+                port=22,
+            ),
+            lambda _connection_id, **_kwargs: (
+                ("/usr/bin/ssh", "example"),
+                {
+                    "PATH": os.environ.get("PATH", ""),
+                    "SSHPILOT_DAEMON_ASKPASS_ACTIVE": "1",
+                },
+            ),
+        )
+        token = environment["SSHPILOT_DAEMON_ASKPASS_TOKEN"]
+        resolved = []
+
+        def resolve() -> None:
+            resolved.append(
+                instance._resolve_askpass_secret(
+                    token,
+                    "alice@example.test's password:",
+                )
+            )
+
+        waiter = threading.Thread(target=resolve)
+        waiter.start()
+        deadline = time.monotonic() + 1
+        interactions: list = []
+        while time.monotonic() < deadline and not interactions:
+            interactions = instance.list(CLIENT_A)
+            time.sleep(0.005)
+        interaction = interactions[0]
+        claim = instance.claim(interaction.id, CLIENT_A)
+        instance.respond(
+            InteractionDecisionRequest(
+                interaction_id=interaction.id,
+                secret_decision=SecretDecision.SUBMIT,
+                remember_policy=RememberPolicy.STORE_AFTER_SUCCESS,
+            ),
+            CLIENT_A,
+        )
+        instance.submit_secret(
+            SecretFrame(
+                kind=SecretFrameKind.RESPONSE,
+                interaction_id=interaction.id,
+                nonce=bytes.fromhex(claim.nonce),
+                secret=bytearray(b"remember-me"),
+            ),
+            CLIENT_A,
+        )
+        waiter.join(1)
+        assert not waiter.is_alive()
+        resolved[0][:] = b"\0" * len(resolved[0])
+        resolved[0].clear()
+
+        # The session dies without ever reporting authentication.
+        with caplog.at_level("WARNING", logger="sshpilot.daemon.interaction_broker"):
+            instance.cancel_session(SESSION_ID)
+
+        assert stored == []
+        messages = [record.getMessage() for record in caplog.records]
+        discarded = [
+            message
+            for message in messages
+            if "Remembered credentials discarded unstored" in message
+        ]
+        assert discarded, messages
+        assert "types=password" in discarded[0]
+        assert str(CONNECTION_ID) in discarded[0]
+        assert "alice@example.test" in discarded[0]
+        assert "remember-me" not in discarded[0]
+    finally:
+        instance.close()
+
+
+def test_remember_after_authentication_is_logged_immediately(
+    monkeypatch,
+    caplog,
+) -> None:
+    """Report the loss when it happens, not when the session is torn down.
+
+    ``mark_authenticated`` runs once. A session that reports authentication
+    before the user is prompted has already spent its only commit point, so a
+    credential remembered afterwards is dead on arrival — and the user is still
+    watching the console right then, unlike at teardown.
+    """
+
+    stored: list[tuple[str, str]] = []
+    instance = InteractionBroker(
+        secret_timeout=1,
+        host_key_timeout=1,
+        password_store=lambda connection_id, value: (
+            stored.append((connection_id, value)) or True
+        ),
+    )
+    monkeypatch.setattr(
+        instance, "_effective_ssh_config", lambda _argv, _environment=None: {}
+    )
+    try:
+        _argv, environment = instance.prepare_launch(
+            SessionLaunchSpec(
+                session_id=SESSION_ID,
+                connection_id=CONNECTION_ID,
+                protocol="ssh",
+                hostname="example.test",
+                username="alice",
+                port=22,
+            ),
+            lambda _connection_id, **_kwargs: (
+                ("/usr/bin/ssh", "example"),
+                {
+                    "PATH": os.environ.get("PATH", ""),
+                    "SSHPILOT_DAEMON_ASKPASS_ACTIVE": "1",
+                },
+            ),
+        )
+        token = environment["SSHPILOT_DAEMON_ASKPASS_TOKEN"]
+
+        # The session is declared authenticated before anyone is prompted —
+        # exactly what premature promotion does.
+        instance.mark_authenticated(SESSION_ID)
+
+        resolved = []
+
+        def resolve() -> None:
+            resolved.append(
+                instance._resolve_askpass_secret(
+                    token,
+                    "alice@example.test's password:",
+                )
+            )
+
+        with caplog.at_level("WARNING", logger="sshpilot.daemon.interaction_broker"):
+            waiter = threading.Thread(target=resolve)
+            waiter.start()
+            deadline = time.monotonic() + 1
+            interactions: list = []
+            while time.monotonic() < deadline and not interactions:
+                interactions = instance.list(CLIENT_A)
+                time.sleep(0.005)
+            interaction = interactions[0]
+            claim = instance.claim(interaction.id, CLIENT_A)
+            instance.respond(
+                InteractionDecisionRequest(
+                    interaction_id=interaction.id,
+                    secret_decision=SecretDecision.SUBMIT,
+                    remember_policy=RememberPolicy.STORE_AFTER_SUCCESS,
+                ),
+                CLIENT_A,
+            )
+            instance.submit_secret(
+                SecretFrame(
+                    kind=SecretFrameKind.RESPONSE,
+                    interaction_id=interaction.id,
+                    nonce=bytes.fromhex(claim.nonce),
+                    secret=bytearray(b"too-late"),
+                ),
+                CLIENT_A,
+            )
+            waiter.join(1)
+            assert not waiter.is_alive()
+            resolved[0][:] = b"\0" * len(resolved[0])
+            resolved[0].clear()
+
+            immediate = [
+                record.getMessage()
+                for record in caplog.records
+                if "Remembered credential cannot be stored" in record.getMessage()
+            ]
+            assert immediate, [record.getMessage() for record in caplog.records]
+            assert str(CONNECTION_ID) in immediate[0]
+            assert "alice@example.test" in immediate[0]
+            assert "too-late" not in immediate[0]
+
+            # Teardown must not repeat a loss that was already reported.
+            caplog.clear()
+            instance.cancel_session(SESSION_ID)
+            repeats = [
+                record.getMessage()
+                for record in caplog.records
+                if "discarded unstored" in record.getMessage()
+            ]
+            assert repeats == []
+        assert stored == []
+    finally:
+        instance.close()

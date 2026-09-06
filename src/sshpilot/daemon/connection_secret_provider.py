@@ -13,12 +13,15 @@ logged, serialized to the API, or included in ``repr``.
 
 from __future__ import annotations
 
+import logging
 import threading
 import time
 from typing import Any, Callable, Dict, Optional
 
 from ..api.models.connections import ConnectionId
 from ..core.connections.models import ConnectionRecord
+
+logger = logging.getLogger(__name__)
 
 
 def _string(value: Any) -> str:
@@ -139,8 +142,14 @@ class DaemonConnectionSecretProvider:
         previous_host: str = "",
         previous_username: str = "",
     ) -> bool:
+        # Every refusal below is logged: a password the user asked to save must
+        # never fail silently, and the caller only sees a bare False.
         record = self._record(connection_id)
         if record is None:
+            logger.warning(
+                "Connection password not stored connection=%s: no such connection",
+                connection_id,
+            )
             return False
         from ..credential_model import canonical_password_host, password_host_candidates
         from ..secret_storage import password_spec
@@ -148,15 +157,41 @@ class DaemonConnectionSecretProvider:
         # The primary key uses the record's *current* identity. The previous_*
         # fields describe the old identity and only feed the cleanup set.
         user = _string(record.username).strip()
-        if not user or not password:
+        if not user:
+            logger.warning(
+                "Connection password not stored connection=%s: the connection "
+                "has no username to key the secret on",
+                connection_id,
+            )
+            return False
+        if not password:
+            logger.warning(
+                "Connection password not stored connection=%s: the password is empty",
+                connection_id,
+            )
             return False
         conn = self._record_dict(record)
         canonical = canonical_password_host(conn)
         if not canonical:
+            logger.warning(
+                "Connection password not stored connection=%s user=%s: the "
+                "connection has no resolvable host to key the secret on",
+                connection_id,
+                user,
+            )
             return False
         manager = self._secret_manager_factory()
         stored = manager.store(password_spec(canonical, user), password)
-        if stored:
+        if not stored:
+            # The manager names the backends it tried; name the connection.
+            logger.warning(
+                "Connection password not stored connection=%s target=%s@%s: "
+                "secure storage rejected the write",
+                connection_id,
+                user,
+                canonical,
+            )
+        else:
             cleanup = {
                 (host, user)
                 for host in password_host_candidates(conn)
