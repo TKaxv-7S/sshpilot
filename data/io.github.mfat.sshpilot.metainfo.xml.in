@@ -61,6 +61,12 @@
 
 
 
+    <release version="6.0.5" date="2026-09-06">
+      <description>
+        <p>Introducing &quot;Host Info&quot; - detailed info about any host, available from the context menu</p>
+        <p>New languages: Spanish, Portuguese, Brazilian Portuguese, Chinese, Russian and Persian</p>
+      </description>
+    </release>
     <release version="6.0.4" date="2026-09-05">
       <description>
         <p>Bug fixes</p>
