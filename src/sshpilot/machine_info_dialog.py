@@ -482,6 +482,19 @@ class MachineInfoDialog:
         self._prev_net_dev: Optional[Dict[str, Tuple[int, int]]] = None
         self._prev_net_time: float = 0
         self._closed = False
+        self._interaction_dialogs = None
+
+        try:
+            from .daemon_interaction_dialogs import DaemonInteractionDialogs
+            client = getattr(window, 'client', None)
+            bridge = getattr(window, 'client_bridge', None)
+            if client is not None and bridge is not None:
+                self._interaction_dialogs = DaemonInteractionDialogs(
+                    client, bridge, window,
+                )
+        except Exception:
+            logger.debug("Host info interaction presenter unavailable",
+                         exc_info=True)
 
         self._dialog = Adw.Dialog()
         self._dialog.set_content_width(900)
@@ -615,12 +628,13 @@ class MachineInfoDialog:
         cmd = _TRAFFIC_CMD if traffic_only else _GATHER_CMD
         conn = self._connection
 
+        interaction_dialogs = self._interaction_dialogs
+
         def _execute():
             from .api.models.broadcast import (
                 BroadcastCommandRequest,
                 BroadcastExecutionPolicy,
             )
-            from .api.models.interactions import ExecutionInteractionMode
 
             daemon_conn = next(
                 (item for item in client.list_connections()
@@ -636,16 +650,22 @@ class MachineInfoDialog:
 
             policy = BroadcastExecutionPolicy(
                 concurrency_limit=1,
-                timeout_seconds=30,
-                interaction_mode=ExecutionInteractionMode.AUTOFILL_ONLY,
+                timeout_seconds=60,
             )
             request = BroadcastCommandRequest(
                 (daemon_conn.id,), cmd, policy,
             )
             summary = client.start_broadcast_command(request)
 
+            if interaction_dialogs is not None:
+                from .api.models.common import SessionId
+                op_id = summary.operation.operation_id
+                GLib.idle_add(
+                    interaction_dialogs.set_session, SessionId(str(op_id)),
+                )
+
             terminal_states = {'succeeded', 'failed', 'cancelled'}
-            deadline = time.monotonic() + 30
+            deadline = time.monotonic() + 60
             while summary.operation.state.value not in terminal_states:
                 if time.monotonic() >= deadline:
                     try:
@@ -654,12 +674,18 @@ class MachineInfoDialog:
                     except Exception:
                         pass
                     raise TimeoutError("Timed out gathering host info")
-                time.sleep(0.1)
+                time.sleep(0.3)
                 summary = client.get_broadcast_command(
                     summary.operation.operation_id)
 
             target = summary.targets[0] if summary.targets else None
-            if target is None or target.exit_code is None:
+            if target is None:
+                raise RuntimeError("No output from remote host")
+            state = getattr(target, 'state', None)
+            if state and hasattr(state, 'value') and state.value == 'failed':
+                stderr = getattr(target, 'stderr', '') or ''
+                raise RuntimeError(stderr or "Command failed on remote host")
+            if target.exit_code is None:
                 raise RuntimeError("No output from remote host")
             return target.stdout or ''
 
@@ -775,6 +801,9 @@ class MachineInfoDialog:
             GLib.source_remove(self._age_timer_id)
             self._age_timer_id = 0
         self._stop_traffic_timer()
+        if self._interaction_dialogs is not None:
+            self._interaction_dialogs.close()
+            self._interaction_dialogs = None
 
     # ── Tab construction ───────────────────────────────────────────────
 
