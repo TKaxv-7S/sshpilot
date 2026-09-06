@@ -16,7 +16,35 @@ notes remain separate.
   correctness fixes within the current contract; no downgrade or
   frontend backend fallback is supported.
 
-## API 0.51 (current)
+## API 0.52 (current)
+
+### API 0.52 daemon-owned remote host information
+
+- Added `start_host_info`, `get_host_info`, and `cancel_host_info` with the new
+  `host_info.read` capability, served by daemon methods `hostinfo.start`,
+  `hostinfo.get`, and `hostinfo.cancel`. The capability is advertised exactly
+  when broadcast execution is available, because host information is a
+  projection over the same daemon-owned execution path.
+- The daemon owns the probe text and its parsing. Clients send a
+  `HostInfoRequest` naming a connection and a `HostInfoProbe` (`full` or
+  `network_counters`) and receive a typed `HostInfoSummary`; no frontend
+  carries shell text or parses remote output.
+- `HostInfoSnapshot` and its members (`CpuInfo`, `MemoryInfo`, `LoadAverage`,
+  `FilesystemUsage`, `NetworkInterface`, `InterfaceCounters`,
+  `TemperatureReading`, `LoginSession`, `SocketConnection`) carry values only:
+  bytes as integers, temperatures as numbers, no localized or formatted text.
+  A reading the host does not publish is `null` rather than a substituted
+  default, so frontends can distinguish "unknown" from "zero".
+- `operation.state_changed` is now delivered over the daemon event stream to
+  the client that owns the operation. The event type, its payload, and the
+  codec were already part of the contract, but the daemon forwarded no
+  operation events, so a client could not observe its own long-running work
+  finishing without polling. Delivery is scoped to the owning client because an
+  `OperationSummary` names its owner and may carry a result.
+- Additive only: no existing method, model, capability, or error changed, and
+  the wire protocol stays at `1.0`.
+
+## API 0.51
 
 ### API 0.51 structured builtin plugin session launch failures
 

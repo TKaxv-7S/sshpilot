@@ -6851,3 +6851,468 @@ def remove_authorized_key_request_from_wire(value: Any) -> Any:
         line_id=_identifier(data["line_id"], "authorized key line id"),
         file_revision=_identifier(data["file_revision"], "authorized keys revision"),
     )
+
+
+# ---------------------------------------------------------------------------
+# Host information
+# ---------------------------------------------------------------------------
+
+
+def _host_info_optional_int(value: Any, context: str) -> Optional[int]:
+    return None if value is None else _integer(value, context)
+
+
+def _host_info_optional_number(value: Any, context: str) -> Optional[float]:
+    if value is None:
+        return None
+    if type(value) not in (int, float) or type(value) is bool:
+        raise ValueError(f"{context} must be a number or null")
+    return float(value)
+
+
+def _host_info_text_list(value: Any, context: str) -> tuple:
+    if type(value) is not list:
+        raise ValueError(f"{context} must be an array")
+    return tuple(_text(item, context, allow_empty=True) for item in value)
+
+
+def host_info_request_to_wire(request: Any) -> Dict[str, Any]:
+    from ..models.host_info import HostInfoRequest
+
+    if type(request) is not HostInfoRequest:
+        raise TypeError("HostInfoRequest is required")
+    return {
+        "connection_id": request.connection_id,
+        "probe": request.probe.value,
+    }
+
+
+def host_info_request_from_wire(value: Any) -> Any:
+    from ..models.host_info import HostInfoProbe, HostInfoRequest
+
+    data = _strict_fields(
+        value, required={"connection_id", "probe"}, context="host info request"
+    )
+    try:
+        probe = HostInfoProbe(data["probe"])
+    except (TypeError, ValueError):
+        raise ValueError("host info request names an unknown probe") from None
+    return HostInfoRequest(
+        ConnectionId(_identifier(data["connection_id"], "connection id")), probe
+    )
+
+
+def _cpu_info_to_wire(cpu: Any) -> Dict[str, Any]:
+    return {
+        "model": cpu.model,
+        "cores_per_socket": cpu.cores_per_socket,
+        "threads_per_core": cpu.threads_per_core,
+        "sockets": cpu.sockets,
+        "logical_processors": cpu.logical_processors,
+        "frequency_mhz": cpu.frequency_mhz,
+        "bogomips": cpu.bogomips,
+    }
+
+
+def _cpu_info_from_wire(value: Any) -> Any:
+    from ..models.host_info import CpuInfo
+
+    data = _strict_fields(
+        value,
+        required={
+            "model",
+            "cores_per_socket",
+            "threads_per_core",
+            "sockets",
+            "logical_processors",
+            "frequency_mhz",
+            "bogomips",
+        },
+        context="host info cpu",
+    )
+    return CpuInfo(
+        model=_text(data["model"], "cpu model", allow_empty=True),
+        cores_per_socket=_host_info_optional_int(data["cores_per_socket"], "cpu cores"),
+        threads_per_core=_host_info_optional_int(data["threads_per_core"], "cpu threads"),
+        sockets=_host_info_optional_int(data["sockets"], "cpu sockets"),
+        logical_processors=_host_info_optional_int(
+            data["logical_processors"], "cpu logical processors"
+        ),
+        frequency_mhz=_host_info_optional_number(data["frequency_mhz"], "cpu frequency"),
+        bogomips=_host_info_optional_number(data["bogomips"], "cpu bogomips"),
+    )
+
+
+def _memory_info_to_wire(memory: Any) -> Dict[str, Any]:
+    return {
+        "total_bytes": memory.total_bytes,
+        "free_bytes": memory.free_bytes,
+        "available_bytes": memory.available_bytes,
+        "cached_bytes": memory.cached_bytes,
+        "buffers_bytes": memory.buffers_bytes,
+        "swap_total_bytes": memory.swap_total_bytes,
+        "swap_free_bytes": memory.swap_free_bytes,
+    }
+
+
+def _memory_info_from_wire(value: Any) -> Any:
+    from ..models.host_info import MemoryInfo
+
+    data = _strict_fields(
+        value,
+        required={
+            "total_bytes",
+            "free_bytes",
+            "available_bytes",
+            "cached_bytes",
+            "buffers_bytes",
+            "swap_total_bytes",
+            "swap_free_bytes",
+        },
+        context="host info memory",
+    )
+    return MemoryInfo(
+        total_bytes=_integer(data["total_bytes"], "memory total"),
+        free_bytes=_integer(data["free_bytes"], "memory free"),
+        available_bytes=_host_info_optional_int(data["available_bytes"], "memory available"),
+        cached_bytes=_integer(data["cached_bytes"], "memory cached"),
+        buffers_bytes=_integer(data["buffers_bytes"], "memory buffers"),
+        swap_total_bytes=_integer(data["swap_total_bytes"], "swap total"),
+        swap_free_bytes=_integer(data["swap_free_bytes"], "swap free"),
+    )
+
+
+def _load_average_to_wire(load: Any) -> Optional[Dict[str, Any]]:
+    if load is None:
+        return None
+    return {"one": load.one, "five": load.five, "fifteen": load.fifteen}
+
+
+def _load_average_from_wire(value: Any) -> Any:
+    from ..models.host_info import LoadAverage
+
+    if value is None:
+        return None
+    data = _strict_fields(
+        value, required={"one", "five", "fifteen"}, context="host info load average"
+    )
+    return LoadAverage(
+        _host_info_optional_number(data["one"], "load average"),
+        _host_info_optional_number(data["five"], "load average"),
+        _host_info_optional_number(data["fifteen"], "load average"),
+    )
+
+
+def _filesystem_usage_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "device": item.device,
+        "mount_point": item.mount_point,
+        "fstype": item.fstype,
+        "size_bytes": item.size_bytes,
+        "used_bytes": item.used_bytes,
+        "available_bytes": item.available_bytes,
+        "use_percent": item.use_percent,
+    }
+
+
+def _filesystem_usage_from_wire(value: Any) -> Any:
+    from ..models.host_info import FilesystemUsage
+
+    data = _strict_fields(
+        value,
+        required={
+            "device",
+            "mount_point",
+            "fstype",
+            "size_bytes",
+            "used_bytes",
+            "available_bytes",
+            "use_percent",
+        },
+        context="host info filesystem",
+    )
+    return FilesystemUsage(
+        device=_text(data["device"], "filesystem device", allow_empty=True),
+        mount_point=_text(data["mount_point"], "filesystem mount point", allow_empty=True),
+        fstype=_text(data["fstype"], "filesystem type", allow_empty=True),
+        size_bytes=_host_info_optional_int(data["size_bytes"], "filesystem size"),
+        used_bytes=_host_info_optional_int(data["used_bytes"], "filesystem used"),
+        available_bytes=_host_info_optional_int(
+            data["available_bytes"], "filesystem available"
+        ),
+        use_percent=_host_info_optional_int(data["use_percent"], "filesystem use percent"),
+    )
+
+
+def _interface_counters_to_wire(item: Any) -> Dict[str, Any]:
+    return {"name": item.name, "rx_bytes": item.rx_bytes, "tx_bytes": item.tx_bytes}
+
+
+def _interface_counters_from_wire(value: Any) -> Any:
+    from ..models.host_info import InterfaceCounters
+
+    data = _strict_fields(
+        value, required={"name", "rx_bytes", "tx_bytes"}, context="host info counters"
+    )
+    return InterfaceCounters(
+        _text(data["name"], "interface name"),
+        _integer(data["rx_bytes"], "interface rx bytes"),
+        _integer(data["tx_bytes"], "interface tx bytes"),
+    )
+
+
+def _network_interface_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "name": item.name,
+        "kind": item.kind.value,
+        "state": item.state.value,
+        "mac_address": item.mac_address,
+        "mtu": item.mtu,
+        "ipv4_addresses": list(item.ipv4_addresses),
+        "ipv6_addresses": list(item.ipv6_addresses),
+    }
+
+
+def _network_interface_from_wire(value: Any) -> Any:
+    from ..models.host_info import (
+        NetworkInterface,
+        NetworkInterfaceKind,
+        NetworkInterfaceState,
+    )
+
+    data = _strict_fields(
+        value,
+        required={
+            "name",
+            "kind",
+            "state",
+            "mac_address",
+            "mtu",
+            "ipv4_addresses",
+            "ipv6_addresses",
+        },
+        context="host info interface",
+    )
+    try:
+        kind = NetworkInterfaceKind(data["kind"])
+        state = NetworkInterfaceState(data["state"])
+    except (TypeError, ValueError):
+        raise ValueError("host info interface has an unknown kind or state") from None
+    return NetworkInterface(
+        name=_text(data["name"], "interface name"),
+        kind=kind,
+        state=state,
+        mac_address=_text(data["mac_address"], "interface mac", allow_empty=True),
+        mtu=_host_info_optional_int(data["mtu"], "interface mtu"),
+        ipv4_addresses=_host_info_text_list(data["ipv4_addresses"], "interface ipv4"),
+        ipv6_addresses=_host_info_text_list(data["ipv6_addresses"], "interface ipv6"),
+    )
+
+
+def _temperature_to_wire(item: Any) -> Dict[str, Any]:
+    return {"label": item.label, "celsius": item.celsius}
+
+
+def _temperature_from_wire(value: Any) -> Any:
+    from ..models.host_info import TemperatureReading
+
+    data = _strict_fields(value, required={"label", "celsius"}, context="host info temperature")
+    return TemperatureReading(
+        _text(data["label"], "temperature label", allow_empty=True),
+        _host_info_optional_number(data["celsius"], "temperature"),
+    )
+
+
+def _login_session_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "user": item.user,
+        "tty": item.tty,
+        "origin": item.origin,
+        "since": item.since,
+        "remote": item.remote,
+    }
+
+
+def _login_session_from_wire(value: Any) -> Any:
+    from ..models.host_info import LoginSession
+
+    data = _strict_fields(
+        value,
+        required={"user", "tty", "origin", "since", "remote"},
+        context="host info login session",
+    )
+    return LoginSession(
+        user=_text(data["user"], "login user", allow_empty=True),
+        tty=_text(data["tty"], "login tty", allow_empty=True),
+        origin=_text(data["origin"], "login origin", allow_empty=True),
+        since=_text(data["since"], "login since", allow_empty=True),
+        remote=_boolean(data["remote"], "login remote"),
+    )
+
+
+def _socket_connection_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "protocol": item.protocol,
+        "local_address": item.local_address,
+        "local_port": item.local_port,
+        "peer_address": item.peer_address,
+        "peer_port": item.peer_port,
+        "process": item.process,
+        "direction": item.direction.value,
+    }
+
+
+def _socket_connection_from_wire(value: Any) -> Any:
+    from ..models.host_info import SocketConnection, SocketDirection
+
+    data = _strict_fields(
+        value,
+        required={
+            "protocol",
+            "local_address",
+            "local_port",
+            "peer_address",
+            "peer_port",
+            "process",
+            "direction",
+        },
+        context="host info socket",
+    )
+    try:
+        direction = SocketDirection(data["direction"])
+    except (TypeError, ValueError):
+        raise ValueError("host info socket has an unknown direction") from None
+    return SocketConnection(
+        protocol=_text(data["protocol"], "socket protocol", allow_empty=True),
+        local_address=_text(data["local_address"], "socket local address", allow_empty=True),
+        local_port=_host_info_optional_int(data["local_port"], "socket local port"),
+        peer_address=_text(data["peer_address"], "socket peer address", allow_empty=True),
+        peer_port=_host_info_optional_int(data["peer_port"], "socket peer port"),
+        process=_text(data["process"], "socket process", allow_empty=True),
+        direction=direction,
+    )
+
+
+def host_info_snapshot_to_wire(snapshot: Any) -> Optional[Dict[str, Any]]:
+    from ..models.host_info import HostInfoSnapshot
+
+    if snapshot is None:
+        return None
+    if type(snapshot) is not HostInfoSnapshot:
+        raise TypeError("HostInfoSnapshot is required")
+    return {
+        "hostname": snapshot.hostname,
+        "device_model": snapshot.device_model,
+        "os_pretty_name": snapshot.os_pretty_name,
+        "kernel": snapshot.kernel,
+        "uptime_seconds": snapshot.uptime_seconds,
+        "boot_time": snapshot.boot_time,
+        "cpu": _cpu_info_to_wire(snapshot.cpu),
+        "memory": _memory_info_to_wire(snapshot.memory),
+        "load_average": _load_average_to_wire(snapshot.load_average),
+        "filesystems": [_filesystem_usage_to_wire(item) for item in snapshot.filesystems],
+        "interfaces": [_network_interface_to_wire(item) for item in snapshot.interfaces],
+        "temperatures": [_temperature_to_wire(item) for item in snapshot.temperatures],
+        "sessions": [_login_session_to_wire(item) for item in snapshot.sessions],
+        "sockets": [_socket_connection_to_wire(item) for item in snapshot.sockets],
+        "default_gateway": snapshot.default_gateway,
+        "default_gateway_interface": snapshot.default_gateway_interface,
+        "dns_servers": list(snapshot.dns_servers),
+        "ssh_port": snapshot.ssh_port,
+        "ssh_process": snapshot.ssh_process,
+    }
+
+
+def host_info_snapshot_from_wire(value: Any) -> Any:
+    from ..models.host_info import HostInfoSnapshot
+
+    if value is None:
+        return None
+    data = _strict_fields(
+        value,
+        required={
+            "hostname",
+            "device_model",
+            "os_pretty_name",
+            "kernel",
+            "uptime_seconds",
+            "boot_time",
+            "cpu",
+            "memory",
+            "load_average",
+            "filesystems",
+            "interfaces",
+            "temperatures",
+            "sessions",
+            "sockets",
+            "default_gateway",
+            "default_gateway_interface",
+            "dns_servers",
+            "ssh_port",
+            "ssh_process",
+        },
+        context="host info snapshot",
+    )
+    for name in ("filesystems", "interfaces", "temperatures", "sessions", "sockets"):
+        if type(data[name]) is not list:
+            raise ValueError(f"host info {name} must be an array")
+    return HostInfoSnapshot(
+        hostname=_text(data["hostname"], "hostname", allow_empty=True),
+        device_model=_text(data["device_model"], "device model", allow_empty=True),
+        os_pretty_name=_text(data["os_pretty_name"], "os name", allow_empty=True),
+        kernel=_text(data["kernel"], "kernel", allow_empty=True),
+        uptime_seconds=_host_info_optional_number(data["uptime_seconds"], "uptime"),
+        boot_time=_text(data["boot_time"], "boot time", allow_empty=True),
+        cpu=_cpu_info_from_wire(data["cpu"]),
+        memory=_memory_info_from_wire(data["memory"]),
+        load_average=_load_average_from_wire(data["load_average"]),
+        filesystems=tuple(_filesystem_usage_from_wire(item) for item in data["filesystems"]),
+        interfaces=tuple(_network_interface_from_wire(item) for item in data["interfaces"]),
+        temperatures=tuple(_temperature_from_wire(item) for item in data["temperatures"]),
+        sessions=tuple(_login_session_from_wire(item) for item in data["sessions"]),
+        sockets=tuple(_socket_connection_from_wire(item) for item in data["sockets"]),
+        default_gateway=_text(data["default_gateway"], "default gateway", allow_empty=True),
+        default_gateway_interface=_text(
+            data["default_gateway_interface"], "gateway interface", allow_empty=True
+        ),
+        dns_servers=_host_info_text_list(data["dns_servers"], "dns servers"),
+        ssh_port=_host_info_optional_int(data["ssh_port"], "ssh port"),
+        ssh_process=_text(data["ssh_process"], "ssh process", allow_empty=True),
+    )
+
+
+def host_info_summary_to_wire(summary: Any) -> Dict[str, Any]:
+    from ..models.host_info import HostInfoSummary
+
+    if type(summary) is not HostInfoSummary:
+        raise TypeError("HostInfoSummary is required")
+    return {
+        "operation": operation_summary_to_wire(summary.operation),
+        "probe": summary.probe.value,
+        "snapshot": host_info_snapshot_to_wire(summary.snapshot),
+        "counters": [_interface_counters_to_wire(item) for item in summary.counters],
+        "failure": _service_failure_to_wire(summary.failure),
+    }
+
+
+def host_info_summary_from_wire(value: Any) -> Any:
+    from ..models.host_info import HostInfoProbe, HostInfoSummary
+
+    data = _strict_fields(
+        value,
+        required={"operation", "probe", "snapshot", "counters", "failure"},
+        context="host info summary",
+    )
+    try:
+        probe = HostInfoProbe(data["probe"])
+    except (TypeError, ValueError):
+        raise ValueError("host info summary names an unknown probe") from None
+    if type(data["counters"]) is not list:
+        raise ValueError("host info counters must be an array")
+    return HostInfoSummary(
+        operation_summary_from_wire(data["operation"]),
+        probe,
+        host_info_snapshot_from_wire(data["snapshot"]),
+        tuple(_interface_counters_from_wire(item) for item in data["counters"]),
+        _service_failure_from_wire(data["failure"]),
+    )

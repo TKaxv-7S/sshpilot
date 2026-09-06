@@ -175,6 +175,7 @@ from sshpilot.daemon.forward_runtime import ForwardRuntime
 from sshpilot.daemon.interaction_broker import InteractionBroker
 from sshpilot.daemon.key_service import DaemonKeyService
 from sshpilot.daemon.known_hosts_service import KnownHostsService
+from sshpilot.daemon.host_info_service import HostInfoService
 from sshpilot.daemon.session_runtime import SessionRuntime
 from sshpilot.daemon.sftp_runtime import SftpServiceRuntime
 from sshpilot.daemon.terminal_stream import ReplaySlice
@@ -186,6 +187,9 @@ DAEMON_METHOD_CAPABILITIES = {
     "broadcast.start": Capability.BROADCAST_WRITE,
     "broadcast.get": Capability.BROADCAST_READ,
     "broadcast.cancel": Capability.BROADCAST_WRITE,
+    "hostinfo.start": Capability.HOST_INFO_READ,
+    "hostinfo.get": Capability.HOST_INFO_READ,
+    "hostinfo.cancel": Capability.HOST_INFO_READ,
     "plugins.settings.get": Capability.PLUGIN_SETTINGS_READ,
     "plugins.settings.set": Capability.PLUGIN_SETTINGS_WRITE,
     "connections.get": Capability.CONNECTIONS_READ,
@@ -355,6 +359,7 @@ DAEMON_METHOD_CAPABILITIES = {
 DRAIN_REJECTED_METHODS = frozenset(
     {
         "broadcast.start",
+        "hostinfo.start",
         "connections.create",
         "connections.duplicate",
         "connections.update",
@@ -516,6 +521,7 @@ DEFERRED_DAEMON_METHODS = frozenset(
         "identity.deploy_key",
         "authorized_keys.list",
         "broadcast.start",
+        "hostinfo.start",
         "authorized_keys.remove",
         "secrets.configuration.get",
         "secrets.configuration.update",
@@ -649,6 +655,11 @@ class RequestDispatcher:
         self._operation_runtime = operation_runtime
         self._operation_mode = operation_mode
         self._broadcast_service = broadcast_service
+        # Host information is a projection over broadcast execution, so it
+        # exists exactly when broadcast execution does.
+        self._host_info_service = (
+            HostInfoService(broadcast_service) if broadcast_service is not None else None
+        )
         self._plugin_settings = plugin_settings
         self._command_input_waiter = command_input_waiter
         self._diagnostics_provider = diagnostics_provider
@@ -799,6 +810,9 @@ class RequestDispatcher:
             "broadcast.start": self._handle_start_broadcast,
             "broadcast.get": self._handle_get_broadcast,
             "broadcast.cancel": self._handle_cancel_broadcast,
+            "hostinfo.start": self._handle_start_host_info,
+            "hostinfo.get": self._handle_get_host_info,
+            "hostinfo.cancel": self._handle_cancel_host_info,
             "plugins.settings.get": self._handle_get_plugin_setting,
             "plugins.settings.set": self._handle_set_plugin_setting,
             "ssh_overrides.get": self._handle_get_ssh_overrides,
@@ -2985,6 +2999,49 @@ class RequestDispatcher:
         )
         return broadcast_command_summary_to_wire(summary)
 
+    def _required_host_info_service(self):
+        if self._host_info_service is None:
+            raise SshPilotError(
+                ErrorCode.UNSUPPORTED_CAPABILITY, "Host information is unavailable"
+            )
+        return self._host_info_service
+
+    def _handle_start_host_info(self, request, state):
+        from sshpilot.api.transport.codec import (
+            host_info_request_from_wire,
+            host_info_summary_to_wire,
+        )
+
+        summary = self._required_host_info_service().start(
+            host_info_request_from_wire(request.params),
+            owner_client_id=self._required_client_id(state),
+        )
+        return host_info_summary_to_wire(summary)
+
+    def _handle_get_host_info(self, request, state):
+        from sshpilot.api.transport.codec import (
+            host_info_summary_to_wire,
+            operation_id_request_from_wire,
+        )
+
+        summary = self._required_host_info_service().get(
+            operation_id_request_from_wire(request.params),
+            client_id=self._required_client_id(state),
+        )
+        return host_info_summary_to_wire(summary)
+
+    def _handle_cancel_host_info(self, request, state):
+        from sshpilot.api.transport.codec import (
+            host_info_summary_to_wire,
+            operation_id_request_from_wire,
+        )
+
+        summary = self._required_host_info_service().cancel(
+            operation_id_request_from_wire(request.params),
+            client_id=self._required_client_id(state),
+        )
+        return host_info_summary_to_wire(summary)
+
     def _handle_cancel_broadcast(self, request, state):
         from sshpilot.api.transport.codec import (
             broadcast_command_summary_to_wire,
@@ -3290,6 +3347,8 @@ class RequestDispatcher:
                     Capability.BROADCAST_READ,
                     Capability.BROADCAST_WRITE,
                     Capability.BROADCAST_EVENTS,
+                    # Host information is served by the same execution path.
+                    Capability.HOST_INFO_READ,
                 }
             )
         if plugin_settings:

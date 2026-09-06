@@ -1,0 +1,438 @@
+"""Frontend-neutral remote host information models.
+
+The daemon runs a read-only probe on the remote host and returns the parsed
+result as these DTOs.  They carry *values*, never presentation: no formatted
+byte counts, no localized text, no colour thresholds.  Frontends decide how a
+byte count, a temperature or an absent reading is rendered, so the same
+snapshot serves GTK, the CLI and any future frontend identically.
+
+Absent readings are ``None`` rather than a sentinel number.  ``MemoryInfo``
+distinguishes "the host reported 0" from "the host does not publish this
+field" because older kernels and BusyBox omit ``MemAvailable``, and guessing a
+default there produced contradictory usage figures.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Optional, Tuple
+
+from .common import ConnectionId, require_identifier
+from .operations import OperationSummary, ServiceFailure
+
+MAX_HOST_INFO_FILESYSTEMS = 256
+MAX_HOST_INFO_INTERFACES = 256
+MAX_HOST_INFO_TEMPERATURES = 256
+MAX_HOST_INFO_SESSIONS = 512
+MAX_HOST_INFO_SOCKETS = 1024
+MAX_HOST_INFO_ADDRESSES = 64
+MAX_HOST_INFO_DNS_SERVERS = 32
+
+
+def _require_text(value: object, field_name: str) -> str:
+    if type(value) is not str:
+        raise TypeError(f"{field_name} must be a string")
+    if "\x00" in value:
+        raise ValueError(f"{field_name} must not contain NUL")
+    return value
+
+
+def _require_optional_count(value: object, field_name: str) -> None:
+    if value is None:
+        return
+    if type(value) is not int or isinstance(value, bool) or value < 0:
+        raise ValueError(f"{field_name} must be a non-negative integer or None")
+
+
+def _require_optional_number(value: object, field_name: str) -> None:
+    if value is None:
+        return
+    if type(value) not in (int, float) or isinstance(value, bool):
+        raise TypeError(f"{field_name} must be a number or None")
+
+
+def _require_port(value: object, field_name: str) -> None:
+    if value is None:
+        return
+    if type(value) is not int or isinstance(value, bool) or not 0 <= value <= 65535:
+        raise ValueError(f"{field_name} must be a TCP/UDP port or None")
+
+
+def _require_text_tuple(value: object, field_name: str, limit: int) -> None:
+    if type(value) is not tuple:
+        raise TypeError(f"{field_name} must be a tuple")
+    if len(value) > limit:
+        raise ValueError(f"{field_name} exceeds the supported length")
+    for item in value:
+        _require_text(item, f"{field_name} entry")
+
+
+class HostInfoProbe(str, Enum):
+    """Which read-only probe the daemon runs on the remote host."""
+
+    FULL = "full"
+    NETWORK_COUNTERS = "network_counters"
+
+
+class NetworkInterfaceKind(str, Enum):
+    LOOPBACK = "loopback"
+    WIRELESS = "wireless"
+    ETHERNET = "ethernet"
+    UNKNOWN = "unknown"
+
+
+class NetworkInterfaceState(str, Enum):
+    UP = "up"
+    DOWN = "down"
+    NO_CARRIER = "no_carrier"
+    UNKNOWN = "unknown"
+
+
+class SocketDirection(str, Enum):
+    INCOMING = "incoming"
+    OUTGOING = "outgoing"
+
+
+@dataclass(frozen=True)
+class CpuInfo:
+    """Processor identity and topology as published by the remote host."""
+
+    model: str = ""
+    cores_per_socket: Optional[int] = None
+    threads_per_core: Optional[int] = None
+    sockets: Optional[int] = None
+    logical_processors: Optional[int] = None
+    frequency_mhz: Optional[float] = None
+    bogomips: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        _require_text(self.model, "cpu model")
+        for name in (
+            "cores_per_socket",
+            "threads_per_core",
+            "sockets",
+            "logical_processors",
+        ):
+            _require_optional_count(getattr(self, name), f"cpu {name}")
+        _require_optional_number(self.frequency_mhz, "cpu frequency")
+        _require_optional_number(self.bogomips, "cpu bogomips")
+
+    @property
+    def total_threads(self) -> Optional[int]:
+        """Threads across every socket, or ``None`` when topology is partial."""
+
+        if None in (self.cores_per_socket, self.threads_per_core, self.sockets):
+            return self.logical_processors
+        return self.cores_per_socket * self.threads_per_core * self.sockets
+
+
+@dataclass(frozen=True)
+class MemoryInfo:
+    """``/proc/meminfo`` values in bytes.
+
+    ``available_bytes`` is ``None`` when the host does not publish
+    ``MemAvailable``; callers must decide what to show rather than silently
+    substituting ``MemFree`` or the total.
+    """
+
+    total_bytes: int = 0
+    free_bytes: int = 0
+    available_bytes: Optional[int] = None
+    cached_bytes: int = 0
+    buffers_bytes: int = 0
+    swap_total_bytes: int = 0
+    swap_free_bytes: int = 0
+
+    def __post_init__(self) -> None:
+        for name in (
+            "total_bytes",
+            "free_bytes",
+            "cached_bytes",
+            "buffers_bytes",
+            "swap_total_bytes",
+            "swap_free_bytes",
+        ):
+            value = getattr(self, name)
+            if type(value) is not int or isinstance(value, bool) or value < 0:
+                raise ValueError(f"memory {name} must be a non-negative integer")
+        _require_optional_count(self.available_bytes, "memory available_bytes")
+
+    @property
+    def used_bytes(self) -> Optional[int]:
+        """Bytes in use, or ``None`` when the host publishes no availability."""
+
+        if self.available_bytes is None or not self.total_bytes:
+            return None
+        return max(0, self.total_bytes - self.available_bytes)
+
+    @property
+    def swap_used_bytes(self) -> int:
+        return max(0, self.swap_total_bytes - self.swap_free_bytes)
+
+
+@dataclass(frozen=True)
+class LoadAverage:
+    one: float
+    five: float
+    fifteen: float
+
+    def __post_init__(self) -> None:
+        for name in ("one", "five", "fifteen"):
+            value = getattr(self, name)
+            if type(value) not in (int, float) or isinstance(value, bool) or value < 0:
+                raise ValueError(f"load average {name} must be a non-negative number")
+
+
+@dataclass(frozen=True)
+class FilesystemUsage:
+    """One mounted filesystem, with every size already normalised to bytes."""
+
+    device: str
+    mount_point: str
+    fstype: str = ""
+    size_bytes: Optional[int] = None
+    used_bytes: Optional[int] = None
+    available_bytes: Optional[int] = None
+    use_percent: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        _require_text(self.device, "filesystem device")
+        _require_text(self.mount_point, "filesystem mount point")
+        _require_text(self.fstype, "filesystem type")
+        for name in ("size_bytes", "used_bytes", "available_bytes"):
+            _require_optional_count(getattr(self, name), f"filesystem {name}")
+        if self.use_percent is not None and (
+            type(self.use_percent) is not int
+            or isinstance(self.use_percent, bool)
+            or not 0 <= self.use_percent <= 100
+        ):
+            raise ValueError("filesystem use_percent must be a percentage or None")
+
+    @property
+    def used_fraction(self) -> Optional[float]:
+        if self.size_bytes and self.used_bytes is not None:
+            return self.used_bytes / self.size_bytes
+        if self.use_percent is not None:
+            return self.use_percent / 100.0
+        return None
+
+
+@dataclass(frozen=True)
+class InterfaceCounters:
+    """Cumulative byte counters for one interface since the host booted."""
+
+    name: str
+    rx_bytes: int
+    tx_bytes: int
+
+    def __post_init__(self) -> None:
+        _require_text(self.name, "interface name")
+        if not self.name:
+            raise ValueError("interface name must not be empty")
+        for field_name in ("rx_bytes", "tx_bytes"):
+            value = getattr(self, field_name)
+            if type(value) is not int or isinstance(value, bool) or value < 0:
+                raise ValueError(f"interface {field_name} must be a non-negative integer")
+
+
+@dataclass(frozen=True)
+class NetworkInterface:
+    name: str
+    kind: NetworkInterfaceKind = NetworkInterfaceKind.UNKNOWN
+    state: NetworkInterfaceState = NetworkInterfaceState.UNKNOWN
+    mac_address: str = ""
+    mtu: Optional[int] = None
+    ipv4_addresses: Tuple[str, ...] = ()
+    ipv6_addresses: Tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        _require_text(self.name, "interface name")
+        if not self.name:
+            raise ValueError("interface name must not be empty")
+        if not isinstance(self.kind, NetworkInterfaceKind):
+            raise TypeError("interface kind must be a NetworkInterfaceKind")
+        if not isinstance(self.state, NetworkInterfaceState):
+            raise TypeError("interface state must be a NetworkInterfaceState")
+        _require_text(self.mac_address, "interface mac address")
+        _require_optional_count(self.mtu, "interface mtu")
+        _require_text_tuple(
+            self.ipv4_addresses, "interface ipv4 addresses", MAX_HOST_INFO_ADDRESSES
+        )
+        _require_text_tuple(
+            self.ipv6_addresses, "interface ipv6 addresses", MAX_HOST_INFO_ADDRESSES
+        )
+
+
+@dataclass(frozen=True)
+class TemperatureReading:
+    label: str
+    celsius: float
+
+    def __post_init__(self) -> None:
+        _require_text(self.label, "temperature label")
+        if type(self.celsius) not in (int, float) or isinstance(self.celsius, bool):
+            raise TypeError("temperature must be a number")
+
+
+@dataclass(frozen=True)
+class LoginSession:
+    """One logged-in user.
+
+    ``origin`` is empty for a local console login; ``remote`` says whether the
+    session arrived over the network, so frontends never have to re-derive it
+    from display-name heuristics such as ``":0"``.
+    """
+
+    user: str = ""
+    tty: str = ""
+    origin: str = ""
+    since: str = ""
+    remote: bool = False
+
+    def __post_init__(self) -> None:
+        for name in ("user", "tty", "origin", "since"):
+            _require_text(getattr(self, name), f"login session {name}")
+        if type(self.remote) is not bool:
+            raise TypeError("login session remote must be a boolean")
+
+
+@dataclass(frozen=True)
+class SocketConnection:
+    protocol: str
+    local_address: str = ""
+    local_port: Optional[int] = None
+    peer_address: str = ""
+    peer_port: Optional[int] = None
+    process: str = ""
+    direction: SocketDirection = SocketDirection.OUTGOING
+
+    def __post_init__(self) -> None:
+        for name in ("protocol", "local_address", "peer_address", "process"):
+            _require_text(getattr(self, name), f"socket {name}")
+        _require_port(self.local_port, "socket local port")
+        _require_port(self.peer_port, "socket peer port")
+        if not isinstance(self.direction, SocketDirection):
+            raise TypeError("socket direction must be a SocketDirection")
+
+
+@dataclass(frozen=True)
+class HostInfoSnapshot:
+    """Everything one full probe observed about a remote host."""
+
+    hostname: str = ""
+    device_model: str = ""
+    os_pretty_name: str = ""
+    kernel: str = ""
+    uptime_seconds: Optional[float] = None
+    boot_time: str = ""
+    cpu: CpuInfo = field(default_factory=CpuInfo)
+    memory: MemoryInfo = field(default_factory=MemoryInfo)
+    load_average: Optional[LoadAverage] = None
+    filesystems: Tuple[FilesystemUsage, ...] = ()
+    interfaces: Tuple[NetworkInterface, ...] = ()
+    temperatures: Tuple[TemperatureReading, ...] = ()
+    sessions: Tuple[LoginSession, ...] = ()
+    sockets: Tuple[SocketConnection, ...] = ()
+    default_gateway: str = ""
+    default_gateway_interface: str = ""
+    dns_servers: Tuple[str, ...] = ()
+    ssh_port: Optional[int] = None
+    ssh_process: str = ""
+
+    def __post_init__(self) -> None:
+        for name in (
+            "hostname",
+            "device_model",
+            "os_pretty_name",
+            "kernel",
+            "boot_time",
+            "default_gateway",
+            "default_gateway_interface",
+            "ssh_process",
+        ):
+            _require_text(getattr(self, name), f"host info {name}")
+        if self.uptime_seconds is not None and (
+            type(self.uptime_seconds) not in (int, float)
+            or isinstance(self.uptime_seconds, bool)
+            or self.uptime_seconds < 0
+        ):
+            raise ValueError("uptime must be a non-negative number or None")
+        if type(self.cpu) is not CpuInfo:
+            raise TypeError("cpu must be a CpuInfo")
+        if type(self.memory) is not MemoryInfo:
+            raise TypeError("memory must be a MemoryInfo")
+        if self.load_average is not None and type(self.load_average) is not LoadAverage:
+            raise TypeError("load average must be a LoadAverage or None")
+        for name, item_type, limit in (
+            ("filesystems", FilesystemUsage, MAX_HOST_INFO_FILESYSTEMS),
+            ("interfaces", NetworkInterface, MAX_HOST_INFO_INTERFACES),
+            ("temperatures", TemperatureReading, MAX_HOST_INFO_TEMPERATURES),
+            ("sessions", LoginSession, MAX_HOST_INFO_SESSIONS),
+            ("sockets", SocketConnection, MAX_HOST_INFO_SOCKETS),
+        ):
+            value = getattr(self, name)
+            if type(value) is not tuple:
+                raise TypeError(f"host info {name} must be a tuple")
+            if len(value) > limit:
+                raise ValueError(f"host info {name} exceeds the supported length")
+            for item in value:
+                if type(item) is not item_type:
+                    raise TypeError(f"host info {name} entries are the wrong type")
+        _require_text_tuple(self.dns_servers, "dns servers", MAX_HOST_INFO_DNS_SERVERS)
+        _require_port(self.ssh_port, "ssh port")
+
+    @property
+    def root_filesystem(self) -> Optional[FilesystemUsage]:
+        """The filesystem backing the root of the host, if it reported one.
+
+        OpenWrt mounts a read-only squashfs at ``/`` and keeps writable state
+        on ``/overlay``, so ``/overlay`` is the meaningful "root" there and is
+        preferred when present.
+        """
+
+        by_mount = {item.mount_point: item for item in self.filesystems}
+        return by_mount.get("/overlay") or by_mount.get("/")
+
+
+@dataclass(frozen=True)
+class HostInfoRequest:
+    connection_id: ConnectionId
+    probe: HostInfoProbe = HostInfoProbe.FULL
+
+    def __post_init__(self) -> None:
+        require_identifier(self.connection_id, "connection id")
+        if not isinstance(self.probe, HostInfoProbe):
+            raise TypeError("probe must be a HostInfoProbe")
+
+
+@dataclass(frozen=True)
+class HostInfoSummary:
+    """A host-info operation plus whatever it has produced so far.
+
+    ``snapshot`` is populated only for a completed ``FULL`` probe; ``counters``
+    is populated by both probes so a frontend can sample bandwidth without
+    paying for the full gather.
+    """
+
+    operation: OperationSummary
+    probe: HostInfoProbe = HostInfoProbe.FULL
+    snapshot: Optional[HostInfoSnapshot] = None
+    counters: Tuple[InterfaceCounters, ...] = ()
+    failure: Optional[ServiceFailure] = None
+
+    def __post_init__(self) -> None:
+        if type(self.operation) is not OperationSummary:
+            raise TypeError("operation must be an OperationSummary")
+        if not isinstance(self.probe, HostInfoProbe):
+            raise TypeError("probe must be a HostInfoProbe")
+        if self.snapshot is not None and type(self.snapshot) is not HostInfoSnapshot:
+            raise TypeError("snapshot must be a HostInfoSnapshot or None")
+        if type(self.counters) is not tuple or any(
+            type(item) is not InterfaceCounters for item in self.counters
+        ):
+            raise TypeError("counters must be a tuple of InterfaceCounters")
+        if len(self.counters) > MAX_HOST_INFO_INTERFACES:
+            raise ValueError("host info counters exceed the supported length")
+        if self.failure is not None and type(self.failure) is not ServiceFailure:
+            raise TypeError("failure must be a ServiceFailure or None")

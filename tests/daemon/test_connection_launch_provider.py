@@ -370,3 +370,39 @@ def test_preload_uses_identities_discovered_by_resolver_when_cache_empty(
     # The builder sees the resolved candidate, and the preload path shares it.
     assert seen_by_builder == [[key]]
     assert credentials.prepared == [(key, True, 0)]
+
+
+def test_remote_identity_supplies_the_account_prompts_and_secrets_need(provider):
+    """Headless operations cannot derive this from argv, so it is exposed.
+
+    A remote-command argv ends with the command rather than the target, so the
+    interaction broker's argv fallback finds no account. An empty username
+    makes a prompt read "unknown@host" and makes the stored-secret lookup miss
+    the key the session path saved under.
+    """
+
+    prov, _records = provider
+
+    hostname, username, port = prov.remote_identity("web")
+
+    assert hostname == "example.com"
+    assert username == "alice"
+    assert port == 22
+
+
+def test_remote_identity_reports_a_non_default_port():
+    records = {"web": _record(port=2222)}
+    prov = DaemonConnectionLaunchProvider(
+        lambda cid: records.get(cid), secret_provider=None, app_config=None
+    )
+
+    assert prov.remote_identity("web")[2] == 2222
+
+
+def test_remote_identity_rejects_an_unknown_connection():
+    prov = DaemonConnectionLaunchProvider(
+        lambda _cid: None, secret_provider=None, app_config=None
+    )
+
+    with pytest.raises(Exception):
+        prov.remote_identity("missing")

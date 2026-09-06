@@ -628,6 +628,31 @@ class DaemonConnectionLaunchProvider:
             host = f"[{host}]"
         return f"{connection.username}@{host}" if connection.username else host
 
+    def remote_identity(self, connection_id: ConnectionId) -> Tuple[str, str, int]:
+        """``(hostname, username, port)`` for prompts and secret lookup.
+
+        Headless operations run ``ssh <alias> <command>``, whose argv ends with
+        the command rather than the target, so the interaction broker cannot
+        derive the identity from argv the way a session launch does. Without
+        it a prompt reads ``unknown@host`` and — worse — the stored-secret
+        lookup misses, so the user is asked for a password the keyring already
+        holds.
+
+        ``effective_username`` is deliberate: when the Host block authored no
+        ``User`` the account is inherited from the SSH configuration, and only
+        the effective value matches what the session path stored under.
+        """
+
+        record = self._resolve(connection_id)
+        connection = HeadlessConnectionView(record)
+        hostname = str(
+            connection.hostname
+            or connection.get_effective_host()
+            or connection.host
+            or ""
+        ).strip()
+        return hostname, str(connection.effective_username or "").strip(), connection.port
+
     def prepare_sftp_launch(
         self,
         connection_id: ConnectionId,

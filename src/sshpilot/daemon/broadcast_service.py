@@ -6,6 +6,7 @@ always delegates SSH construction/authentication to ConnectionLaunchProvider.
 
 from __future__ import annotations
 
+import logging
 import selectors
 import subprocess
 import threading
@@ -30,6 +31,8 @@ from sshpilot.api.models.operations import (
     ServiceFailure,
 )
 from sshpilot.daemon.operation_runtime import OperationCancelled, OperationHandle, OperationRuntime
+
+logger = logging.getLogger(__name__)
 
 _CHUNK_BYTES = 16_384
 _TERMINATION_GRACE = 1.0
@@ -231,6 +234,7 @@ class BroadcastCommandService:
 
     def _execute(self, handle: OperationHandle, request: BroadcastCommandRequest, input_data=None) -> str:
         operation_id = handle.operation_id
+        authenticated = False
         with self._lock:
             self._entered.add(operation_id)
         # start_operation can schedule immediately, before start() records the DTOs.
@@ -306,7 +310,18 @@ class BroadcastCommandService:
                     raise OperationCancelled()
             with self._lock:
                 results = tuple(self._targets[operation_id])
+                authenticated = any(
+                    item.state is HostCommandState.SUCCEEDED for item in results
+                )
         finally:
+            # Commit credentials the user chose to remember AFTER a target
+            # authenticated, and BEFORE the scope is torn down:
+            # ``cancel_session`` destroys the askpass context and clears its
+            # pending remembered secrets. Without this a "remember" choice made
+            # at a broadcast or host-info prompt was silently discarded and the
+            # user was asked again on the next run.
+            if authenticated:
+                self._interaction_broker.mark_authenticated(operation_id)
             self._interaction_broker.cancel_session(operation_id)
             self._remember_terminal(operation_id)
             if isinstance(input_data, bytearray):
@@ -319,17 +334,41 @@ class BroadcastCommandService:
             )
         return "Broadcast command completed"
 
+    def _remote_identity(self, connection_id) -> tuple:
+        """Best-effort ``(hostname, username, port)`` for prompt display."""
+
+        resolve = getattr(self._launch_provider, "remote_identity", None)
+        if callable(resolve):
+            try:
+                hostname, username, port = resolve(connection_id)
+                return str(hostname or connection_id), str(username or ""), int(port)
+            except Exception:
+                logger.debug(
+                    "Could not resolve broadcast target identity", exc_info=True
+                )
+        return str(connection_id), "", 22
+
     def _run_target(self, operation_id, connection_id, request, cancel, input_data=None):
         try:
             argv, environment = self._launch_provider.prepare_remote_command_launch(
                 connection_id, request.command, interaction_policy="broker"
             )
+            # The connection id is a nickname, not an address, and this argv
+            # ends with the remote command rather than the target, so neither
+            # the caller's id nor the broker's argv fallback yields a usable
+            # identity. Ask the launch provider for the real one: an empty
+            # username makes a prompt read "unknown@host" and makes the
+            # stored-secret lookup miss, so the user is asked for a password
+            # the keyring already holds.
+            hostname, username, port = self._remote_identity(connection_id)
             argv, environment = self._interaction_broker.prepare_operation_launch(
                 argv,
                 environment,
                 scope_id=operation_id,
                 connection_id=connection_id,
-                hostname=str(connection_id),
+                hostname=hostname,
+                username=username,
+                port=port,
                 interaction_mode=request.policy.interaction_mode,
             )
             owned_process = [None]

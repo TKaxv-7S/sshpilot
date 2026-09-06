@@ -983,6 +983,40 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: CpuInfo -->
+## `CpuInfo`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Processor identity and topology as published by the remote host.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `model` | `str` | No | `` | No |
+| `cores_per_socket` | `Optional[int]` | No | `null` | No |
+| `threads_per_core` | `Optional[int]` | No | `null` | No |
+| `sockets` | `Optional[int]` | No | `null` | No |
+| `logical_processors` | `Optional[int]` | No | `null` | No |
+| `frequency_mhz` | `Optional[float]` | No | `null` | No |
+| `bogomips` | `Optional[float]` | No | `null` | No |
+
+Synthetic representation:
+
+```json
+{
+  "bogomips": null,
+  "cores_per_socket": null,
+  "frequency_mhz": null,
+  "logical_processors": null,
+  "model": "",
+  "sockets": null,
+  "threads_per_core": null
+}
+```
+
 <!-- api-model: CreateConnectionRequest -->
 ## `CreateConnectionRequest`
 
@@ -1602,6 +1636,40 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: FilesystemUsage -->
+## `FilesystemUsage`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One mounted filesystem, with every size already normalised to bytes.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `device` | `str` | Yes | — | No |
+| `mount_point` | `str` | Yes | — | No |
+| `fstype` | `str` | No | `` | No |
+| `size_bytes` | `Optional[int]` | No | `null` | No |
+| `used_bytes` | `Optional[int]` | No | `null` | No |
+| `available_bytes` | `Optional[int]` | No | `null` | No |
+| `use_percent` | `Optional[int]` | No | `null` | No |
+
+Synthetic representation:
+
+```json
+{
+  "available_bytes": null,
+  "device": {},
+  "fstype": "",
+  "mount_point": {},
+  "size_bytes": null,
+  "use_percent": null,
+  "used_bytes": null
+}
+```
+
 <!-- api-model: ForwardSummary -->
 ## `ForwardSummary`
 
@@ -1897,6 +1965,138 @@ Synthetic representation:
   "development_revision": "",
   "selected_protocol_version": {},
   "server_instance_id": {}
+}
+```
+
+<!-- api-model: HostInfoRequest -->
+## `HostInfoRequest`
+
+**Status:** Implemented
+**Introduced:** Protocol v1
+**Purpose:** Frontend-neutral `HostInfoRequest` record.
+
+**Related methods:** `start_host_info`
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `connection_id` | `ConnectionId` | Yes | — | No |
+| `probe` | `HostInfoProbe` | No | `full` | No |
+
+Synthetic representation:
+
+```json
+{
+  "connection_id": "production",
+  "probe": "full"
+}
+```
+
+<!-- api-model: HostInfoSnapshot -->
+## `HostInfoSnapshot`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Everything one full probe observed about a remote host.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `hostname` | `str` | No | `` | No |
+| `device_model` | `str` | No | `` | No |
+| `os_pretty_name` | `str` | No | `` | No |
+| `kernel` | `str` | No | `` | No |
+| `uptime_seconds` | `Optional[float]` | No | `null` | No |
+| `boot_time` | `str` | No | `` | No |
+| `cpu` | `CpuInfo` | No | `{"bogomips": null, "cores_per_socket": null, "frequency_mhz": null, "logical_processors": null, "model": "", "sockets": null, "threads_per_core": null}` | No |
+| `memory` | `MemoryInfo` | No | `{"available_bytes": null, "buffers_bytes": 0, "cached_bytes": 0, "free_bytes": 0, "swap_free_bytes": 0, "swap_total_bytes": 0, "total_bytes": 0}` | No |
+| `load_average` | `Optional[LoadAverage]` | No | `null` | No |
+| `filesystems` | `Tuple[FilesystemUsage, ...]` | No | `[]` | No |
+| `interfaces` | `Tuple[NetworkInterface, ...]` | No | `[]` | No |
+| `temperatures` | `Tuple[TemperatureReading, ...]` | No | `[]` | No |
+| `sessions` | `Tuple[LoginSession, ...]` | No | `[]` | No |
+| `sockets` | `Tuple[SocketConnection, ...]` | No | `[]` | No |
+| `default_gateway` | `str` | No | `` | No |
+| `default_gateway_interface` | `str` | No | `` | No |
+| `dns_servers` | `Tuple[str, ...]` | No | `[]` | No |
+| `ssh_port` | `Optional[int]` | No | `null` | No |
+| `ssh_process` | `str` | No | `` | No |
+
+Synthetic representation:
+
+```json
+{
+  "boot_time": "",
+  "cpu": {
+    "bogomips": null,
+    "cores_per_socket": null,
+    "frequency_mhz": null,
+    "logical_processors": null,
+    "model": "",
+    "sockets": null,
+    "threads_per_core": null
+  },
+  "default_gateway": "",
+  "default_gateway_interface": "",
+  "device_model": "",
+  "dns_servers": [],
+  "filesystems": [],
+  "hostname": "",
+  "interfaces": [],
+  "kernel": "",
+  "load_average": null,
+  "memory": {
+    "available_bytes": null,
+    "buffers_bytes": 0,
+    "cached_bytes": 0,
+    "free_bytes": 0,
+    "swap_free_bytes": 0,
+    "swap_total_bytes": 0,
+    "total_bytes": 0
+  },
+  "os_pretty_name": "",
+  "sessions": [],
+  "sockets": [],
+  "ssh_port": null,
+  "ssh_process": "",
+  "temperatures": [],
+  "uptime_seconds": null
+}
+```
+
+<!-- api-model: HostInfoSummary -->
+## `HostInfoSummary`
+
+**Status:** Implemented
+**Introduced:** Protocol v1
+**Purpose:** A host-info operation plus whatever it has produced so far.
+
+``snapshot`` is populated only for a completed ``FULL`` probe; ``counters``
+is populated by both probes so a frontend can sample bandwidth without
+paying for the full gather.
+
+**Related methods:** `cancel_host_info`, `get_host_info`, `start_host_info`
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `operation` | `OperationSummary` | Yes | — | No |
+| `probe` | `HostInfoProbe` | No | `full` | No |
+| `snapshot` | `Optional[HostInfoSnapshot]` | No | `null` | No |
+| `counters` | `Tuple[InterfaceCounters, ...]` | No | `[]` | No |
+| `failure` | `Optional[ServiceFailure]` | No | `null` | No |
+
+Synthetic representation:
+
+```json
+{
+  "counters": [],
+  "failure": null,
+  "operation": "status",
+  "probe": "full",
+  "snapshot": null
 }
 ```
 
@@ -2228,6 +2428,32 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: InterfaceCounters -->
+## `InterfaceCounters`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Cumulative byte counters for one interface since the host booted.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `name` | `str` | Yes | — | No |
+| `rx_bytes` | `int` | Yes | — | No |
+| `tx_bytes` | `int` | Yes | — | No |
+
+Synthetic representation:
+
+```json
+{
+  "name": "example",
+  "rx_bytes": {},
+  "tx_bytes": {}
+}
+```
+
 <!-- api-model: KeyList -->
 ## `KeyList`
 
@@ -2438,6 +2664,66 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: LoadAverage -->
+## `LoadAverage`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Frontend-neutral `LoadAverage` record.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `one` | `float` | Yes | — | No |
+| `five` | `float` | Yes | — | No |
+| `fifteen` | `float` | Yes | — | No |
+
+Synthetic representation:
+
+```json
+{
+  "fifteen": {},
+  "five": {},
+  "one": {}
+}
+```
+
+<!-- api-model: LoginSession -->
+## `LoginSession`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One logged-in user.
+
+``origin`` is empty for a local console login; ``remote`` says whether the
+session arrived over the network, so frontends never have to re-derive it
+from display-name heuristics such as ``":0"``.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `user` | `str` | No | `` | No |
+| `tty` | `str` | No | `` | No |
+| `origin` | `str` | No | `` | No |
+| `since` | `str` | No | `` | No |
+| `remote` | `bool` | No | `false` | No |
+
+Synthetic representation:
+
+```json
+{
+  "origin": "",
+  "remote": false,
+  "since": "",
+  "tty": "",
+  "user": ""
+}
+```
+
 <!-- api-model: LookupKeyPassphraseRequest -->
 ## `LookupKeyPassphraseRequest`
 
@@ -2457,6 +2743,44 @@ Synthetic representation:
 ```json
 {
   "key_path": "example"
+}
+```
+
+<!-- api-model: MemoryInfo -->
+## `MemoryInfo`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** ``/proc/meminfo`` values in bytes.
+
+``available_bytes`` is ``None`` when the host does not publish
+``MemAvailable``; callers must decide what to show rather than silently
+substituting ``MemFree`` or the total.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `total_bytes` | `int` | No | `0` | No |
+| `free_bytes` | `int` | No | `0` | No |
+| `available_bytes` | `Optional[int]` | No | `null` | No |
+| `cached_bytes` | `int` | No | `0` | No |
+| `buffers_bytes` | `int` | No | `0` | No |
+| `swap_total_bytes` | `int` | No | `0` | No |
+| `swap_free_bytes` | `int` | No | `0` | No |
+
+Synthetic representation:
+
+```json
+{
+  "available_bytes": null,
+  "buffers_bytes": 0,
+  "cached_bytes": 0,
+  "free_bytes": 0,
+  "swap_free_bytes": 0,
+  "swap_total_bytes": 0,
+  "total_bytes": 0
 }
 ```
 
@@ -2491,6 +2815,40 @@ Synthetic representation:
   "source_group_id": null,
   "target_connection_id": null,
   "target_group_id": null
+}
+```
+
+<!-- api-model: NetworkInterface -->
+## `NetworkInterface`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Frontend-neutral `NetworkInterface` record.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `name` | `str` | Yes | — | No |
+| `kind` | `NetworkInterfaceKind` | No | `unknown` | No |
+| `state` | `NetworkInterfaceState` | No | `unknown` | No |
+| `mac_address` | `str` | No | `` | No |
+| `mtu` | `Optional[int]` | No | `null` | No |
+| `ipv4_addresses` | `Tuple[str, ...]` | No | `[]` | No |
+| `ipv6_addresses` | `Tuple[str, ...]` | No | `[]` | No |
+
+Synthetic representation:
+
+```json
+{
+  "ipv4_addresses": [],
+  "ipv6_addresses": [],
+  "kind": "unknown",
+  "mac_address": "",
+  "mtu": null,
+  "name": "example",
+  "state": "unknown"
 }
 ```
 
@@ -4211,6 +4569,40 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: SocketConnection -->
+## `SocketConnection`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Frontend-neutral `SocketConnection` record.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `protocol` | `str` | Yes | — | No |
+| `local_address` | `str` | No | `` | No |
+| `local_port` | `Optional[int]` | No | `null` | No |
+| `peer_address` | `str` | No | `` | No |
+| `peer_port` | `Optional[int]` | No | `null` | No |
+| `process` | `str` | No | `` | No |
+| `direction` | `SocketDirection` | No | `outgoing` | No |
+
+Synthetic representation:
+
+```json
+{
+  "direction": "outgoing",
+  "local_address": "",
+  "local_port": null,
+  "peer_address": "",
+  "peer_port": null,
+  "process": "",
+  "protocol": "ssh"
+}
+```
+
 <!-- api-model: SplitConnectionRequest -->
 ## `SplitConnectionRequest`
 
@@ -4484,6 +4876,30 @@ Synthetic representation:
   "protocol_version": {},
   "request_id": "request-3",
   "result": "<sensitive value omitted>"
+}
+```
+
+<!-- api-model: TemperatureReading -->
+## `TemperatureReading`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** Frontend-neutral `TemperatureReading` record.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `label` | `str` | Yes | — | No |
+| `celsius` | `float` | Yes | — | No |
+
+Synthetic representation:
+
+```json
+{
+  "celsius": {},
+  "label": {}
 }
 ```
 

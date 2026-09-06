@@ -37,6 +37,7 @@ src/sshpilot/gtk/secret_transfer_messages.py
 src/sshpilot/host_picker.py
 src/sshpilot/known_hosts_editor.py
 src/sshpilot/log_viewer.py
+src/sshpilot/machine_info_dialog.py
 src/sshpilot/macos_menubar.py
 src/sshpilot/main.py
 src/sshpilot/omni_search.py

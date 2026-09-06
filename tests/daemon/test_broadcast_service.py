@@ -29,14 +29,21 @@ class LaunchProvider:
 
     def prepare_remote_command_launch(self, connection_id, command, *, interaction_policy):
         self.calls.append((connection_id, command, interaction_policy))
+        # Note the shape: the target is argv[-2] and the remote command is
+        # argv[-1], which is why the broker cannot derive identity from argv.
         return (("ssh", str(connection_id), command), {"BASE": "1"})
+
+    def remote_identity(self, connection_id):
+        return (f"{connection_id}.example.test", "alice", 2222)
 
 
 class Broker:
     def __init__(self):
         self.calls = []
         self.interaction_modes = []
+        self.identities = []
         self.cancelled = []
+        self.authenticated = []
 
     def prepare_operation_launch(
         self,
@@ -46,12 +53,20 @@ class Broker:
         scope_id,
         connection_id,
         hostname="",
+        username="",
+        port=22,
         interaction_mode=ExecutionInteractionMode.INTERACTIVE,
     ):
-        assert hostname == str(connection_id)
+        self.identities.append((hostname, username, port))
         self.interaction_modes.append(interaction_mode)
         self.calls.append((scope_id, connection_id, tuple(argv), dict(environment)))
         return tuple(argv), {**environment, "BROKER": str(connection_id)}
+
+    def mark_authenticated(self, scope_id):
+        # Order matters: cancel_session destroys the askpass context and drops
+        # anything the user asked to remember.
+        assert scope_id not in self.cancelled
+        self.authenticated.append(scope_id)
 
     def cancel_session(self, scope_id):
         self.cancelled.append(scope_id)
@@ -346,3 +361,97 @@ def test_cancel_before_operation_body_finalizes_pending_targets_and_retention():
     assert cancelled.operation.state is OperationState.CANCELLED
     assert all(target.state is HostCommandState.CANCELLED for target in cancelled.targets)
     assert started.operation.operation_id in service._terminal_records
+
+
+def test_the_broker_is_given_the_connection_identity_not_the_nickname():
+    """A prompt reads "unknown@host" and misses the keyring without this.
+
+    The connection id is a nickname, and a remote-command argv ends with the
+    command rather than the target, so neither the id nor the broker's argv
+    fallback yields the account the secret was stored under.
+    """
+
+    provider = LaunchProvider()
+    broker = Broker()
+    runtime = OperationRuntime()
+    service = BroadcastCommandService(
+        runtime, provider, interaction_broker=broker, runner=Runner()
+    )
+    owner = ClientId("client-1")
+
+    started = service.start(
+        BroadcastCommandRequest((ConnectionId("demo"),), "uptime"),
+        owner_client_id=owner,
+    )
+    wait_terminal(service, started, owner)
+
+    assert broker.identities == [("demo.example.test", "alice", 2222)]
+
+
+def test_an_unresolvable_identity_falls_back_without_failing_the_command():
+    class Bare(LaunchProvider):
+        remote_identity = None
+
+    provider = Bare()
+    broker = Broker()
+    runtime = OperationRuntime()
+    service = BroadcastCommandService(
+        runtime, provider, interaction_broker=broker, runner=Runner()
+    )
+    owner = ClientId("client-1")
+
+    started = service.start(
+        BroadcastCommandRequest((ConnectionId("demo"),), "uptime"),
+        owner_client_id=owner,
+    )
+    result = wait_terminal(service, started, owner)
+
+    assert result.targets[0].state is HostCommandState.SUCCEEDED
+    assert broker.identities == [("demo", "", 22)]
+
+
+def test_a_remembered_password_is_committed_after_a_successful_run():
+    """cancel_session drops pending secrets, so this must happen first."""
+
+    provider = LaunchProvider()
+    broker = Broker()
+    runtime = OperationRuntime()
+    service = BroadcastCommandService(
+        runtime, provider, interaction_broker=broker, runner=Runner()
+    )
+    owner = ClientId("client-1")
+
+    started = service.start(
+        BroadcastCommandRequest((ConnectionId("demo"),), "uptime"),
+        owner_client_id=owner,
+    )
+    result = wait_terminal(service, started, owner)
+
+    assert result.targets[0].state is HostCommandState.SUCCEEDED
+    assert broker.authenticated == [started.operation.operation_id]
+    assert broker.cancelled == [started.operation.operation_id]
+
+
+def test_nothing_is_remembered_when_every_target_failed():
+    """A wrong password must not be saved."""
+
+    provider = LaunchProvider()
+    broker = Broker()
+    runtime = OperationRuntime()
+    service = BroadcastCommandService(
+        runtime,
+        provider,
+        interaction_broker=broker,
+        runner=Runner(exits={"demo": 255}),
+    )
+    owner = ClientId("client-1")
+
+    started = service.start(
+        BroadcastCommandRequest((ConnectionId("demo"),), "uptime"),
+        owner_client_id=owner,
+    )
+    result = wait_terminal(service, started, owner)
+
+    assert result.targets[0].state is HostCommandState.FAILED
+    assert broker.authenticated == []
+    assert broker.cancelled == [started.operation.operation_id]

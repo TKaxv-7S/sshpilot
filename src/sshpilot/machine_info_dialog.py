@@ -1,458 +1,246 @@
-"""Host Info dialog — remote host system information."""
+"""Host Info dialog — renders daemon-owned remote host information.
+
+This module is presentation only.  It holds no probe text and no parsing: the
+daemon runs the probe and returns typed DTOs
+(:mod:`sshpilot.api.models.host_info`), and
+:class:`~sshpilot.gtk.host_info_controller.HostInfoController` starts probes
+and delivers their results without polling.  Everything here turns values into
+pixels and localized text.
+
+Two presentation rules keep the tabs consistent with each other:
+
+* severity is computed once, in :func:`_usage_severity`, and drives both the
+  donut ring and the usage bars -- green while there is headroom, amber as it
+  runs out, red when it is nearly gone -- so the same number can never read
+  "critical" on one tab and "healthy" on another;
+* a value the host did not report is rendered as "N/A" rather than as zero.
+"""
 
 from __future__ import annotations
 
 import logging
 import math
-import re
-import time
-from datetime import datetime, timedelta, timezone
-from gettext import gettext as _
-from typing import Any, Dict, List, Optional, Tuple
+from gettext import gettext as _, ngettext
+from typing import Callable, List, Optional, Sequence, Tuple
 
-from gi.repository import Adw, GLib, Gtk, Gdk, Pango
+from gi.repository import Adw, GLib, Gdk, Gtk, Pango
 
-try:
-    import cairo
-except ImportError:
-    cairo = None
+from .api.connection_identity import connection_id_for
+from .api.models.common import SessionId
+from .api.models.host_info import (
+    HostInfoProbe,
+    HostInfoSnapshot,
+    InterfaceCounters,
+    NetworkInterfaceKind,
+    NetworkInterfaceState,
+    SocketDirection,
+)
+from .gtk.host_info_controller import HostInfoController, HostInfoProbeBusy
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Gather command — every section delimited by a unique marker
-# ---------------------------------------------------------------------------
+#: How often the Traffic tab samples byte counters while it is visible.
+_TRAFFIC_INTERVAL_MS = 2000
 
-_GATHER_CMD = (
-    'echo "===HOSTNAME==="; hostname 2>/dev/null || cat /proc/sys/kernel/hostname 2>/dev/null;'
-    'echo "===DEVICE_MODEL==="; cat /tmp/sysinfo/model 2>/dev/null;'
-    'echo "===OS_RELEASE==="; cat /etc/os-release 2>/dev/null;'
-    'echo "===UNAME==="; uname -srm 2>/dev/null;'
-    'echo "===UPTIME==="; cat /proc/uptime 2>/dev/null;'
-    'echo "===UPTIME_PRETTY==="; uptime -p 2>/dev/null;'
-    'echo "===BOOT_TIME==="; who -b 2>/dev/null;'
-    'echo "===UPTIME_SINCE==="; uptime -s 2>/dev/null;'
-    'echo "===LOADAVG==="; cat /proc/loadavg 2>/dev/null;'
-    'echo "===NPROC==="; nproc 2>/dev/null || grep -c "^processor" /proc/cpuinfo 2>/dev/null;'
-    'echo "===LSCPU==="; lscpu 2>/dev/null;'
-    'echo "===CPUINFO==="; cat /proc/cpuinfo 2>/dev/null;'
-    'echo "===MEMINFO==="; cat /proc/meminfo 2>/dev/null;'
-    'echo "===DF==="; df -T -B1 -x tmpfs -x devtmpfs -x overlay -x squashfs 2>/dev/null || df 2>/dev/null;'
-    'echo "===NET_DEV==="; cat /proc/net/dev 2>/dev/null;'
-    'echo "===IP_ADDR==="; ip -o addr show 2>/dev/null;'
-    'echo "===IP_LINK==="; ip -o link show 2>/dev/null;'
-    'echo "===IP_ROUTE==="; ip route show default 2>/dev/null;'
-    'echo "===DNS==="; cat /etc/resolv.conf 2>/dev/null;'
-    'echo "===SS_LISTEN==="; ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null;'
-    'echo "===SS_ESTAB==="; ss -tunap state established 2>/dev/null || netstat -tunap 2>/dev/null;'
-    'echo "===WHO==="; who 2>/dev/null;'
-    'echo "===W==="; w -h 2>/dev/null;'
-    'echo "===TEMPS==="; for f in /sys/class/thermal/thermal_zone*/temp; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
-    'echo "===TEMP_TYPES==="; for f in /sys/class/thermal/thermal_zone*/type; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
-    'echo "===SENSORS==="; sensors 2>/dev/null;'
-    'echo "===CPU_FREQ==="; cat /proc/cpuinfo 2>/dev/null | grep -i "cpu mhz" | head -1;'
-    'echo "===CPU_STAT==="; head -1 /proc/stat 2>/dev/null;'
-    'echo "===END===";'
+#: Usage fractions at or above these read as elevated and critical.
+_WARN_FRACTION = 0.75
+_CRITICAL_FRACTION = 0.90
+
+#: Temperatures in °C at or above these read as elevated and critical.
+_WARN_CELSIUS = 60.0
+_CRITICAL_CELSIUS = 80.0
+
+_SEVERITY_OK = "usage-ok"
+_SEVERITY_WARN = "usage-warn"
+_SEVERITY_CRITICAL = "usage-critical"
+#: A reading the host did not publish is neither healthy nor alarming. It gets
+#: its own neutral colour so an unknown value never reads as "fine".
+_SEVERITY_UNKNOWN = "usage-unknown"
+_SEVERITY_CLASSES = (
+    _SEVERITY_OK,
+    _SEVERITY_WARN,
+    _SEVERITY_CRITICAL,
+    _SEVERITY_UNKNOWN,
 )
 
-_TRAFFIC_CMD = 'cat /proc/net/dev 2>/dev/null'
+_CSS = b"""
+/* Usage bars mean "how full", so the fill must darken as the value rises:
+   green while there is headroom, amber as it runs out, red when it is nearly
+   gone. GTK's own levelbar offsets mean the opposite (they describe a level,
+   where full is good) and painted a nearly-full disk green, so every filled
+   block is painted from the severity class instead. */
+levelbar.usage-bar block.filled {
+    background-color: @success_bg_color;
+    border-radius: 3px;
+}
+levelbar.usage-bar.usage-warn block.filled {
+    background-color: @warning_bg_color;
+}
+levelbar.usage-bar.usage-critical block.filled {
+    background-color: @error_bg_color;
+}
+levelbar.usage-bar.usage-unknown block.filled {
+    background-color: @insensitive_fg_color;
+}
+levelbar.usage-bar trough {
+    border-radius: 3px;
+}
 
-# Accent colours matching the design
-_BLUE = (0.208, 0.518, 0.894)      # #3584e4
-_AMBER = (0.898, 0.647, 0.039)     # #e5a50a
-_GREEN = (0.180, 0.761, 0.494)     # #2ec27e
-_RED = (0.878, 0.106, 0.141)       # #e01b24
-_PURPLE = (0.569, 0.255, 0.675)    # #9141ac
-_TRACK = (0.0, 0.0, 0.0, 0.09)
+/* The donut ring reads its colour from the CSS foreground so it follows the
+   light/dark theme and the user's palette instead of a baked-in RGB value. */
+.host-info-gauge { color: @success_bg_color; }
+.host-info-gauge.usage-warn { color: @warning_bg_color; }
+.host-info-gauge.usage-critical { color: @error_bg_color; }
+.host-info-gauge.usage-unknown { color: @insensitive_fg_color; }
+"""
+
+_css_installed = False
+
+
+def _ensure_css() -> None:
+    """Install the dialog's styling once per display."""
+
+    global _css_installed
+    if _css_installed:
+        return
+    display = Gdk.Display.get_default()
+    if display is None:
+        return
+    provider = Gtk.CssProvider()
+    provider.load_from_data(_CSS)
+    Gtk.StyleContext.add_provider_for_display(
+        display, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+    )
+    _css_installed = True
 
 
 # ---------------------------------------------------------------------------
-# Parsing helpers
+# Value formatting (the only place raw numbers become text)
 # ---------------------------------------------------------------------------
 
-def _parse_sections(raw: str) -> Dict[str, str]:
-    sections: Dict[str, str] = {}
-    current_key: Optional[str] = None
-    current_lines: List[str] = []
-    for line in raw.splitlines():
-        m = re.match(r'^===([A-Z_]+)===$', line)
-        if m:
-            if current_key is not None:
-                sections[current_key] = '\n'.join(current_lines).strip()
-            current_key = m.group(1)
-            current_lines = []
-        elif current_key is not None:
-            current_lines.append(line)
-    if current_key is not None:
-        sections[current_key] = '\n'.join(current_lines).strip()
-    return sections
+def _format_bytes(value: Optional[float]) -> str:
+    """Binary units, for memory as the kernel reports it."""
+
+    if value is None:
+        return _("N/A")
+    if value < 1024:
+        return _("%d B") % int(value)
+    scaled = float(value)
+    for unit in ("KiB", "MiB", "GiB", "TiB", "PiB"):
+        scaled /= 1024
+        if scaled < 1024 or unit == "PiB":
+            precision = 1 if scaled < 100 else 0
+            return f"{scaled:.{precision}f} {unit}"
+    return ""
 
 
-def _parse_os_release(text: str) -> Dict[str, str]:
-    d: Dict[str, str] = {}
-    for line in text.splitlines():
-        if '=' in line:
-            k, _, v = line.partition('=')
-            d[k.strip()] = v.strip().strip('"')
-    return d
+def _format_bytes_si(value: Optional[float]) -> str:
+    """Decimal units, for storage as drive vendors label it."""
+
+    if value is None:
+        return _("N/A")
+    if value < 1000:
+        return _("%d B") % int(value)
+    scaled = float(value)
+    for unit in ("KB", "MB", "GB", "TB", "PB"):
+        scaled /= 1000
+        if scaled < 1000 or unit == "PB":
+            precision = 1 if scaled < 100 else 0
+            return f"{scaled:.{precision}f} {unit}"
+    return ""
 
 
-def _parse_meminfo(text: str) -> Dict[str, int]:
-    d: Dict[str, int] = {}
-    for line in text.splitlines():
-        m = re.match(r'^(\w+):\s+(\d+)', line)
-        if m:
-            d[m.group(1)] = int(m.group(2)) * 1024  # kB → bytes
-    return d
+def _format_rate(value: Optional[float]) -> str:
+    if value is None:
+        return "—"
+    if value < 1024:
+        return _("%d B/s") % int(value)
+    scaled = float(value)
+    for unit in ("KiB/s", "MiB/s", "GiB/s", "TiB/s"):
+        scaled /= 1024
+        if scaled < 1024 or unit == "TiB/s":
+            precision = 1 if scaled < 100 else 0
+            return f"{scaled:.{precision}f} {unit}"
+    return ""
 
 
-def _parse_lscpu(text: str) -> Dict[str, str]:
-    d: Dict[str, str] = {}
-    for line in text.splitlines():
-        if ':' in line:
-            k, _, v = line.partition(':')
-            d[k.strip()] = v.strip()
-    return d
-
-
-def _parse_cpuinfo(text: str) -> Dict[str, str]:
-    """Extract lscpu-like fields from /proc/cpuinfo (ARM/MIPS fallback)."""
-    d: Dict[str, str] = {}
-    processors = 0
-    for line in text.splitlines():
-        if ':' not in line:
-            continue
-        k, _, v = line.partition(':')
-        k, v = k.strip(), v.strip()
-        if k == 'processor':
-            processors += 1
-        elif k in ('model name', 'cpu model', 'system type',
-                    'machine', 'Hardware'):
-            if 'Model name' not in d:
-                d['Model name'] = v
-        elif k == 'cpu MHz' and 'cpu MHz' not in d:
-            d['cpu MHz'] = v
-        elif k == 'BogoMIPS' and 'BogoMIPS' not in d:
-            d['BogoMIPS'] = v
-    if processors:
-        d['_processors'] = str(processors)
-    return d
-
-
-def _parse_df(text: str) -> List[Dict[str, str]]:
-    """Parse df output — handles both coreutils (7-col) and BusyBox (6-col).
-
-    BusyBox ``df`` reports 1K-blocks; coreutils with ``-B1`` reports bytes.
-    All sizes are normalised to bytes in the output dicts.
-    """
-    rows: List[Dict[str, str]] = []
-    lines = text.strip().splitlines()
-    if not lines:
-        return rows
-    header = lines[0].lower()
-    has_type = 'type' in header
-    multiplier = 1
-    if '1k-block' in header or '1024-block' in header:
-        multiplier = 1024
-    for line in lines[1:]:
-        parts = line.split()
-        if has_type and len(parts) >= 7:
-            rows.append({
-                'fs': parts[0],
-                'type': parts[1],
-                'size': str(int(parts[2]) * multiplier) if parts[2].isdigit() else parts[2],
-                'used': str(int(parts[3]) * multiplier) if parts[3].isdigit() else parts[3],
-                'avail': str(int(parts[4]) * multiplier) if parts[4].isdigit() else parts[4],
-                'pct': parts[5].rstrip('%'),
-                'mount': ' '.join(parts[6:]),
-            })
-        elif not has_type and len(parts) >= 6:
-            rows.append({
-                'fs': parts[0],
-                'type': '',
-                'size': str(int(parts[1]) * multiplier) if parts[1].isdigit() else parts[1],
-                'used': str(int(parts[2]) * multiplier) if parts[2].isdigit() else parts[2],
-                'avail': str(int(parts[3]) * multiplier) if parts[3].isdigit() else parts[3],
-                'pct': parts[4].rstrip('%'),
-                'mount': ' '.join(parts[5:]),
-            })
-    return rows
-
-
-def _parse_net_dev(text: str) -> Dict[str, Tuple[int, int]]:
-    result: Dict[str, Tuple[int, int]] = {}
-    for line in text.splitlines():
-        m = re.match(r'\s*(\S+):\s+(\d+)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)', line)
-        if m:
-            result[m.group(1)] = (int(m.group(2)), int(m.group(3)))
-    return result
-
-
-def _parse_ip_addr(text: str) -> List[Dict[str, str]]:
-    entries: List[Dict[str, str]] = []
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) >= 4 and parts[2] in ('inet', 'inet6'):
-            entries.append({
-                'iface': parts[1],
-                'family': parts[2],
-                'addr': parts[3],
-            })
-    return entries
-
-
-def _parse_ip_link(text: str) -> Dict[str, Dict[str, str]]:
-    result: Dict[str, Dict[str, str]] = {}
-    for line in text.splitlines():
-        m = re.match(r'^\d+:\s+(\S+?)(?:@\S+)?:', line)
-        if not m:
-            continue
-        iface = m.group(1)
-        info: Dict[str, str] = {}
-        mac_m = re.search(r'link/\S+\s+([\da-f:]{17})', line)
-        if mac_m:
-            info['mac'] = mac_m.group(1)
-        if 'NO-CARRIER' in line:
-            info['state'] = 'no-carrier'
-        elif 'state UP' in line:
-            info['state'] = 'up'
-        elif 'state DOWN' in line:
-            info['state'] = 'down'
-        elif 'LOOPBACK' in line:
-            info['state'] = 'loopback'
-        mtu_m = re.search(r'mtu\s+(\d+)', line)
-        if mtu_m:
-            info['mtu'] = mtu_m.group(1)
-        if 'LOOPBACK' in line:
-            info['type'] = 'loopback'
-        elif 'wl' in iface.lower() or 'wifi' in line.lower() or 'BROADCAST' in line and 'wl' in iface:
-            info['type'] = 'wifi'
-        else:
-            info['type'] = 'ethernet'
-        result[iface] = info
-    return result
-
-
-def _parse_who(text: str) -> List[Dict[str, str]]:
-    rows: List[Dict[str, str]] = []
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) >= 3:
-            row: Dict[str, str] = {'user': parts[0], 'tty': parts[1]}
-            rest = ' '.join(parts[2:])
-            paren_m = re.search(r'\((.+)\)', rest)
-            if paren_m:
-                row['from'] = paren_m.group(1)
-                rest = rest[:paren_m.start()].strip()
-            row['since'] = rest
-            rows.append(row)
-    return rows
-
-
-def _parse_w(text: str) -> List[Dict[str, str]]:
-    """Parse `w -h` output as a fallback when `who` returns nothing."""
-    rows: List[Dict[str, str]] = []
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) >= 3:
-            row: Dict[str, str] = {
-                'user': parts[0],
-                'tty': parts[1],
-                'from': parts[2] if len(parts) > 3 else '',
-                'since': parts[3] if len(parts) > 3 else parts[2],
-            }
-            rows.append(row)
-    return rows
-
-
-def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
-    """Extract SSH client sessions from ss/netstat established connections."""
-    rows: List[Dict[str, str]] = []
-    seen: set = set()
-    is_netstat = any(l.strip().startswith(('Proto', 'Active'))
-                     for l in ss_text.splitlines()[:2])
-    for line in ss_text.splitlines():
-        parts = line.split()
-        if len(parts) < 5 or parts[0] in ('Netid', 'State', 'Proto', 'Active'):
-            continue
-        if is_netstat:
-            if len(parts) > 5 and parts[5] in ('LISTEN', 'TIME_WAIT'):
-                continue
-            local, peer = (parts[3], parts[4]) if len(parts) > 4 else ('', '')
-        else:
-            local = parts[4] if len(parts) > 4 else ''
-            peer = parts[5] if len(parts) > 5 else ''
-        lm = re.search(r':(\d+)$', local)
-        if not lm or lm.group(1) != '22':
-            continue
-        peer_addr = re.sub(r':\d+$', '', peer)
-        if peer_addr in seen:
-            continue
-        seen.add(peer_addr)
-        rows.append({
-            'user': '',
-            'tty': 'ssh',
-            'from': peer_addr,
-            'since': '',
-        })
-    return rows
-
-
-def _parse_ss_estab(text: str) -> List[Dict[str, str]]:
-    """Parse ss or netstat established connection output."""
-    rows: List[Dict[str, str]] = []
-    is_netstat = any(l.strip().startswith(('Proto', 'Active'))
-                     for l in text.splitlines()[:2])
-    for line in text.splitlines():
-        parts = line.split()
-        if len(parts) < 5 or parts[0] in ('Netid', 'State', 'Proto', 'Active'):
-            continue
-        if is_netstat:
-            row = {
-                'proto': parts[0],
-                'local': parts[3] if len(parts) > 3 else '',
-                'peer': parts[4] if len(parts) > 4 else '',
-            }
-            pid_prog = parts[6] if len(parts) > 6 else ''
-            pm = re.search(r'/(\S+)', pid_prog)
-            row['proc'] = pm.group(1) if pm else ''
-        else:
-            row = {
-                'proto': parts[0],
-                'local': parts[3] if len(parts) > 3 else '',
-                'peer': parts[4] if len(parts) > 4 else '',
-            }
-            if len(parts) > 5:
-                proc_m = re.search(r'users:\(\("([^"]+)"', parts[5])
-                row['proc'] = proc_m.group(1) if proc_m else ''
-            else:
-                row['proc'] = ''
-        rows.append(row)
-    return rows
-
-
-def _parse_temps(text: str, types_text: str) -> List[Dict[str, Any]]:
-    temps: Dict[str, int] = {}
-    for line in text.splitlines():
-        m = re.match(r'.*/thermal_zone(\d+)/temp:(\d+)', line)
-        if m:
-            temps[m.group(1)] = int(m.group(2))
-    labels: Dict[str, str] = {}
-    for line in types_text.splitlines():
-        m = re.match(r'.*/thermal_zone(\d+)/type:(.+)', line)
-        if m:
-            labels[m.group(1)] = m.group(2).strip()
-    result: List[Dict[str, Any]] = []
-    for zone in sorted(temps):
-        result.append({
-            'label': labels.get(zone, f'zone{zone}'),
-            'temp_c': temps[zone] / 1000.0,
-        })
-    return result
-
-
-def _parse_sensors(text: str) -> List[Dict[str, Any]]:
-    """Parse `sensors` output as a fallback for thermal_zone."""
-    result: List[Dict[str, Any]] = []
-    adapter = ''
-    for line in text.splitlines():
-        if not line or line.startswith('Adapter:'):
-            continue
-        if not line.startswith(' ') and not line.startswith('\t') and ':' not in line:
-            adapter = line.strip()
-            continue
-        m = re.match(r'^(.+?):\s+\+?([\d.]+)\s*°C', line)
-        if m:
-            label = m.group(1).strip()
-            temp_c = float(m.group(2))
-            if adapter:
-                label = f"{adapter} · {label}"
-            result.append({'label': label, 'temp_c': temp_c})
-    return result
-
-
-def _fmt_bytes(n: float) -> str:
-    if n < 1024:
-        return f"{n:.0f} B"
-    for unit in ('KiB', 'MiB', 'GiB', 'TiB'):
-        n /= 1024
-        if n < 1024:
-            return f"{n:.1f} {unit}" if n < 100 else f"{n:.0f} {unit}"
-    return f"{n:.1f} PiB"
-
-
-def _fmt_bytes_rate(n: float) -> str:
-    if n < 1024:
-        return f"{n:.0f} B/s"
-    for unit in ('KiB/s', 'MiB/s', 'GiB/s'):
-        n /= 1024
-        if n < 1024:
-            return f"{n:.1f} {unit}" if n < 100 else f"{n:.0f} {unit}"
-    return f"{n:.1f} TiB/s"
-
-
-def _fmt_bytes_si(n: float) -> str:
-    if n < 1000:
-        return f"{n:.0f} B"
-    for unit in ('KB', 'MB', 'GB', 'TB'):
-        n /= 1000
-        if n < 1000:
-            return f"{n:.1f} {unit}" if n < 100 else f"{n:.0f} {unit}"
-    return f"{n:.1f} PB"
-
-
-def _fmt_uptime_seconds(secs: float) -> str:
-    days = int(secs // 86400)
-    hours = int((secs % 86400) // 3600)
-    minutes = int((secs % 3600) // 60)
-    parts = []
+def _format_uptime(seconds: Optional[float]) -> str:
+    if seconds is None:
+        return _("N/A")
+    days = int(seconds // 86400)
+    hours = int((seconds % 86400) // 3600)
+    minutes = int((seconds % 3600) // 60)
+    parts: List[str] = []
     if days:
-        parts.append(f"{days} {'day' if days == 1 else 'days'}")
+        parts.append(ngettext("%d day", "%d days", days) % days)
     if hours:
-        parts.append(f"{hours} {'hour' if hours == 1 else 'hours'}")
+        parts.append(ngettext("%d hour", "%d hours", hours) % hours)
     if minutes:
-        parts.append(f"{minutes} {'minute' if minutes == 1 else 'minutes'}")
-    return ', '.join(parts) or '< 1 minute'
+        parts.append(ngettext("%d minute", "%d minutes", minutes) % minutes)
+    if not parts:
+        return _("Less than a minute")
+    return _(", ").join(parts)
+
+
+def _format_frequency(megahertz: Optional[float]) -> str:
+    if megahertz is None:
+        return _("N/A")
+    if megahertz >= 1000:
+        return _("%.2f GHz") % (megahertz / 1000)
+    return _("%.0f MHz") % megahertz
+
+
+def _format_percent(fraction: Optional[float]) -> str:
+    return "—" if fraction is None else _("%d%%") % int(round(fraction * 100))
+
+
+def _or_na(text: str) -> str:
+    return text.strip() or _("N/A")
+
+
+def _usage_severity(fraction: Optional[float]) -> str:
+    if fraction is None:
+        return _SEVERITY_UNKNOWN
+    if fraction < _WARN_FRACTION:
+        return _SEVERITY_OK
+    return _SEVERITY_CRITICAL if fraction >= _CRITICAL_FRACTION else _SEVERITY_WARN
+
+
+def _temperature_severity(celsius: float) -> str:
+    if celsius >= _CRITICAL_CELSIUS:
+        return _SEVERITY_CRITICAL
+    return _SEVERITY_WARN if celsius >= _WARN_CELSIUS else _SEVERITY_OK
+
+
+def _interface_icon(kind: NetworkInterfaceKind) -> str:
+    if kind is NetworkInterfaceKind.LOOPBACK:
+        return "network-transmit-receive-symbolic"
+    if kind is NetworkInterfaceKind.WIRELESS:
+        return "network-wireless-symbolic"
+    return "network-idle-symbolic"
+
+
+def _interface_kind_label(kind: NetworkInterfaceKind) -> str:
+    return {
+        NetworkInterfaceKind.LOOPBACK: _("Loopback"),
+        NetworkInterfaceKind.WIRELESS: _("Wi-Fi"),
+        NetworkInterfaceKind.ETHERNET: _("Ethernet"),
+    }.get(kind, _("Unknown"))
+
+
+def _interface_state_label(state: NetworkInterfaceState) -> str:
+    return {
+        NetworkInterfaceState.UP: _("Up"),
+        NetworkInterfaceState.DOWN: _("Down"),
+        NetworkInterfaceState.NO_CARRIER: _("No carrier"),
+    }.get(state, _("Unknown"))
 
 
 # ---------------------------------------------------------------------------
-# Donut gauge drawing
+# Small widget builders
 # ---------------------------------------------------------------------------
 
-def _draw_donut(area, cr, width, height, fraction, color_rgb, label):
-    """Draw a donut-chart gauge with a percentage label in the centre."""
-    cx, cy = width / 2, height / 2
-    radius = min(cx, cy) - 6
-    line_w = max(8, radius * 0.22)
-
-    cr.set_line_width(line_w)
-    cr.set_line_cap(1)  # ROUND
-
-    cr.set_source_rgba(*_TRACK)
-    cr.arc(cx, cy, radius, 0, 2 * math.pi)
-    cr.stroke()
-
-    if fraction > 0:
-        cr.set_source_rgb(*color_rgb)
-        start = -math.pi / 2
-        cr.arc(cx, cy, radius, start, start + 2 * math.pi * min(fraction, 1.0))
-        cr.stroke()
-
-    pct_text = f"{int(round(fraction * 100))}%"
-    cr.set_source_rgb(0.18, 0.20, 0.21)
-    cr.select_font_face("Cantarell", 0, 1)
-    cr.set_font_size(max(16, radius * 0.5))
-    ext = cr.text_extents(pct_text)
-    cr.move_to(cx - ext.width / 2 - ext.x_bearing,
-               cy - ext.height / 2 - ext.y_bearing)
-    cr.show_text(pct_text)
-
-
-# ---------------------------------------------------------------------------
-# Widget helpers
-# ---------------------------------------------------------------------------
-
-def _card_box() -> Gtk.Box:
+def _card() -> Gtk.Box:
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     box.add_css_class("card")
     return box
@@ -462,340 +250,461 @@ def _section_label(text: str) -> Gtk.Label:
     label = Gtk.Label(label=text)
     label.set_xalign(0)
     label.add_css_class("heading")
-    label.set_opacity(0.65)
     label.add_css_class("caption")
+    label.set_opacity(0.65)
     return label
 
 
-def _kv_row(key: str, value: str, *, mono: bool = False,
-            last: bool = False) -> Gtk.Box:
-    row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-    row.set_margin_start(16)
-    row.set_margin_end(16)
-    row.set_margin_top(12)
-    row.set_margin_bottom(12)
+def _caption(text: str, *, dim: float = 0.55) -> Gtk.Label:
+    label = Gtk.Label(label=text)
+    label.set_xalign(0)
+    label.add_css_class("caption")
+    label.set_opacity(dim)
+    label.set_wrap(True)
+    return label
 
-    key_label = Gtk.Label(label=key)
-    key_label.set_xalign(0)
-    key_label.set_opacity(0.6)
-    key_label.set_size_request(200, -1)
-    row.append(key_label)
 
-    val_label = Gtk.Label(label=value)
-    val_label.set_xalign(0)
-    val_label.set_hexpand(True)
-    val_label.set_wrap(True)
-    val_label.set_selectable(True)
+def _value_label(text: str, *, mono: bool = False, selectable: bool = True) -> Gtk.Label:
+    label = Gtk.Label(label=text)
+    label.set_xalign(0)
+    label.set_selectable(selectable)
+    label.set_ellipsize(Pango.EllipsizeMode.END)
     if mono:
-        val_label.add_css_class("monospace")
-    row.append(val_label)
-
-    wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    wrapper.append(row)
-    if not last:
-        sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        wrapper.append(sep)
-    return wrapper
+        label.add_css_class("monospace")
+    return label
 
 
-def _progress_bar_box(fraction: float, color_hex: str,
-                      height: int = 8) -> Gtk.Box:
-    outer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-    outer.set_hexpand(True)
+def _usage_bar(fraction: Optional[float], *, height: int = 8,
+               severity: Optional[str] = None) -> Gtk.LevelBar:
+    """A bar whose fill colour states severity, not GTK's inverted level."""
 
     bar = Gtk.LevelBar()
     bar.set_min_value(0)
     bar.set_max_value(1.0)
-    bar.set_value(min(max(fraction, 0), 1.0))
+    bar.set_value(min(max(fraction or 0.0, 0.0), 1.0))
     bar.set_hexpand(True)
     bar.set_valign(Gtk.Align.CENTER)
     bar.set_size_request(-1, height)
-    bar.add_css_class("machine-info-bar")
-    outer.append(bar)
-    return outer
+    bar.add_css_class("usage-bar")
+    bar.add_css_class(severity or _usage_severity(fraction))
+    bar.set_sensitive(fraction is not None)
+    return bar
 
 
-def _mono_label(text: str) -> Gtk.Label:
-    label = Gtk.Label(label=text)
-    label.add_css_class("monospace")
-    label.set_selectable(True)
-    return label
+def _key_value_rows(card: Gtk.Box, rows: Sequence[Tuple[str, str, bool]]) -> None:
+    """Fill a card with ``(key, value, monospace)`` rows separated by rules."""
+
+    for index, (key, value, mono) in enumerate(rows):
+        row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        row.set_margin_start(16)
+        row.set_margin_end(16)
+        row.set_margin_top(12)
+        row.set_margin_bottom(12)
+
+        key_label = Gtk.Label(label=key)
+        key_label.set_xalign(0)
+        key_label.set_opacity(0.6)
+        key_label.set_size_request(200, -1)
+        row.append(key_label)
+
+        value_label = _value_label(value, mono=mono)
+        value_label.set_hexpand(True)
+        row.append(value_label)
+
+        card.append(row)
+        if index < len(rows) - 1:
+            card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+
+
+class _Table:
+    """A card-hosted grid whose header and rows share real column widths.
+
+    Columns are grid columns rather than labels padded with a minimum size
+    request, so a long mount point or device name widens its column instead of
+    silently overflowing into the next one.
+    """
+
+    def __init__(self, columns: Sequence[Tuple[str, float, bool]]) -> None:
+        self.widget = _card()
+        self._columns = columns
+        self._grid = Gtk.Grid()
+        self._grid.set_column_spacing(16)
+        self._grid.set_margin_start(16)
+        self._grid.set_margin_end(16)
+        self._grid.set_margin_top(10)
+        self._grid.set_margin_bottom(10)
+        self._row = 0
+        self.widget.append(self._grid)
+
+        for column, (title, xalign, expand) in enumerate(columns):
+            label = Gtk.Label(label=title)
+            label.set_xalign(xalign)
+            label.add_css_class("caption")
+            label.add_css_class("heading")
+            label.set_opacity(0.6)
+            label.set_hexpand(expand)
+            self._grid.attach(label, column, 0, 1, 1)
+        self._row = 1
+
+    def add_row(self, cells: Sequence[Gtk.Widget]) -> None:
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        separator.set_margin_top(6)
+        separator.set_margin_bottom(6)
+        self._grid.attach(separator, 0, self._row, len(self._columns), 1)
+        self._row += 1
+        for column, cell in enumerate(cells):
+            _, xalign, expand = self._columns[column]
+            if isinstance(cell, Gtk.Label):
+                cell.set_xalign(xalign)
+            cell.set_hexpand(expand)
+            self._grid.attach(cell, column, self._row, 1, 1)
+        self._row += 1
+
+    def add_empty(self, text: str) -> None:
+        label = Gtk.Label(label=text)
+        label.add_css_class("dim-label")
+        label.set_margin_top(14)
+        label.set_margin_bottom(14)
+        self.widget.append(label)
 
 
 # ---------------------------------------------------------------------------
-# Main dialog
+# Donut gauge
+# ---------------------------------------------------------------------------
+
+def _draw_ring(area: Gtk.DrawingArea, cr, width: int, height: int,
+               fraction: Optional[float]) -> None:
+    """Draw the gauge ring in the widget's themed foreground colour."""
+
+    colour = area.get_color()
+    centre_x, centre_y = width / 2, height / 2
+    radius = min(centre_x, centre_y) - 6
+    if radius <= 0:
+        return
+    cr.set_line_width(max(8, radius * 0.22))
+    cr.set_line_cap(1)  # round
+
+    cr.set_source_rgba(colour.red, colour.green, colour.blue, colour.alpha * 0.18)
+    cr.arc(centre_x, centre_y, radius, 0, 2 * math.pi)
+    cr.stroke()
+
+    if fraction:
+        cr.set_source_rgba(colour.red, colour.green, colour.blue, colour.alpha)
+        start = -math.pi / 2
+        cr.arc(centre_x, centre_y, radius, start, start + 2 * math.pi * min(fraction, 1.0))
+        cr.stroke()
+
+
+def _gauge_card(fraction: Optional[float], title: str, detail: str,
+                sub_detail: str) -> Gtk.Box:
+    """A donut gauge whose percentage is a real label, not painted text."""
+
+    card = _card()
+    inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+    inner.set_margin_top(16)
+    inner.set_margin_bottom(12)
+    inner.set_margin_start(12)
+    inner.set_margin_end(12)
+
+    area = Gtk.DrawingArea()
+    area.set_content_width(96)
+    area.set_content_height(96)
+    area.add_css_class("host-info-gauge")
+    area.add_css_class(_usage_severity(fraction))
+    area.set_draw_func(lambda widget, cr, w, h: _draw_ring(widget, cr, w, h, fraction))
+
+    percent = Gtk.Label(label=_format_percent(fraction))
+    percent.add_css_class("title-1")
+    percent.set_halign(Gtk.Align.CENTER)
+    percent.set_valign(Gtk.Align.CENTER)
+
+    overlay = Gtk.Overlay()
+    overlay.set_halign(Gtk.Align.CENTER)
+    overlay.set_child(area)
+    overlay.add_overlay(percent)
+    inner.append(overlay)
+
+    heading = Gtk.Label(label=title)
+    heading.add_css_class("heading")
+    inner.append(heading)
+
+    if detail:
+        detail_label = Gtk.Label(label=detail)
+        detail_label.add_css_class("caption")
+        detail_label.add_css_class("monospace")
+        inner.append(detail_label)
+    if sub_detail:
+        sub_label = Gtk.Label(label=sub_detail)
+        sub_label.add_css_class("caption")
+        sub_label.set_opacity(0.6)
+        inner.append(sub_label)
+
+    card.append(inner)
+    return card
+
+
+def _page() -> Gtk.Box:
+    page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
+    page.set_margin_top(18)
+    page.set_margin_bottom(24)
+    page.set_margin_start(24)
+    page.set_margin_end(24)
+    return page
+
+
+# ---------------------------------------------------------------------------
+# Dialog
 # ---------------------------------------------------------------------------
 
 class MachineInfoDialog:
-    """System information dialog for a remote SSH host."""
+    """Presents one remote host's daemon-reported system information."""
 
     def __init__(self, window, connection) -> None:
+        _ensure_css()
         self._window = window
         self._connection = connection
-        self._data: Dict[str, str] = {}
-        self._last_refresh: float = 0
-        self._age_timer_id: int = 0
-        self._traffic_timer_id: int = 0
-        self._prev_net_dev: Optional[Dict[str, Tuple[int, int]]] = None
-        self._prev_net_time: float = 0
+        self._snapshot: Optional[HostInfoSnapshot] = None
         self._closed = False
+        self._controller: Optional[HostInfoController] = None
         self._interaction_dialogs = None
 
-        try:
-            from .daemon_interaction_dialogs import DaemonInteractionDialogs
-            client = getattr(window, 'client', None)
-            bridge = getattr(window, 'client_bridge', None)
-            if client is not None and bridge is not None:
-                self._interaction_dialogs = DaemonInteractionDialogs(
-                    client, bridge, window,
-                )
-        except Exception:
-            logger.debug("Host info interaction presenter unavailable",
-                         exc_info=True)
+        self._age_timer_id = 0
+        self._traffic_timer_id = 0
+        self._last_refresh: Optional[float] = None
+        self._previous_counters: Optional[Sequence[InterfaceCounters]] = None
+        self._previous_counter_time = 0.0
+        self._rate_labels: dict = {}
 
         self._dialog = Adw.Dialog()
         self._dialog.set_content_width(900)
         self._dialog.set_content_height(716)
 
         toolbar = Adw.ToolbarView()
-        self._header = self._build_header()
-        toolbar.add_top_bar(self._header)
-
-        self._body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self._body.set_vexpand(True)
-
-        self._stack = None
-        self._switcher_box = None
-        self._content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self._content_box.set_vexpand(True)
-
-        self._body.append(self._content_box)
-        toolbar.set_content(self._body)
-
+        toolbar.add_top_bar(self._build_header())
+        self._content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._content.set_vexpand(True)
+        toolbar.set_content(self._content)
         self._dialog.set_child(toolbar)
-        self._dialog.connect('closed', self._on_closed)
+        self._dialog.connect("closed", self._on_closed)
 
-        self._show_spinner()
+        self._show_status(_("Gathering host information…"), spinner=True)
         self._dialog.present(window)
+        self._start_probe()
 
-        self._run_gather()
-
-    # ── Header ─────────────────────────────────────────────────────────
+    # -- header ---------------------------------------------------------
 
     def _build_header(self) -> Adw.HeaderBar:
         header = Adw.HeaderBar()
         header.set_show_start_title_buttons(False)
         header.set_show_end_title_buttons(False)
 
-        icon = Gtk.Image.new_from_icon_name('info-outline-symbolic')
-        icon.set_opacity(0.65)
-
         title_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         title_row.set_halign(Gtk.Align.CENTER)
-        title_row.set_valign(Gtk.Align.CENTER)
+        icon = Gtk.Image.new_from_icon_name("info-outline-symbolic")
+        icon.set_opacity(0.65)
         title_row.append(icon)
 
-        title_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
-        title_label = Gtk.Label(label=_("Host Info"))
-        title_label.add_css_class("title")
-        title_col.append(title_label)
+        title_column = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
+        title = Gtk.Label(label=_("Host Info"))
+        title.add_css_class("title")
+        title_column.append(title)
 
-        nickname = getattr(self._connection, 'nickname', '') or ''
-        user = getattr(self._connection, 'username', '') or ''
-        host = getattr(self._connection, 'host', '') or ''
-        subtitle = nickname
-        if user and host:
-            subtitle = f"{nickname} — {user}@{host}"
-        elif host:
-            subtitle = f"{nickname} — {host}"
-        self._subtitle_label = Gtk.Label(label=subtitle)
-        self._subtitle_label.add_css_class("subtitle")
-        self._subtitle_label.set_opacity(0.55)
-        title_col.append(self._subtitle_label)
-
-        title_row.append(title_col)
+        subtitle = Gtk.Label(label=self._subtitle())
+        subtitle.add_css_class("subtitle")
+        subtitle.set_opacity(0.55)
+        subtitle.set_ellipsize(Pango.EllipsizeMode.END)
+        title_column.append(subtitle)
+        title_row.append(title_column)
         header.set_title_widget(title_row)
 
-        close_btn = Gtk.Button()
-        close_btn.set_icon_name('window-close-symbolic')
-        close_btn.add_css_class("circular")
-        close_btn.set_tooltip_text(_("Close"))
-        close_btn.connect('clicked', lambda _b: self._dialog.close())
-        header.pack_end(close_btn)
+        close_button = Gtk.Button(icon_name="window-close-symbolic")
+        close_button.add_css_class("circular")
+        close_button.set_tooltip_text(_("Close"))
+        close_button.connect("clicked", lambda _button: self._dialog.close())
+        header.pack_end(close_button)
 
-        refresh_btn = Gtk.Button()
-        refresh_btn.set_icon_name('view-refresh-symbolic')
-        refresh_btn.set_label(_("Refresh"))
-        refresh_btn.set_tooltip_text(_("Refresh host information"))
-        refresh_btn.connect('clicked', lambda _b: self._on_refresh())
-        self._refresh_btn = refresh_btn
-        header.pack_end(refresh_btn)
+        self._refresh_button = Gtk.Button(label=_("Refresh"))
+        self._refresh_button.set_icon_name("view-refresh-symbolic")
+        self._refresh_button.set_tooltip_text(_("Refresh host information"))
+        self._refresh_button.connect("clicked", lambda _button: self._on_refresh())
+        header.pack_end(self._refresh_button)
 
         self._age_label = Gtk.Label(label="")
         self._age_label.add_css_class("dim-label")
         self._age_label.add_css_class("caption")
         header.pack_end(self._age_label)
-
         return header
 
-    # ── Spinner / placeholder ──────────────────────────────────────────
+    def _subtitle(self) -> str:
+        nickname = getattr(self._connection, "nickname", "") or ""
+        username = getattr(self._connection, "username", "") or ""
+        host = getattr(self._connection, "host", "") or ""
+        if username and host:
+            return _("%(nickname)s — %(user)s@%(host)s") % {
+                "nickname": nickname, "user": username, "host": host
+            }
+        if host:
+            return _("%(nickname)s — %(host)s") % {"nickname": nickname, "host": host}
+        return nickname
 
-    def _clear_content(self):
-        child = self._content_box.get_first_child()
-        while child:
-            nxt = child.get_next_sibling()
-            self._content_box.remove(child)
-            child = nxt
+    # -- daemon probes --------------------------------------------------
 
-    def _show_spinner(self):
-        self._clear_content()
-        center = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        center.set_valign(Gtk.Align.CENTER)
-        center.set_vexpand(True)
-        spinner = Gtk.Spinner()
-        spinner.set_size_request(32, 32)
-        spinner.start()
-        center.append(spinner)
-        center.append(Gtk.Label(label=_("Gathering host information…")))
-        self._content_box.append(center)
+    def _ensure_controller(self) -> Optional[HostInfoController]:
+        if self._controller is not None:
+            return self._controller
+        client = getattr(self._window, "client", None)
+        if client is None:
+            return None
+        self._controller = HostInfoController(client)
+        if self._interaction_dialogs is None:
+            self._attach_interaction_presenter(client)
+        return self._controller
 
-    def _show_error(self, message: str):
-        self._clear_content()
-        center = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        center.set_valign(Gtk.Align.CENTER)
-        center.set_vexpand(True)
-        center.set_margin_start(24)
-        center.set_margin_end(24)
-        lbl = Gtk.Label(label=message)
-        lbl.set_wrap(True)
-        lbl.set_justify(Gtk.Justification.CENTER)
-        lbl.add_css_class("dim-label")
-        center.append(lbl)
-        self._content_box.append(center)
+    def _attach_interaction_presenter(self, client) -> None:
+        """Let a gather ask for a passphrase, password, host key or MFA answer.
 
-    # ── Data gathering ─────────────────────────────────────────────────
+        The presenter is built before the probe starts so it exists by the time
+        a prompt can appear, and starts unbound -- ignoring every interaction
+        -- until :meth:`_bind_interactions` binds it to the operation scope the
+        daemon raises the probe's prompts under.
+        """
 
-    def _run_gather(self, traffic_only: bool = False):
-        client = getattr(self._window, 'client', None)
-        bridge = getattr(self._window, 'client_bridge', None)
-        if client is None or bridge is None:
-            self._show_error(_("Daemon connection unavailable."))
+        bridge = getattr(self._window, "client_bridge", None)
+        if bridge is None:
             return
+        try:
+            from .daemon_interaction_dialogs import DaemonInteractionDialogs
 
-        cmd = _TRAFFIC_CMD if traffic_only else _GATHER_CMD
-        conn = self._connection
-
-        interaction_dialogs = self._interaction_dialogs
-
-        def _execute():
-            from .api.models.broadcast import (
-                BroadcastCommandRequest,
-                BroadcastExecutionPolicy,
+            self._interaction_dialogs = DaemonInteractionDialogs(
+                client, bridge, self._window
             )
+        except Exception:
+            logger.debug("Host info interaction presenter unavailable", exc_info=True)
 
-            daemon_conn = next(
-                (item for item in client.list_connections()
-                 if getattr(item, 'nickname', None)
-                 == getattr(conn, 'nickname', None)),
-                None,
+    def _bind_interactions(self, operation_id) -> bool:
+        """Bind the presenter to the probe's operation scope.
+
+        ``set_session`` reconciles prompts the daemon already created, so a
+        password asked for before this ran is still presented.
+        """
+
+        if self._closed or self._interaction_dialogs is None:
+            return False
+        try:
+            self._interaction_dialogs.set_session(SessionId(str(operation_id)))
+        except Exception:
+            logger.debug(
+                "Host info interaction presenter bind failed", exc_info=True
             )
-            if daemon_conn is None:
-                raise RuntimeError(
-                    f"Connection '{getattr(conn, 'nickname', '?')}' "
-                    "not found in daemon"
-                )
+        return False
 
-            policy = BroadcastExecutionPolicy(
-                concurrency_limit=1,
-                timeout_seconds=60,
+    def _submit(self, probe: HostInfoProbe, on_result: Callable, on_error: Callable) -> bool:
+        """Ask the daemon for one probe; returns False when it cannot be asked.
+
+        The controller owns its own worker, so this returns immediately and the
+        callbacks are marshalled back onto the GTK main loop.  A probe of this
+        kind that is already outstanding raises :class:`HostInfoProbeBusy`.
+        """
+
+        controller = self._ensure_controller()
+        if controller is None:
+            return False
+        try:
+            connection_id = connection_id_for(self._connection)
+        except Exception:
+            logger.debug("Host info connection identity unavailable", exc_info=True)
+            return False
+        # Only the full gather is interactive; bandwidth sampling is
+        # autofill-only and must never rebind the presenter away from it.
+        on_started = None
+        if probe is HostInfoProbe.FULL:
+            on_started = lambda operation_id: GLib.idle_add(  # noqa: E731
+                self._bind_interactions, operation_id
             )
-            request = BroadcastCommandRequest(
-                (daemon_conn.id,), cmd, policy,
-            )
-            summary = client.start_broadcast_command(request)
+        controller.start(
+            connection_id,
+            probe,
+            lambda summary: GLib.idle_add(on_result, summary),
+            lambda error: GLib.idle_add(on_error, error),
+            on_started=on_started,
+        )
+        return True
 
-            if interaction_dialogs is not None:
-                from .api.models.common import SessionId
-                op_id = summary.operation.operation_id
-                GLib.idle_add(
-                    interaction_dialogs.set_session, SessionId(str(op_id)),
-                )
+    def _start_probe(self) -> None:
+        try:
+            started = self._submit(HostInfoProbe.FULL, self._on_snapshot, self._on_error)
+        except HostInfoProbeBusy:
+            return
+        if not started:
+            self._show_status(_("Daemon connection unavailable."))
+            self._refresh_button.set_sensitive(True)
 
-            terminal_states = {'succeeded', 'failed', 'cancelled'}
-            deadline = time.monotonic() + 60
-            while summary.operation.state.value not in terminal_states:
-                if time.monotonic() >= deadline:
-                    try:
-                        client.cancel_broadcast_command(
-                            summary.operation.operation_id)
-                    except Exception:
-                        pass
-                    raise TimeoutError("Timed out gathering host info")
-                time.sleep(0.3)
-                summary = client.get_broadcast_command(
-                    summary.operation.operation_id)
+    def _on_refresh(self) -> None:
+        self._refresh_button.set_sensitive(False)
+        self._stop_traffic_timer()
+        self._show_status(_("Gathering host information…"), spinner=True)
+        self._start_probe()
 
-            target = summary.targets[0] if summary.targets else None
-            if target is None:
-                raise RuntimeError("No output from remote host")
-            state = getattr(target, 'state', None)
-            if state and hasattr(state, 'value') and state.value == 'failed':
-                stderr = getattr(target, 'stderr', '') or ''
-                raise RuntimeError(stderr or "Command failed on remote host")
-            if target.exit_code is None:
-                raise RuntimeError("No output from remote host")
-            return target.stdout or ''
-
-        if traffic_only:
-            bridge.submit(
-                _execute,
-                on_success=self._on_traffic_data,
-                on_error=lambda e: logger.debug(
-                    "Traffic poll failed: %s", e),
-            )
-        else:
-            bridge.submit(
-                _execute,
-                on_success=self._on_data,
-                on_error=self._on_error,
-            )
-
-    def _on_data(self, raw_output: str):
+    def _on_snapshot(self, summary) -> bool:
         if self._closed:
-            return
-        self._data = _parse_sections(raw_output)
-        self._last_refresh = time.monotonic()
+            return False
+        self._refresh_button.set_sensitive(True)
+        if summary.failure is not None:
+            self._show_status(
+                _("Could not gather host information.\n\n%s") % summary.failure.message
+            )
+            return False
+        if summary.snapshot is None:
+            self._show_status(_("The host returned no system information."))
+            return False
+        self._snapshot = summary.snapshot
+        self._previous_counters = summary.counters
+        self._previous_counter_time = GLib.get_monotonic_time() / 1_000_000
+        self._last_refresh = self._previous_counter_time
         self._build_tabs()
         self._start_age_timer()
+        return False
 
-    def _on_error(self, error: BaseException):
+    def _on_error(self, error: BaseException) -> bool:
         if self._closed:
-            return
-        logger.warning("Machine info gather failed: %s", error)
-        self._show_error(
-            _("Could not gather host information.\n\n%s") % str(error))
+            return False
+        # A failed refresh must not leave the button dead; the user needs to be
+        # able to try again.
+        self._refresh_button.set_sensitive(True)
+        logger.warning("Host info gather failed: %s", error)
+        self._show_status(_("Could not gather host information.\n\n%s") % str(error))
+        return False
 
-    def _on_refresh(self):
-        self._refresh_btn.set_sensitive(False)
-        self._stop_traffic_timer()
-        self._show_spinner()
-        self._run_gather()
+    # -- status / age ---------------------------------------------------
 
-    def _on_traffic_data(self, raw_output: str):
-        if self._closed:
-            return
-        new_dev = _parse_net_dev(raw_output)
-        now = time.monotonic()
-        if self._prev_net_dev is not None and self._traffic_content is not None:
-            dt = now - self._prev_net_time
-            if dt > 0:
-                self._update_traffic_rates(self._prev_net_dev, new_dev, dt)
-        self._prev_net_dev = new_dev
-        self._prev_net_time = now
+    def _clear_content(self) -> None:
+        child = self._content.get_first_child()
+        while child is not None:
+            following = child.get_next_sibling()
+            self._content.remove(child)
+            child = following
 
-    # ── Age timer ──────────────────────────────────────────────────────
+    def _show_status(self, message: str, *, spinner: bool = False) -> None:
+        self._clear_content()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        box.set_valign(Gtk.Align.CENTER)
+        box.set_vexpand(True)
+        box.set_margin_start(24)
+        box.set_margin_end(24)
+        if spinner:
+            busy = Gtk.Spinner()
+            busy.set_size_request(32, 32)
+            busy.start()
+            box.append(busy)
+        label = Gtk.Label(label=message)
+        label.set_wrap(True)
+        label.set_justify(Gtk.Justification.CENTER)
+        if not spinner:
+            label.add_css_class("dim-label")
+        box.append(label)
+        self._content.append(box)
 
-    def _start_age_timer(self):
+    def _start_age_timer(self) -> None:
         if self._age_timer_id:
             GLib.source_remove(self._age_timer_id)
         self._update_age_label()
@@ -803,115 +712,141 @@ class MachineInfoDialog:
 
     def _tick_age(self) -> bool:
         if self._closed:
+            self._age_timer_id = 0
             return False
         self._update_age_label()
         return True
 
-    def _update_age_label(self):
-        if not self._last_refresh:
+    def _update_age_label(self) -> None:
+        if self._last_refresh is None:
             self._age_label.set_text("")
             return
-        elapsed = int(time.monotonic() - self._last_refresh)
+        elapsed = int(GLib.get_monotonic_time() / 1_000_000 - self._last_refresh)
         if elapsed < 60:
             self._age_label.set_text(
-                _("Updated %d s ago") % elapsed)
+                ngettext("Updated %d second ago", "Updated %d seconds ago", elapsed)
+                % elapsed
+            )
         else:
-            mins = elapsed // 60
+            minutes = elapsed // 60
             self._age_label.set_text(
-                _("Updated %d min ago") % mins)
+                ngettext("Updated %d minute ago", "Updated %d minutes ago", minutes)
+                % minutes
+            )
 
-    def _get_logged_in_users(self) -> List[Dict[str, str]]:
-        rows = _parse_who(self._data.get('WHO', ''))
-        if not rows:
-            rows = _parse_w(self._data.get('W', ''))
-        if not rows:
-            rows = _ssh_sessions_from_ss(self._data.get('SS_ESTAB', ''))
-            login_name = getattr(self._connection, 'username', '') or ''
-            for r in rows:
-                if not r.get('user'):
-                    r['user'] = login_name
-        return rows
+    # -- traffic sampling ----------------------------------------------
 
-    # ── Traffic polling ────────────────────────────────────────────────
-
-    def _start_traffic_timer(self):
+    def _start_traffic_timer(self) -> None:
         if self._traffic_timer_id:
             return
-        self._prev_net_dev = _parse_net_dev(
-            self._data.get('NET_DEV', ''))
-        self._prev_net_time = time.monotonic()
-        self._traffic_timer_id = GLib.timeout_add(2000, self._tick_traffic)
+        self._traffic_timer_id = GLib.timeout_add(
+            _TRAFFIC_INTERVAL_MS, self._tick_traffic
+        )
 
-    def _stop_traffic_timer(self):
+    def _stop_traffic_timer(self) -> None:
         if self._traffic_timer_id:
             GLib.source_remove(self._traffic_timer_id)
             self._traffic_timer_id = 0
-        self._prev_net_dev = None
 
     def _tick_traffic(self) -> bool:
         if self._closed:
+            self._traffic_timer_id = 0
             return False
-        self._run_gather(traffic_only=True)
+        # Skip this tick when the previous sample has not come back yet, so a
+        # slow link cannot build a queue of outstanding probes.
+        try:
+            started = self._submit(
+                HostInfoProbe.NETWORK_COUNTERS,
+                self._on_counters,
+                self._on_counter_error,
+            )
+        except HostInfoProbeBusy:
+            return True
+        if not started:
+            self._traffic_timer_id = 0
+            return False
         return True
 
-    # ── Cleanup ────────────────────────────────────────────────────────
+    def _on_counters(self, summary) -> bool:
+        if self._closed or summary.failure is not None:
+            return False
+        now = GLib.get_monotonic_time() / 1_000_000
+        elapsed = now - self._previous_counter_time
+        if self._previous_counters and elapsed > 0:
+            previous = {item.name: item for item in self._previous_counters}
+            for counters in summary.counters:
+                labels = self._rate_labels.get(counters.name)
+                earlier = previous.get(counters.name)
+                if labels is None or earlier is None:
+                    continue
+                receive, transmit = labels
+                receive.set_text(
+                    _format_rate(max(0, counters.rx_bytes - earlier.rx_bytes) / elapsed)
+                )
+                transmit.set_text(
+                    _format_rate(max(0, counters.tx_bytes - earlier.tx_bytes) / elapsed)
+                )
+        self._previous_counters = summary.counters
+        self._previous_counter_time = now
+        return False
 
-    def _on_closed(self, *_args):
+    def _on_counter_error(self, error: BaseException) -> bool:
+        logger.debug("Host info bandwidth sample failed: %s", error)
+        return False
+
+    # -- teardown -------------------------------------------------------
+
+    def _on_closed(self, *_args) -> None:
         self._closed = True
         if self._age_timer_id:
             GLib.source_remove(self._age_timer_id)
             self._age_timer_id = 0
         self._stop_traffic_timer()
+        if self._controller is not None:
+            self._controller.close()
+            self._controller = None
         if self._interaction_dialogs is not None:
             self._interaction_dialogs.close()
             self._interaction_dialogs = None
 
-    # ── Tab construction ───────────────────────────────────────────────
+    # -- tabs -----------------------------------------------------------
 
-    def _build_tabs(self):
+    def _build_tabs(self) -> None:
         self._clear_content()
-        self._refresh_btn.set_sensitive(True)
+        self._rate_labels = {}
 
-        self._traffic_content = None
-
-        pages = [
-            ('overview', _("Overview"), self._build_overview()),
-            ('resources', _("Resources"), self._build_resources()),
-            ('storage', _("Storage"), self._build_storage()),
-            ('network', _("Network"), self._build_network()),
-            ('traffic', _("Traffic"), self._build_traffic()),
-            ('system', _("System"), self._build_system()),
-        ]
+        pages = (
+            ("overview", _("Overview"), self._build_overview()),
+            ("resources", _("Resources"), self._build_resources()),
+            ("storage", _("Storage"), self._build_storage()),
+            ("network", _("Network"), self._build_network()),
+            ("traffic", _("Traffic"), self._build_traffic()),
+            ("system", _("System"), self._build_system()),
+        )
 
         stack = Adw.ViewStack()
         stack.set_vexpand(True)
-        self._stack = stack
-
         for name, title, widget in pages:
             scrolled = Gtk.ScrolledWindow()
-            scrolled.set_policy(Gtk.PolicyType.NEVER,
-                                Gtk.PolicyType.AUTOMATIC)
+            scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scrolled.set_vexpand(True)
             scrolled.set_child(widget)
             stack.add_titled(scrolled, name, title)
 
-        use_inline = hasattr(Adw, 'InlineViewSwitcher')
-        if use_inline:
+        if hasattr(Adw, "InlineViewSwitcher"):
             switcher = Adw.InlineViewSwitcher()
             switcher.set_stack(stack)
             switcher.set_hexpand(True)
             switcher.set_halign(Gtk.Align.FILL)
             try:
-                switcher.set_display_mode(
-                    Adw.InlineViewSwitcherDisplayMode.LABELS)
+                switcher.set_display_mode(Adw.InlineViewSwitcherDisplayMode.LABELS)
             except Exception:
-                pass
+                logger.debug("Inline switcher label mode unavailable", exc_info=True)
         else:
             switcher = Gtk.StackSwitcher(stack=stack)
             switcher.set_halign(Gtk.Align.CENTER)
 
-        switcher_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        switcher_card.add_css_class("card")
+        switcher_card = _card()
         switcher_card.set_hexpand(True)
         switcher_card.set_margin_start(24)
         switcher_card.set_margin_end(24)
@@ -922,282 +857,148 @@ class MachineInfoDialog:
         container.set_vexpand(True)
         container.append(switcher_card)
         container.append(stack)
+        self._content.append(container)
 
-        self._content_box.append(container)
+        stack.connect("notify::visible-child-name", self._on_tab_changed)
 
-        stack.connect('notify::visible-child-name',
-                      self._on_tab_changed)
-
-    def _on_tab_changed(self, stack, _pspec):
-        name = stack.get_visible_child_name()
-        if name == 'traffic':
+    def _on_tab_changed(self, stack, _pspec) -> None:
+        if stack.get_visible_child_name() == "traffic":
             self._start_traffic_timer()
         else:
             self._stop_traffic_timer()
 
-    # ── Overview tab ───────────────────────────────────────────────────
+    # -- Overview -------------------------------------------------------
 
     def _build_overview(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
+        page = _page()
+        snapshot = self._snapshot
+        memory = snapshot.memory
+        processors = snapshot.cpu.logical_processors
 
-        mem = _parse_meminfo(self._data.get('MEMINFO', ''))
-        mem_total = mem.get('MemTotal', 1)
-        mem_used = mem_total - mem.get('MemAvailable', mem_total)
-        mem_frac = mem_used / mem_total if mem_total else 0
-
-        df_rows = _parse_df(self._data.get('DF', ''))
-        root_row = (
-            next((r for r in df_rows if r['mount'] == '/overlay'), None)
-            or next((r for r in df_rows if r['mount'] == '/'), None)
-        )
-        root_frac = 0.0
-        root_used_str = root_size_str = root_type_str = ''
-        if root_row:
-            try:
-                size = int(root_row['size'])
-                used = int(root_row['used'])
-                root_frac = used / size if size else 0
-                root_used_str = _fmt_bytes_si(used)
-                root_size_str = _fmt_bytes_si(size)
-            except (ValueError, ZeroDivisionError):
-                pass
-            root_type_str = root_row.get('type', '')
-
-        loadavg = self._data.get('LOADAVG', '').split()
-        nproc = 1
-        try:
-            nproc = int(self._data.get('NPROC', '1'))
-        except ValueError:
-            pass
-        cpu_load = 0.0
-        if loadavg:
-            try:
-                cpu_load = float(loadavg[0]) / nproc
-            except (ValueError, IndexError):
-                pass
-
-        freq_text = ''
-        freq_line = self._data.get('CPU_FREQ', '')
-        m = re.search(r'([\d.]+)', freq_line)
-        if m:
-            try:
-                freq_text = f"{float(m.group(1)) / 1000:.2f} GHz"
-            except ValueError:
-                freq_text = f"{m.group(1)} MHz"
+        load_fraction = None
+        load_detail = ""
+        if snapshot.load_average is not None:
+            load_detail = _("load %(one).2f · %(five).2f · %(fifteen).2f") % {
+                "one": snapshot.load_average.one,
+                "five": snapshot.load_average.five,
+                "fifteen": snapshot.load_average.fifteen,
+            }
+            if processors:
+                load_fraction = snapshot.load_average.one / processors
 
         gauges = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         gauges.set_homogeneous(True)
+        gauges.append(
+            _gauge_card(
+                load_fraction,
+                _("CPU"),
+                _format_frequency(snapshot.cpu.frequency_mhz),
+                load_detail,
+            )
+        )
 
-        cpu_color = _RED if cpu_load > 0.85 else _BLUE
-        gauges.append(self._gauge_card(
-            cpu_load, cpu_color, _("CPU"), freq_text,
-            _("load %s") % ' · '.join(loadavg[:3]) if loadavg else ''))
+        used = memory.used_bytes
+        memory_fraction = used / memory.total_bytes if used is not None and memory.total_bytes else None
+        swap_detail = ""
+        if memory.swap_total_bytes:
+            swap_detail = _("swap %(used)s / %(total)s") % {
+                "used": _format_bytes(memory.swap_used_bytes),
+                "total": _format_bytes(memory.swap_total_bytes),
+            }
+        gauges.append(
+            _gauge_card(
+                memory_fraction,
+                _("Memory"),
+                _("%(used)s / %(total)s") % {
+                    "used": _format_bytes(used),
+                    "total": _format_bytes(memory.total_bytes),
+                },
+                swap_detail,
+            )
+        )
 
-        mem_color = _RED if mem_frac > 0.85 else _AMBER
-        swap_total = mem.get('SwapTotal', 0)
-        swap_free = mem.get('SwapFree', 0)
-        swap_used = swap_total - swap_free
-        swap_text = ''
-        if swap_total:
-            swap_text = _("swap %s / %s") % (
-                _fmt_bytes(swap_used), _fmt_bytes(swap_total))
-        gauges.append(self._gauge_card(
-            mem_frac, mem_color, _("Memory"),
-            f"{_fmt_bytes(mem_used)} / {_fmt_bytes(mem_total)}",
-            swap_text))
-
-        root_color = _RED if root_frac > 0.85 else _GREEN
-        root_dev = ''
-        if root_row:
-            rtype = root_row.get('type', '')
-            rfs = root_row.get('fs', '')
-            root_dev = f"{rtype} on {rfs}" if rtype else rfs
-        gauges.append(self._gauge_card(
-            root_frac, root_color, _("Root filesystem"),
-            f"{root_used_str} / {root_size_str}" if root_used_str else '',
-            root_dev))
-
+        root = snapshot.root_filesystem
+        root_detail = root_device = ""
+        if root is not None:
+            root_detail = _("%(used)s / %(total)s") % {
+                "used": _format_bytes_si(root.used_bytes),
+                "total": _format_bytes_si(root.size_bytes),
+            }
+            root_device = (
+                _("%(fstype)s on %(device)s")
+                % {"fstype": root.fstype, "device": root.device}
+                if root.fstype
+                else root.device
+            )
+        gauges.append(
+            _gauge_card(
+                root.used_fraction if root is not None else None,
+                _("Root filesystem"),
+                root_detail,
+                root_device,
+            )
+        )
         page.append(gauges)
 
-        info_card = _card_box()
-
-        hostname = self._data.get('HOSTNAME', '').strip()
-        info_card.append(_kv_row(_("Hostname"), hostname or _("N/A"),
-                                 mono=bool(hostname)))
-
-        device_model = self._data.get('DEVICE_MODEL', '').strip()
-        if device_model:
-            info_card.append(_kv_row(_("Device"), device_model))
-
-        osr = _parse_os_release(self._data.get('OS_RELEASE', ''))
-        os_text = osr.get('PRETTY_NAME', '')
-        info_card.append(_kv_row(_("Operating system"), os_text))
-
-        uname = self._data.get('UNAME', '').strip()
-        info_card.append(_kv_row(_("Kernel"), uname, mono=True))
-
-        lscpu = _parse_lscpu(self._data.get('LSCPU', ''))
-        cpuinfo = _parse_cpuinfo(self._data.get('CPUINFO', ''))
-        model = lscpu.get('Model name', '') or cpuinfo.get('Model name', '')
-        cores = lscpu.get('Core(s) per socket', '')
-        threads_per = lscpu.get('Thread(s) per core', '1')
-        sockets = lscpu.get('Socket(s)', '1')
-        if cores:
-            try:
-                total_threads = int(cores) * int(threads_per) * int(sockets)
-            except ValueError:
-                total_threads = '?'
-            topo_text = (f"{cores} cores · {total_threads} threads"
-                         f" · {sockets} socket{'s' if sockets != '1' else ''}")
-        else:
-            nproc_str = self._data.get('NPROC', '').strip()
-            proc_count = cpuinfo.get('_processors', nproc_str)
-            topo_text = f"{proc_count} cores" if proc_count else ''
-        cpu_text = f"{model}  ({topo_text})" if model and topo_text else (model or topo_text)
-        info_card.append(_kv_row(_("Processor"), cpu_text or _("N/A")))
-
-        freq_text = ''
-        freq_line = self._data.get('CPU_FREQ', '')
-        fm = re.search(r'([\d.]+)', freq_line)
-        if fm:
-            try:
-                freq_text = f"{float(fm.group(1)) / 1000:.2f} GHz"
-            except ValueError:
-                freq_text = f"{fm.group(1)} MHz"
-        if not freq_text:
-            mhz = cpuinfo.get('cpu MHz', '')
-            if mhz:
-                try:
-                    freq_text = f"{float(mhz) / 1000:.2f} GHz"
-                except ValueError:
-                    freq_text = f"{mhz} MHz"
-        if not freq_text:
-            bogo = cpuinfo.get('BogoMIPS', '')
-            if bogo:
-                freq_text = f"{bogo} BogoMIPS"
-        info_card.append(_kv_row(_("CPU frequency"), freq_text or _("N/A"),
-                                 mono=bool(freq_text)))
-
-        info_card.append(_kv_row(_("Memory"), _fmt_bytes(mem_total), mono=True))
-
-        uptime_secs = 0.0
-        uptime_raw = self._data.get('UPTIME', '').strip()
-        if uptime_raw:
-            try:
-                uptime_secs = float(uptime_raw.split()[0])
-            except (ValueError, IndexError):
-                pass
-        uptime_pretty = self._data.get('UPTIME_PRETTY', '').strip()
-        if uptime_pretty.startswith('up '):
-            uptime_pretty = uptime_pretty[3:]
-        if not uptime_pretty and uptime_secs:
-            uptime_pretty = _fmt_uptime_seconds(uptime_secs)
-        info_card.append(_kv_row(_("Uptime"), uptime_pretty))
-
-        boot_time = self._data.get('BOOT_TIME', '').strip()
-        boot_text = ''
-        if boot_time:
-            parts = boot_time.split()
-            if len(parts) >= 3:
-                boot_text = ' '.join(parts[-2:])
-        if not boot_text:
-            boot_text = self._data.get('UPTIME_SINCE', '').strip()
-        if not boot_text and uptime_secs:
-            boot_dt = datetime.now(timezone.utc) - timedelta(seconds=uptime_secs)
-            boot_text = boot_dt.strftime('%Y-%m-%d %H:%M')
-        info_card.append(_kv_row(_("Booted"), boot_text, last=True))
-
-        page.append(info_card)
+        card = _card()
+        rows = [
+            (_("Hostname"), _or_na(snapshot.hostname), True),
+        ]
+        if snapshot.device_model:
+            rows.append((_("Device"), snapshot.device_model, False))
+        rows.extend(
+            [
+                (_("Operating system"), _or_na(snapshot.os_pretty_name), False),
+                (_("Kernel"), _or_na(snapshot.kernel), True),
+                (_("Processor"), self._processor_text(), False),
+                (_("CPU frequency"), _format_frequency(snapshot.cpu.frequency_mhz), True),
+                (_("Memory"), _format_bytes(memory.total_bytes or None), True),
+                (_("Uptime"), _format_uptime(snapshot.uptime_seconds), False),
+                (_("Booted"), _or_na(snapshot.boot_time), False),
+            ]
+        )
+        _key_value_rows(card, rows)
+        page.append(card)
         return page
 
-    def _gauge_card(self, fraction: float, color: Tuple,
-                    title: str, detail: str,
-                    sub_detail: str) -> Gtk.Box:
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        card.add_css_class("card")
-        card.set_halign(Gtk.Align.FILL)
+    def _processor_text(self) -> str:
+        cpu = self._snapshot.cpu
+        threads = cpu.total_threads
+        if cpu.cores_per_socket and cpu.sockets:
+            cores = cpu.cores_per_socket * cpu.sockets
+            topology = _("%(cores)d cores · %(threads)d threads · %(sockets)d sockets") % {
+                "cores": cores,
+                "threads": threads or cores,
+                "sockets": cpu.sockets,
+            }
+        elif threads:
+            topology = ngettext("%d core", "%d cores", threads) % threads
+        else:
+            topology = ""
+        if cpu.model and topology:
+            return _("%(model)s (%(topology)s)") % {
+                "model": cpu.model, "topology": topology
+            }
+        return _or_na(cpu.model or topology)
 
-        inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        inner.set_margin_top(16)
-        inner.set_margin_bottom(12)
-        inner.set_margin_start(12)
-        inner.set_margin_end(12)
-
-        area = Gtk.DrawingArea()
-        area.set_size_request(96, 96)
-        area.set_halign(Gtk.Align.CENTER)
-        area.set_content_width(96)
-        area.set_content_height(96)
-
-        frac = fraction
-        col = color
-
-        def _on_draw(a, cr, w, h):
-            _draw_donut(a, cr, w, h, frac, col, '')
-
-        area.set_draw_func(_on_draw)
-        inner.append(area)
-
-        title_lbl = Gtk.Label(label=title)
-        title_lbl.set_halign(Gtk.Align.CENTER)
-        title_lbl.add_css_class("heading")
-        inner.append(title_lbl)
-
-        if detail:
-            detail_lbl = Gtk.Label(label=detail)
-            detail_lbl.set_halign(Gtk.Align.CENTER)
-            detail_lbl.add_css_class("monospace")
-            detail_lbl.add_css_class("caption")
-            inner.append(detail_lbl)
-
-        if sub_detail:
-            sub_lbl = Gtk.Label(label=sub_detail)
-            sub_lbl.set_halign(Gtk.Align.CENTER)
-            sub_lbl.add_css_class("caption")
-            sub_lbl.set_opacity(0.6)
-            inner.append(sub_lbl)
-
-        card.append(inner)
-        return card
-
-    # ── Resources tab ──────────────────────────────────────────────────
+    # -- Resources ------------------------------------------------------
 
     def _build_resources(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
-
-        # Load average
-        loadavg = self._data.get('LOADAVG', '').split()
-        nproc = 1
-        try:
-            nproc = int(self._data.get('NPROC', '1'))
-        except ValueError:
-            pass
+        page = _page()
+        snapshot = self._snapshot
+        processors = snapshot.cpu.logical_processors
 
         page.append(_section_label(_("Load average")))
-        load_grid = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        load_grid.set_homogeneous(True)
-        for i, label in enumerate(('1 min', '5 min', '15 min')):
-            val = 0.0
-            val_text = '0.00'
-            if i < len(loadavg):
-                try:
-                    val = float(loadavg[i])
-                    val_text = loadavg[i]
-                except ValueError:
-                    pass
-            frac = min(val / nproc, 1.0) if nproc else 0
-
-            card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-            card.add_css_class("card")
-
+        load_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        load_row.set_homogeneous(True)
+        averages = (
+            (_("1 min"), snapshot.load_average.one if snapshot.load_average else None),
+            (_("5 min"), snapshot.load_average.five if snapshot.load_average else None),
+            (_("15 min"), snapshot.load_average.fifteen if snapshot.load_average else None),
+        )
+        for title, value in averages:
+            fraction = value / processors if value is not None and processors else None
+            card = _card()
             inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
             inner.set_margin_top(14)
             inner.set_margin_bottom(14)
@@ -1205,832 +1006,462 @@ class MachineInfoDialog:
             inner.set_margin_end(16)
 
             header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            lbl = Gtk.Label(label=label)
-            lbl.set_opacity(0.6)
-            lbl.add_css_class("caption")
-            header.append(lbl)
-            spacer = Gtk.Box()
-            spacer.set_hexpand(True)
-            header.append(spacer)
-            val_lbl = Gtk.Label(label=val_text)
-            val_lbl.add_css_class("monospace")
-            val_lbl.add_css_class("heading")
-            header.append(val_lbl)
+            caption = Gtk.Label(label=title)
+            caption.add_css_class("caption")
+            caption.set_opacity(0.6)
+            caption.set_hexpand(True)
+            caption.set_xalign(0)
+            header.append(caption)
+            reading = Gtk.Label(label="—" if value is None else f"{value:.2f}")
+            reading.add_css_class("monospace")
+            reading.add_css_class("heading")
+            header.append(reading)
             inner.append(header)
-
-            bar = Gtk.LevelBar()
-            bar.set_min_value(0)
-            bar.set_max_value(1.0)
-            bar.set_value(frac)
-            bar.set_hexpand(True)
-            bar.set_size_request(-1, 6)
-            inner.append(bar)
-
+            inner.append(_usage_bar(fraction, height=6))
             card.append(inner)
-            load_grid.append(card)
+            load_row.append(card)
+        page.append(load_row)
+        page.append(
+            _caption(
+                ngettext("Based on %d CPU", "Based on %d CPUs", processors)
+                % processors
+                if processors
+                else _("CPU count unavailable.")
+            )
+        )
 
-        page.append(load_grid)
-
-        note = Gtk.Label(label=_("Based on %d CPUs") % nproc)
-        note.set_xalign(0)
-        note.add_css_class("caption")
-        note.set_opacity(0.55)
-        page.append(note)
-
-        # Memory + Temperatures side by side
-        two_col = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        two_col.set_homogeneous(True)
-
-        # Memory
-        mem = _parse_meminfo(self._data.get('MEMINFO', ''))
-        mem_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        mem_box.append(_section_label(_("Memory")))
-        mem_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        mem_card.add_css_class("card")
-
-        mem_inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        mem_inner.set_margin_top(16)
-        mem_inner.set_margin_bottom(16)
-        mem_inner.set_margin_start(16)
-        mem_inner.set_margin_end(16)
-
-        mem_total = mem.get('MemTotal', 1)
-        mem_free = mem.get('MemFree', 0)
-        mem_avail = mem.get('MemAvailable', 0)
-        mem_cached = mem.get('Cached', 0) + mem.get('Buffers', 0)
-        mem_used = mem_total - mem_avail
-        mem_frac = mem_used / mem_total if mem_total else 0
-
-        bar = Gtk.LevelBar()
-        bar.set_min_value(0)
-        bar.set_max_value(1.0)
-        bar.set_value(min(mem_frac, 1.0))
-        bar.set_hexpand(True)
-        bar.set_size_request(-1, 10)
-        mem_inner.append(bar)
-
-        stats = Gtk.FlowBox()
-        stats.set_selection_mode(Gtk.SelectionMode.NONE)
-        stats.set_homogeneous(False)
-        stats.set_max_children_per_line(4)
-        stats.set_min_children_per_line(2)
-        for k, v in [(_("Total"), _fmt_bytes(mem_total)),
-                     (_("Free"), _fmt_bytes(mem_free)),
-                     (_("Cached"), _fmt_bytes(mem.get('Cached', 0))),
-                     (_("Available"), _fmt_bytes(mem_avail))]:
-            item = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-            kl = Gtk.Label(label=k)
-            kl.set_opacity(0.6)
-            item.append(kl)
-            vl = Gtk.Label(label=v)
-            vl.add_css_class("monospace")
-            item.append(vl)
-            stats.insert(item, -1)
-        mem_inner.append(stats)
-
-        mem_card.append(mem_inner)
-
-        swap_total = mem.get('SwapTotal', 0)
-        swap_free = mem.get('SwapFree', 0)
-        swap_used = swap_total - swap_free
-        if swap_total:
-            sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-            mem_card.append(sep)
-            swap_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-            swap_box.set_margin_top(12)
-            swap_box.set_margin_bottom(16)
-            swap_box.set_margin_start(16)
-            swap_box.set_margin_end(16)
-            swap_header = Gtk.Box(
-                orientation=Gtk.Orientation.HORIZONTAL)
-            sl = Gtk.Label(label=_("Swap"))
-            sl.set_opacity(0.6)
-            swap_header.append(sl)
-            spacer = Gtk.Box()
-            spacer.set_hexpand(True)
-            swap_header.append(spacer)
-            swap_pct = int(swap_used / swap_total * 100) if swap_total else 0
-            sv = _mono_label(
-                f"{_fmt_bytes(swap_used)} / {_fmt_bytes(swap_total)}"
-                f" · {swap_pct}%")
-            swap_header.append(sv)
-            swap_box.append(swap_header)
-            swap_bar = Gtk.LevelBar()
-            swap_bar.set_min_value(0)
-            swap_bar.set_max_value(1.0)
-            swap_bar.set_value(
-                min(swap_used / swap_total, 1.0) if swap_total else 0)
-            swap_bar.set_size_request(-1, 6)
-            swap_box.append(swap_bar)
-            mem_card.append(swap_box)
-
-        mem_box.append(mem_card)
-        two_col.append(mem_box)
-
-        # Temperatures
-        temps = _parse_temps(
-            self._data.get('TEMPS', ''),
-            self._data.get('TEMP_TYPES', ''))
-        if not temps:
-            temps = _parse_sensors(self._data.get('SENSORS', ''))
-        temp_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        temp_box.append(_section_label(_("Temperatures")))
-        temp_card = _card_box()
-        if temps:
-            for i, t in enumerate(temps):
-                temp_c = t['temp_c']
-                label_text = t['label']
-                frac = min(temp_c / 100, 1.0)
-                color = _RED if temp_c > 80 else (_AMBER if temp_c > 60 else _GREEN)
-
-                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
-                              spacing=12)
-                row.set_margin_start(16)
-                row.set_margin_end(16)
-                row.set_margin_top(11)
-                row.set_margin_bottom(11)
-
-                name_lbl = Gtk.Label(label=label_text)
-                name_lbl.set_opacity(0.6)
-                name_lbl.set_size_request(120, -1)
-                name_lbl.set_xalign(0)
-                row.append(name_lbl)
-
-                bar = Gtk.LevelBar()
-                bar.set_min_value(0)
-                bar.set_max_value(1.0)
-                bar.set_value(frac)
-                bar.set_hexpand(True)
-                bar.set_size_request(-1, 6)
-                bar.set_valign(Gtk.Align.CENTER)
-                row.append(bar)
-
-                val_lbl = _mono_label(f"{int(temp_c)} °C")
-                val_lbl.set_size_request(48, -1)
-                val_lbl.set_xalign(1)
-                row.append(val_lbl)
-
-                wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                wrapper.append(row)
-                if i < len(temps) - 1:
-                    wrapper.append(Gtk.Separator(
-                        orientation=Gtk.Orientation.HORIZONTAL))
-                temp_card.append(wrapper)
-        else:
-            no_temp = Gtk.Label(label=_("N/A"))
-            no_temp.set_margin_top(16)
-            no_temp.set_margin_bottom(16)
-            no_temp.add_css_class("dim-label")
-            temp_card.append(no_temp)
-
-        temp_box.append(temp_card)
-        two_col.append(temp_box)
-        page.append(two_col)
-
+        # Full width and stacked: the memory readings and the sensor labels
+        # both wrap badly in a half-width column.
+        page.append(self._memory_section())
+        page.append(self._temperature_section())
         return page
 
-    # ── Storage tab ────────────────────────────────────────────────────
+    def _memory_section(self) -> Gtk.Box:
+        memory = self._snapshot.memory
+        section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        section.append(_section_label(_("Memory")))
 
-    def _build_storage(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
+        card = _card()
+        inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        inner.set_margin_top(16)
+        inner.set_margin_bottom(16)
+        inner.set_margin_start(16)
+        inner.set_margin_end(16)
 
-        page.append(_section_label(_("Filesystems")))
+        used = memory.used_bytes
+        fraction = used / memory.total_bytes if used is not None and memory.total_bytes else None
+        inner.append(_usage_bar(fraction, height=10))
 
-        _pseudo_fs = {'tmpfs', 'devtmpfs', 'overlay', 'squashfs', 'udev',
-                      'none', 'sysfs', 'proc', 'devpts', 'cgroup', 'cgroup2'}
-        df_rows = [r for r in _parse_df(self._data.get('DF', ''))
-                   if r['fs'] not in _pseudo_fs
-                   and r.get('type', '') not in _pseudo_fs
-                   and not r['mount'].startswith('/snap/')]
-        card = _card_box()
+        readings = Gtk.FlowBox()
+        readings.set_selection_mode(Gtk.SelectionMode.NONE)
+        readings.set_max_children_per_line(4)
+        readings.set_min_children_per_line(2)
+        for key, value in (
+            (_("MemTotal"), _format_bytes(memory.total_bytes or None)),
+            (_("MemFree"), _format_bytes(memory.free_bytes)),
+            (_("Cached"), _format_bytes(memory.cached_bytes)),
+            (_("MemAvailable"), _format_bytes(memory.available_bytes)),
+        ):
+            item = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+            name = Gtk.Label(label=key)
+            name.set_opacity(0.6)
+            item.append(name)
+            reading = Gtk.Label(label=value)
+            reading.add_css_class("monospace")
+            item.append(reading)
+            readings.insert(item, -1)
+        inner.append(readings)
+        card.append(inner)
 
-        # Header
-        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-        header.set_margin_start(16)
-        header.set_margin_end(16)
-        header.set_margin_top(10)
-        header.set_margin_bottom(10)
-        for text, width in [(_("Mount point"), 150), (_("Device"), 190),
-                            (_("Usage"), -1), (_("Used / Size"), 130)]:
-            lbl = Gtk.Label(label=text)
-            lbl.set_xalign(0 if width != 130 else 1)
-            lbl.add_css_class("caption")
-            lbl.add_css_class("heading")
-            lbl.set_opacity(0.6)
-            if width > 0:
-                lbl.set_size_request(width, -1)
-            else:
-                lbl.set_hexpand(True)
-            header.append(lbl)
-        card.append(header)
-        card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+        if memory.swap_total_bytes:
+            card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+            swap = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            swap.set_margin_top(12)
+            swap.set_margin_bottom(16)
+            swap.set_margin_start(16)
+            swap.set_margin_end(16)
+            header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            title = Gtk.Label(label=_("Swap"))
+            title.set_opacity(0.6)
+            title.set_hexpand(True)
+            title.set_xalign(0)
+            header.append(title)
+            swap_fraction = memory.swap_used_bytes / memory.swap_total_bytes
+            reading = Gtk.Label(
+                label=_("%(used)s / %(total)s · %(percent)s") % {
+                    "used": _format_bytes(memory.swap_used_bytes),
+                    "total": _format_bytes(memory.swap_total_bytes),
+                    "percent": _format_percent(swap_fraction),
+                }
+            )
+            reading.add_css_class("monospace")
+            header.append(reading)
+            swap.append(header)
+            swap.append(_usage_bar(swap_fraction, height=6))
+            card.append(swap)
 
-        for i, r in enumerate(df_rows):
-            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        section.append(card)
+        return section
+
+    def _temperature_section(self) -> Gtk.Box:
+        section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        section.append(_section_label(_("Temperatures")))
+        readings = self._snapshot.temperatures
+        card = _card()
+        if not readings:
+            label = Gtk.Label(label=_("N/A"))
+            label.add_css_class("dim-label")
+            label.set_margin_top(16)
+            label.set_margin_bottom(16)
+            card.append(label)
+            section.append(card)
+            return section
+
+        for index, reading in enumerate(readings):
+            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
             row.set_margin_start(16)
             row.set_margin_end(16)
-            row.set_margin_top(14)
-            row.set_margin_bottom(14)
+            row.set_margin_top(11)
+            row.set_margin_bottom(11)
 
-            mount_lbl = _mono_label(r['mount'])
-            mount_lbl.set_size_request(150, -1)
-            mount_lbl.set_xalign(0)
-            row.append(mount_lbl)
+            name = Gtk.Label(label=reading.label)
+            name.set_opacity(0.6)
+            name.set_xalign(0)
+            name.set_size_request(120, -1)
+            name.set_ellipsize(Pango.EllipsizeMode.END)
+            row.append(name)
 
-            dev_name = r['fs'].split('/')[-1] if '/' in r['fs'] else r['fs']
-            dev_text = f"{dev_name} · {r['type']}" if r.get('type') else dev_name
-            dev_lbl = _mono_label(dev_text)
-            dev_lbl.set_size_request(190, -1)
-            dev_lbl.set_xalign(0)
-            dev_lbl.set_opacity(0.7)
-            dev_lbl.add_css_class("caption")
-            row.append(dev_lbl)
+            # The reading drives the bar's colour, so a hot sensor is
+            # visibly hot rather than merely long.
+            row.append(
+                _usage_bar(
+                    min(reading.celsius / 100.0, 1.0),
+                    height=6,
+                    severity=_temperature_severity(reading.celsius),
+                )
+            )
 
-            pct = 0
-            try:
-                pct = int(r['pct'])
-            except ValueError:
-                pass
-            frac = pct / 100.0
+            value = Gtk.Label(label=_("%d °C") % int(reading.celsius))
+            value.add_css_class("monospace")
+            value.set_xalign(1)
+            value.set_size_request(56, -1)
+            row.append(value)
 
-            usage_box = Gtk.Box(
-                orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            usage_box.set_hexpand(True)
-            usage_box.set_valign(Gtk.Align.CENTER)
-            bar = Gtk.LevelBar()
-            bar.set_min_value(0)
-            bar.set_max_value(1.0)
-            bar.set_value(frac)
-            bar.set_hexpand(True)
-            bar.set_size_request(-1, 8)
-            bar.set_valign(Gtk.Align.CENTER)
-            usage_box.append(bar)
-            pct_lbl = _mono_label(f"{pct}%")
-            pct_lbl.set_size_request(34, -1)
-            pct_lbl.add_css_class("caption")
-            usage_box.append(pct_lbl)
-            row.append(usage_box)
+            card.append(row)
+            if index < len(readings) - 1:
+                card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+        section.append(card)
+        return section
 
-            try:
-                used_str = _fmt_bytes_si(int(r['used']))
-                size_str = _fmt_bytes_si(int(r['size']))
-            except ValueError:
-                used_str = r.get('used', '?')
-                size_str = r.get('size', '?')
-            size_lbl = _mono_label(f"{used_str} / {size_str}")
-            size_lbl.set_size_request(130, -1)
-            size_lbl.set_xalign(1)
-            size_lbl.add_css_class("caption")
-            row.append(size_lbl)
+    # -- Storage --------------------------------------------------------
 
-            wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            wrapper.append(row)
-            if i < len(df_rows) - 1:
-                wrapper.append(
-                    Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-            card.append(wrapper)
+    def _build_storage(self) -> Gtk.Box:
+        page = _page()
+        page.append(_section_label(_("Filesystems")))
+        table = _Table(
+            (
+                (_("Mount point"), 0.0, False),
+                (_("Device"), 0.0, False),
+                (_("Usage"), 0.0, True),
+                (_("Used / Size"), 1.0, False),
+            )
+        )
+        filesystems = self._snapshot.filesystems
+        for filesystem in filesystems:
+            usage = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            usage.set_hexpand(True)
+            usage.append(_usage_bar(filesystem.used_fraction))
+            percent = Gtk.Label(label=_format_percent(filesystem.used_fraction))
+            percent.add_css_class("monospace")
+            percent.add_css_class("caption")
+            usage.append(percent)
 
-        page.append(card)
+            device = _value_label(
+                _("%(device)s · %(fstype)s") % {
+                    "device": filesystem.device, "fstype": filesystem.fstype
+                }
+                if filesystem.fstype
+                else filesystem.device,
+                mono=True,
+            )
+            device.set_opacity(0.7)
+            device.add_css_class("caption")
 
-        note = Gtk.Label(
-            label=_("Only physical disks are shown."))
-        note.set_xalign(0)
-        note.add_css_class("caption")
-        note.set_opacity(0.55)
-        page.append(note)
+            size = _value_label(
+                _("%(used)s / %(total)s") % {
+                    "used": _format_bytes_si(filesystem.used_bytes),
+                    "total": _format_bytes_si(filesystem.size_bytes),
+                },
+                mono=True,
+            )
+            size.add_css_class("caption")
+
+            table.add_row(
+                [_value_label(filesystem.mount_point, mono=True), device, usage, size]
+            )
+        if not filesystems:
+            table.add_empty(_("No filesystems reported"))
+        page.append(table.widget)
+        page.append(_caption(_("Only physical disks are shown.")))
         return page
 
-    # ── Network tab ────────────────────────────────────────────────────
+    # -- Network --------------------------------------------------------
 
     def _build_network(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
-
-        ip_addrs = _parse_ip_addr(self._data.get('IP_ADDR', ''))
-        ip_links = _parse_ip_link(self._data.get('IP_LINK', ''))
-        net_dev = _parse_net_dev(self._data.get('NET_DEV', ''))
+        page = _page()
+        snapshot = self._snapshot
 
         page.append(_section_label(_("Interfaces")))
-        iface_card = _card_box()
-
-        seen_ifaces = []
-        for iface in ip_links:
-            if iface in seen_ifaces:
-                continue
-            seen_ifaces.append(iface)
-
-        for idx, iface in enumerate(seen_ifaces):
-            link = ip_links.get(iface, {})
-            addrs = [a for a in ip_addrs
-                     if a['iface'] == iface and a['family'] == 'inet']
-
+        card = _card()
+        interfaces = snapshot.interfaces
+        for index, interface in enumerate(interfaces):
             row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
             row.set_margin_start(16)
             row.set_margin_end(16)
             row.set_margin_top(14)
             row.set_margin_bottom(14)
 
-            icon_name = 'network-wireless-symbolic'
-            itype = link.get('type', 'ethernet')
-            if itype == 'loopback':
-                icon_name = 'network-transmit-receive-symbolic'
-            elif itype == 'ethernet':
-                icon_name = 'network-idle-symbolic'
-
-            state = link.get('state', 'unknown')
-            icon = Gtk.Image.new_from_icon_name(icon_name)
+            icon = Gtk.Image.new_from_icon_name(_interface_icon(interface.kind))
             icon.set_pixel_size(16)
-            if state == 'up':
-                pass
-            elif state in ('no-carrier', 'down'):
+            if interface.state is not NetworkInterfaceState.UP:
                 icon.set_opacity(0.5)
+            icon.set_tooltip_text(_interface_state_label(interface.state))
             row.append(icon)
 
-            name_lbl = _mono_label(iface)
-            name_lbl.set_size_request(180, -1)
-            name_lbl.set_xalign(0)
-            name_lbl.add_css_class("caption")
-            row.append(name_lbl)
+            name = _value_label(interface.name, mono=True)
+            name.set_size_request(160, -1)
+            name.add_css_class("caption")
+            row.append(name)
 
-            detail_box = Gtk.Box(
-                orientation=Gtk.Orientation.VERTICAL, spacing=2)
-            detail_box.set_hexpand(True)
-            if addrs:
-                addr_lbl = _mono_label(addrs[0]['addr'])
-                addr_lbl.set_xalign(0)
-                addr_lbl.add_css_class("caption")
-                detail_box.append(addr_lbl)
-            elif state == 'no-carrier':
-                nc_lbl = Gtk.Label(label=_("No carrier"))
-                nc_lbl.set_xalign(0)
-                nc_lbl.set_opacity(0.6)
-                nc_lbl.add_css_class("caption")
-                detail_box.append(nc_lbl)
+            details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            details.set_hexpand(True)
+            if interface.ipv4_addresses:
+                address = _value_label(interface.ipv4_addresses[0], mono=True)
+                address.add_css_class("caption")
+                details.append(address)
+            elif interface.state is NetworkInterfaceState.NO_CARRIER:
+                details.append(_caption(_("No carrier"), dim=0.6))
 
-            mac = link.get('mac', '')
-            mtu = link.get('mtu', '')
-            sub_parts = []
-            if mac:
-                sub_parts.append(mac)
-            sub_parts.append(itype)
-            if mtu:
-                sub_parts.append(f"MTU {mtu}")
-            sub_lbl = _mono_label(' · '.join(sub_parts))
-            sub_lbl.set_xalign(0)
-            sub_lbl.set_opacity(0.55)
-            sub_lbl.add_css_class("caption")
-            detail_box.append(sub_lbl)
-            row.append(detail_box)
+            descriptors = []
+            if interface.mac_address:
+                descriptors.append(interface.mac_address)
+            descriptors.append(_interface_kind_label(interface.kind))
+            if interface.mtu:
+                descriptors.append(_("MTU %d") % interface.mtu)
+            summary = _value_label(_(" · ").join(descriptors), mono=True)
+            summary.add_css_class("caption")
+            summary.set_opacity(0.55)
+            details.append(summary)
+            row.append(details)
 
-            wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            wrapper.append(row)
-            if idx < len(seen_ifaces) - 1:
-                wrapper.append(
-                    Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-            iface_card.append(wrapper)
-
-        page.append(iface_card)
-
-        # Routing & resolution
-        page.append(_section_label(_("Routing & resolution")))
-        route_card = _card_box()
-
-        default_route = self._data.get('IP_ROUTE', '').strip()
-        gw_text = ''
-        if default_route:
-            parts = default_route.split()
-            gw = ''
-            dev = ''
-            for j, p in enumerate(parts):
-                if p == 'via' and j + 1 < len(parts):
-                    gw = parts[j + 1]
-                if p == 'dev' and j + 1 < len(parts):
-                    dev = parts[j + 1]
-            gw_text = gw
-            if dev:
-                gw_text += f" via {dev}"
-        route_card.append(_kv_row(_("Default gateway"), gw_text, mono=True))
-
-        dns_text = self._data.get('DNS', '')
-        servers = []
-        for line in dns_text.splitlines():
-            if line.strip().startswith('nameserver'):
-                servers.append(line.split()[-1])
-        route_card.append(_kv_row(
-            _("DNS servers"), ', '.join(servers), mono=True))
-
-        ss_listen = self._data.get('SS_LISTEN', '')
-        ssh_port = ''
-        for line in ss_listen.splitlines():
-            if ':22 ' in line or line.strip().endswith(':22'):
-                proc_m = re.search(r'users:\(\("([^"]+)"|(\d+)/(\S+)', line)
-                proc_name = (proc_m.group(1) or proc_m.group(3)
-                             if proc_m else 'sshd')
-                ssh_port = f"22/tcp ({proc_name})"
-                break
-        route_card.append(_kv_row(
-            _("Listening SSH port"), ssh_port, mono=True, last=True))
-
-        page.append(route_card)
-        return page
-
-    # ── Traffic tab ────────────────────────────────────────────────────
-
-    def _build_traffic(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
-
-        # Live banner
-        banner = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        banner.set_margin_start(12)
-        banner.set_margin_end(12)
-        banner.set_margin_top(8)
-        banner.set_margin_bottom(8)
-
-        dot = Gtk.DrawingArea()
-        dot.set_size_request(8, 8)
-        dot.set_valign(Gtk.Align.CENTER)
-        dot.set_content_width(8)
-        dot.set_content_height(8)
-        dot.set_draw_func(
-            lambda _a, cr, w, h: (
-                cr.set_source_rgb(*_BLUE),
-                cr.arc(w / 2, h / 2, 4, 0, 2 * math.pi),
-                cr.fill(),
-            ))
-        banner.append(dot)
-        banner_lbl = Gtk.Label(
-            label=_("Live — sampling every 2 s while this"
-                    " window is open. Rates are averaged over"
-                    " the last sample."))
-        banner_lbl.add_css_class("caption")
-        banner_lbl.set_wrap(True)
-        banner.append(banner_lbl)
-        page.append(banner)
-
-        # Bandwidth per interface
-        net_dev = _parse_net_dev(self._data.get('NET_DEV', ''))
-        ip_links = _parse_ip_link(self._data.get('IP_LINK', ''))
-
-        page.append(_section_label(_("Bandwidth")))
-        bw_card = _card_box()
-
-        bw_hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-        bw_hdr.set_margin_start(16)
-        bw_hdr.set_margin_end(16)
-        bw_hdr.set_margin_top(10)
-        bw_hdr.set_margin_bottom(10)
-        for text, w in [(_("Interface"), 140), (_("Received"), 120),
-                        (_("Transmitted"), 120), (_("Rate ↓"), -1),
-                        (_("Rate ↑"), 90)]:
-            lbl = Gtk.Label(label=text)
-            lbl.set_xalign(1 if text != _("Interface") else 0)
-            lbl.add_css_class("caption")
-            lbl.add_css_class("heading")
-            lbl.set_opacity(0.6)
-            if w > 0:
-                lbl.set_size_request(w, -1)
-            else:
-                lbl.set_hexpand(True)
-                lbl.set_xalign(1)
-            bw_hdr.append(lbl)
-        bw_card.append(bw_hdr)
-        bw_card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-
-        self._bw_rate_labels: Dict[str, Tuple[Gtk.Label, Gtk.Label]] = {}
-        ifaces = [i for i in net_dev if i != 'lo']
-        if not ifaces:
-            ifaces = list(net_dev.keys())
-
-        for idx, iface in enumerate(ifaces):
-            rx, tx = net_dev.get(iface, (0, 0))
-
-            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-            row.set_margin_start(16)
-            row.set_margin_end(16)
-            row.set_margin_top(12)
-            row.set_margin_bottom(12)
-
-            name_lbl = _mono_label(iface)
-            name_lbl.set_size_request(140, -1)
-            name_lbl.set_xalign(0)
-            name_lbl.add_css_class("caption")
-            row.append(name_lbl)
-
-            rx_lbl = _mono_label(_fmt_bytes(rx))
-            rx_lbl.set_size_request(120, -1)
-            rx_lbl.set_xalign(1)
-            rx_lbl.add_css_class("caption")
-            row.append(rx_lbl)
-
-            tx_lbl = _mono_label(_fmt_bytes(tx))
-            tx_lbl.set_size_request(120, -1)
-            tx_lbl.set_xalign(1)
-            tx_lbl.add_css_class("caption")
-            row.append(tx_lbl)
-
-            rate_rx = _mono_label("—")
-            rate_rx.set_hexpand(True)
-            rate_rx.set_xalign(1)
-            rate_rx.add_css_class("caption")
-            row.append(rate_rx)
-
-            rate_tx = _mono_label("—")
-            rate_tx.set_size_request(90, -1)
-            rate_tx.set_xalign(1)
-            rate_tx.add_css_class("caption")
-            row.append(rate_tx)
-
-            self._bw_rate_labels[iface] = (rate_rx, rate_tx)
-
-            wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            wrapper.append(row)
-            if idx < len(ifaces) - 1:
-                wrapper.append(
-                    Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-            bw_card.append(wrapper)
-
-        page.append(bw_card)
-
-        bw_note = Gtk.Label(
-            label=_("Totals since boot."))
-        bw_note.set_xalign(0)
-        bw_note.add_css_class("caption")
-        bw_note.set_opacity(0.55)
-        bw_note.set_wrap(True)
-        page.append(bw_note)
-
-        # Connected SSH clients
-        page.append(_section_label(_("Connected SSH clients")))
-        who_rows = self._get_logged_in_users()
-        ss_rows = _parse_ss_estab(self._data.get('SS_ESTAB', ''))
-
-        clients_card = _card_box()
-
-        # Header
-        hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-        hdr.set_margin_start(16)
-        hdr.set_margin_end(16)
-        hdr.set_margin_top(10)
-        hdr.set_margin_bottom(10)
-        for text, w in [(_("User"), 110), (_("From"), 190),
-                        (_("TTY"), 90), (_("Since"), -1)]:
-            lbl = Gtk.Label(label=text)
-            lbl.set_xalign(0 if w != -1 else 1)
-            lbl.add_css_class("caption")
-            lbl.add_css_class("heading")
-            lbl.set_opacity(0.6)
-            if w > 0:
-                lbl.set_size_request(w, -1)
-            else:
-                lbl.set_hexpand(True)
-                lbl.set_xalign(1)
-            hdr.append(lbl)
-        clients_card.append(hdr)
-        clients_card.append(
-            Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-
-        for i, who in enumerate(who_rows):
-            row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
-            row.set_margin_start(16)
-            row.set_margin_end(16)
-            row.set_margin_top(13)
-            row.set_margin_bottom(13)
-
-            user_box = Gtk.Box(
-                orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-            user_box.set_size_request(110, -1)
-            d2 = Gtk.DrawingArea()
-            d2.set_size_request(8, 8)
-            d2.set_valign(Gtk.Align.CENTER)
-            d2.set_content_width(8)
-            d2.set_content_height(8)
-            is_ssh = 'from' in who and who['from'] not in (
-                '', ':0', ':1', 'local console')
-            color = _GREEN if is_ssh else (0.467, 0.463, 0.482)
-            d2.set_draw_func(
-                lambda _a, cr, w, h, c=color: (
-                    cr.set_source_rgb(*c),
-                    cr.arc(w / 2, h / 2, 4, 0, 2 * math.pi),
-                    cr.fill(),
-                ))
-            user_box.append(d2)
-            ul = Gtk.Label(label=who['user'])
-            ul.add_css_class("heading")
-            user_box.append(ul)
-            row.append(user_box)
-
-            from_text = who.get('from', '')
-            if not from_text:
-                from_text = _("local console")
-            fl = Gtk.Label(label=from_text)
-            fl.set_size_request(190, -1)
-            fl.set_xalign(0)
-            if from_text != _("local console"):
-                fl.add_css_class("monospace")
-            else:
-                fl.set_opacity(0.6)
-            fl.add_css_class("caption")
-            row.append(fl)
-
-            tl = _mono_label(who['tty'])
-            tl.set_size_request(90, -1)
-            tl.set_xalign(0)
-            tl.add_css_class("caption")
-            row.append(tl)
-
-            sl = Gtk.Label(label=who.get('since', ''))
-            sl.set_hexpand(True)
-            sl.set_xalign(1)
-            sl.add_css_class("caption")
-            row.append(sl)
-
-            wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            wrapper.append(row)
-            if i < len(who_rows) - 1:
-                wrapper.append(
-                    Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-            clients_card.append(wrapper)
-
-        if not who_rows:
-            empty = Gtk.Label(label=_("No logged-in users"))
+            card.append(row)
+            if index < len(interfaces) - 1:
+                card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+        if not interfaces:
+            empty = Gtk.Label(label=_("No interfaces reported"))
+            empty.add_css_class("dim-label")
             empty.set_margin_top(16)
             empty.set_margin_bottom(16)
-            empty.add_css_class("dim-label")
-            clients_card.append(empty)
+            card.append(empty)
+        page.append(card)
 
-        page.append(clients_card)
-
-        # TCP connections: incoming vs outgoing
-        incoming = []
-        outgoing = []
-        for s in ss_rows:
-            local_port = ''
-            peer_port = ''
-            lp = s.get('local', '')
-            pp = s.get('peer', '')
-            lm = re.search(r':(\d+)$', lp)
-            pm = re.search(r':(\d+)$', pp)
-            if lm:
-                local_port = lm.group(1)
-            if pm:
-                peer_port = pm.group(1)
-            try:
-                if int(local_port) < 1024 or int(local_port) in (3306, 5432, 6379, 8080, 9100):
-                    incoming.append(s)
-                else:
-                    outgoing.append(s)
-            except ValueError:
-                outgoing.append(s)
-
-        two_col = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        two_col.set_homogeneous(True)
-
-        for label_text, conns in [
-            (_("Incoming · %d established") % len(incoming), incoming),
-            (_("Outgoing · %d established") % len(outgoing), outgoing),
-        ]:
-            col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-            col.append(_section_label(label_text))
-            conn_card = _card_box()
-            for j, s in enumerate(conns[:8]):
-                lp = s.get('local', '')
-                pp = s.get('peer', '')
-                lm = re.search(r':(\d+)$', lp)
-                port = f":{lm.group(1)}" if lm else lp
-
-                r = Gtk.Box(
-                    orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-                r.set_margin_start(16)
-                r.set_margin_end(16)
-                r.set_margin_top(11)
-                r.set_margin_bottom(11)
-
-                pl = _mono_label(port)
-                pl.set_size_request(56, -1)
-                pl.set_xalign(0)
-                pl.add_css_class("caption")
-                r.append(pl)
-
-                peer_lbl = _mono_label(pp)
-                peer_lbl.set_hexpand(True)
-                peer_lbl.set_xalign(0)
-                peer_lbl.set_opacity(0.75)
-                peer_lbl.add_css_class("caption")
-                r.append(peer_lbl)
-
-                proc_lbl = Gtk.Label(label=s.get('proc', ''))
-                proc_lbl.add_css_class("caption")
-                proc_lbl.set_opacity(0.55)
-                r.append(proc_lbl)
-
-                w2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                w2.append(r)
-                if j < len(conns) - 1 and j < 7:
-                    w2.append(Gtk.Separator(
-                        orientation=Gtk.Orientation.HORIZONTAL))
-                conn_card.append(w2)
-            if not conns:
-                empty = Gtk.Label(label=_("None"))
-                empty.set_margin_top(12)
-                empty.set_margin_bottom(12)
-                empty.add_css_class("dim-label")
-                conn_card.append(empty)
-            col.append(conn_card)
-            two_col.append(col)
-
-        page.append(two_col)
-
-        note = Gtk.Label(label=_(
-            "Some process names may require root to display."))
-        note.set_xalign(0)
-        note.add_css_class("caption")
-        note.set_opacity(0.55)
-        note.set_wrap(True)
-        page.append(note)
-
-        self._traffic_content = page
+        page.append(_section_label(_("Routing & resolution")))
+        gateway = snapshot.default_gateway
+        if gateway and snapshot.default_gateway_interface:
+            gateway = _("%(gateway)s via %(interface)s") % {
+                "gateway": gateway, "interface": snapshot.default_gateway_interface
+            }
+        ssh_endpoint = _("N/A")
+        if snapshot.ssh_port is not None:
+            ssh_endpoint = (
+                _("%(port)d/tcp (%(process)s)") % {
+                    "port": snapshot.ssh_port, "process": snapshot.ssh_process
+                }
+                if snapshot.ssh_process
+                else _("%d/tcp") % snapshot.ssh_port
+            )
+        routing = _card()
+        _key_value_rows(
+            routing,
+            [
+                (_("Default gateway"), _or_na(gateway), True),
+                (_("DNS servers"), _or_na(_(", ").join(snapshot.dns_servers)), True),
+                (_("Listening SSH port"), ssh_endpoint, True),
+            ],
+        )
+        page.append(routing)
         return page
 
-    def _update_traffic_rates(self, prev, curr, dt):
-        if not hasattr(self, '_bw_rate_labels'):
-            return
-        for iface, (rx_lbl, tx_lbl) in self._bw_rate_labels.items():
-            prev_rx, prev_tx = prev.get(iface, (0, 0))
-            curr_rx, curr_tx = curr.get(iface, (0, 0))
-            rx_rate = max(0, (curr_rx - prev_rx) / dt)
-            tx_rate = max(0, (curr_tx - prev_tx) / dt)
-            rx_lbl.set_text(_fmt_bytes_rate(rx_rate))
-            tx_lbl.set_text(_fmt_bytes_rate(tx_rate))
+    # -- Traffic --------------------------------------------------------
 
-    # ── System tab ─────────────────────────────────────────────────────
+    def _build_traffic(self) -> Gtk.Box:
+        page = _page()
+        page.append(
+            _caption(
+                _("Live — sampled every 2 s."),
+                dim=0.75,
+            )
+        )
+
+        page.append(_section_label(_("Bandwidth")))
+        table = _Table(
+            (
+                (_("Interface"), 0.0, False),
+                (_("Received"), 1.0, False),
+                (_("Transmitted"), 1.0, False),
+                (_("Rate ↓"), 1.0, True),
+                (_("Rate ↑"), 1.0, False),
+            )
+        )
+        # Hide loopback by what the host said it is, not by the name "lo".
+        loopback = {
+            item.name for item in self._snapshot.interfaces
+            if item.kind is NetworkInterfaceKind.LOOPBACK
+        }
+        counters = [
+            item for item in (self._previous_counters or ())
+            if item.name not in loopback
+        ]
+        if not counters:
+            counters = list(self._previous_counters or ())
+        for item in counters:
+            receive_rate = _value_label("—", mono=True, selectable=False)
+            receive_rate.add_css_class("caption")
+            transmit_rate = _value_label("—", mono=True, selectable=False)
+            transmit_rate.add_css_class("caption")
+            self._rate_labels[item.name] = (receive_rate, transmit_rate)
+
+            received = _value_label(_format_bytes(item.rx_bytes), mono=True)
+            received.add_css_class("caption")
+            transmitted = _value_label(_format_bytes(item.tx_bytes), mono=True)
+            transmitted.add_css_class("caption")
+            name = _value_label(item.name, mono=True)
+            name.add_css_class("caption")
+            table.add_row([name, received, transmitted, receive_rate, transmit_rate])
+        if not counters:
+            table.add_empty(_("No interface counters reported"))
+        page.append(table.widget)
+        page.append(_caption(_("Totals since boot.")))
+
+        page.append(_section_label(_("Remote sessions")))
+        page.append(self._sessions_card(remote_only=True))
+
+        incoming = [
+            item for item in self._snapshot.sockets
+            if item.direction is SocketDirection.INCOMING
+        ]
+        outgoing = [
+            item for item in self._snapshot.sockets
+            if item.direction is SocketDirection.OUTGOING
+        ]
+        columns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        columns.set_homogeneous(True)
+        for title, sockets in (
+            (ngettext("Incoming · %d established", "Incoming · %d established",
+                      len(incoming)) % len(incoming), incoming),
+            (ngettext("Outgoing · %d established", "Outgoing · %d established",
+                      len(outgoing)) % len(outgoing), outgoing),
+        ):
+            column = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            column.append(_section_label(title))
+            card = _card()
+            shown = sockets[:8]
+            for index, socket in enumerate(shown):
+                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+                row.set_margin_start(16)
+                row.set_margin_end(16)
+                row.set_margin_top(11)
+                row.set_margin_bottom(11)
+
+                port = _value_label(
+                    "—" if socket.local_port is None else f":{socket.local_port}",
+                    mono=True,
+                )
+                port.set_size_request(60, -1)
+                port.add_css_class("caption")
+                row.append(port)
+
+                peer = _value_label(
+                    socket.peer_address
+                    if socket.peer_port is None
+                    else f"{socket.peer_address}:{socket.peer_port}",
+                    mono=True,
+                )
+                peer.set_hexpand(True)
+                peer.set_opacity(0.75)
+                peer.add_css_class("caption")
+                row.append(peer)
+
+                process = Gtk.Label(label=socket.process)
+                process.add_css_class("caption")
+                process.set_opacity(0.55)
+                row.append(process)
+
+                card.append(row)
+                if index < len(shown) - 1:
+                    card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+            if not shown:
+                empty = Gtk.Label(label=_("None"))
+                empty.add_css_class("dim-label")
+                empty.set_margin_top(12)
+                empty.set_margin_bottom(12)
+                card.append(empty)
+            column.append(card)
+            columns.append(column)
+        page.append(columns)
+        page.append(_caption(_("Some process names need root.")))
+        return page
+
+    # -- System ---------------------------------------------------------
 
     def _build_system(self) -> Gtk.Box:
-        page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18)
-        page.set_margin_top(18)
-        page.set_margin_bottom(24)
-        page.set_margin_start(24)
-        page.set_margin_end(24)
-
-        # Logged-in users
+        page = _page()
         page.append(_section_label(_("Logged-in users")))
-        users_card = _card_box()
+        page.append(self._sessions_card(remote_only=False))
+        return page
 
-        who_rows = self._get_logged_in_users()
-        for i, who in enumerate(who_rows):
+    def _sessions_card(self, *, remote_only: bool) -> Gtk.Box:
+        sessions = [
+            session for session in self._snapshot.sessions
+            if session.remote or not remote_only
+        ]
+        card = _card()
+        if not sessions:
+            empty = Gtk.Label(
+                label=_("No remote sessions") if remote_only else _("No logged-in users")
+            )
+            empty.add_css_class("dim-label")
+            empty.set_margin_top(16)
+            empty.set_margin_bottom(16)
+            card.append(empty)
+            return card
+
+        for index, session in enumerate(sessions):
             row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
             row.set_margin_start(16)
             row.set_margin_end(16)
             row.set_margin_top(12)
             row.set_margin_bottom(12)
 
-            ul = Gtk.Label(label=who['user'])
-            ul.add_css_class("heading")
-            ul.set_size_request(70, -1)
-            ul.set_xalign(0)
-            row.append(ul)
+            user = _value_label(session.user or _("Unknown"))
+            user.add_css_class("heading")
+            user.set_size_request(110, -1)
+            row.append(user)
 
-            from_text = who.get('from', '')
-            detail = f"{who['tty']}"
-            if from_text:
-                detail += f" · {from_text}"
-            elif 'tty' in who['tty'] and 'pts' not in who['tty']:
-                detail += f" · local console"
-            dl = _mono_label(detail)
-            dl.set_hexpand(True)
-            dl.set_xalign(0)
-            dl.set_opacity(0.75)
-            dl.add_css_class("caption")
-            row.append(dl)
+            descriptors = [session.tty] if session.tty else []
+            descriptors.append(session.origin or _("local console"))
+            detail = _value_label(_(" · ").join(descriptors), mono=True)
+            detail.set_hexpand(True)
+            detail.set_opacity(0.75)
+            detail.add_css_class("caption")
+            row.append(detail)
 
-            sl = Gtk.Label(label=who.get('since', ''))
-            sl.add_css_class("caption")
-            sl.set_opacity(0.55)
-            row.append(sl)
+            since = Gtk.Label(label=session.since)
+            since.add_css_class("caption")
+            since.set_opacity(0.55)
+            row.append(since)
 
-            w2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            w2.append(row)
-            if i < len(who_rows) - 1:
-                w2.append(Gtk.Separator(
-                    orientation=Gtk.Orientation.HORIZONTAL))
-            users_card.append(w2)
-
-        if not who_rows:
-            empty = Gtk.Label(label=_("No logged-in users"))
-            empty.set_margin_top(16)
-            empty.set_margin_bottom(16)
-            empty.add_css_class("dim-label")
-            users_card.append(empty)
-
-        page.append(users_card)
-        return page
+            card.append(row)
+            if index < len(sessions) - 1:
+                card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+        return card

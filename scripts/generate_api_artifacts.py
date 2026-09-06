@@ -69,6 +69,7 @@ from sshpilot.api.models import (  # noqa: E402
     known_hosts,
     keys,
     connection_store,
+    host_info,
 )
 from sshpilot.api.transport import __all__ as TRANSPORT_EXPORTS  # noqa: E402
 from sshpilot.api.transport import envelopes  # noqa: E402
@@ -87,6 +88,7 @@ MODEL_MODULES = (
     known_hosts,
     keys,
     connection_store,
+    host_info,
     envelopes,
 )
 EXTRA_MODELS = (

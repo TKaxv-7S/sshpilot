@@ -1,5 +1,5 @@
 {
-  "api_implementation_version": "0.51",
+  "api_implementation_version": "0.52",
   "client_method_contract": {
     "add_agent_key": {
       "capability": "identity.operate",
@@ -64,6 +64,10 @@
     "cancel_broadcast_command": {
       "capability": "broadcast.write",
       "status": "schema-only"
+    },
+    "cancel_host_info": {
+      "capability": "host_info.read",
+      "status": "daemon-only"
     },
     "cancel_interaction": {
       "capability": "interactions.respond",
@@ -196,6 +200,10 @@
     "get_global_ssh_overrides": {
       "capability": "ssh_overrides.read",
       "status": "implemented"
+    },
+    "get_host_info": {
+      "capability": "host_info.read",
+      "status": "daemon-only"
     },
     "get_identity_providers": {
       "capability": "identity.read",
@@ -541,6 +549,10 @@
       "capability": "broadcast.write",
       "status": "schema-only"
     },
+    "start_host_info": {
+      "capability": "host_info.read",
+      "status": "daemon-only"
+    },
     "start_scp_transfer": {
       "capability": "transfers.scp",
       "status": "daemon-only"
@@ -792,6 +804,15 @@
     },
     "groups.set_color": {
       "capability": "connections.groups"
+    },
+    "hostinfo.cancel": {
+      "capability": "host_info.read"
+    },
+    "hostinfo.get": {
+      "capability": "host_info.read"
+    },
+    "hostinfo.start": {
+      "capability": "host_info.read"
     },
     "identity.agent.key.add": {
       "capability": "identity.operate"
@@ -1177,6 +1198,7 @@
       "broadcast.read",
       "broadcast.write",
       "broadcast.events",
+      "host_info.read",
       "ssh_overrides.read",
       "ssh_overrides.write",
       "plugins",
@@ -1379,6 +1401,10 @@
       "remote",
       "dynamic"
     ],
+    "HostInfoProbe": [
+      "full",
+      "network_counters"
+    ],
     "HostKeyDecision": [
       "accept",
       "reject"
@@ -1436,6 +1462,18 @@
     "KeyStoreScope": [
       "default",
       "isolated"
+    ],
+    "NetworkInterfaceKind": [
+      "loopback",
+      "wireless",
+      "ethernet",
+      "unknown"
+    ],
+    "NetworkInterfaceState": [
+      "up",
+      "down",
+      "no_carrier",
+      "unknown"
     ],
     "OperationKind": [
       "broadcast_command",
@@ -1611,6 +1649,10 @@
       "closing",
       "closed",
       "failed"
+    ],
+    "SocketDirection": [
+      "incoming",
+      "outgoing"
     ],
     "TransferBackend": [
       "sftp",
@@ -2929,6 +2971,60 @@
       ],
       "status": "Implemented"
     },
+    "CpuInfo": {
+      "fields": [
+        {
+          "default": "",
+          "name": "model",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "cores_per_socket",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "threads_per_core",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "sockets",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "logical_processors",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "frequency_mhz",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[float]"
+        },
+        {
+          "default": null,
+          "name": "bogomips",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[float]"
+        }
+      ],
+      "status": "Schema only"
+    },
     "CreateConnectionRequest": {
       "fields": [
         {
@@ -3720,6 +3816,60 @@
       ],
       "status": "Implemented"
     },
+    "FilesystemUsage": {
+      "fields": [
+        {
+          "default": null,
+          "name": "device",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "mount_point",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "fstype",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "size_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "used_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "available_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": null,
+          "name": "use_percent",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        }
+      ],
+      "status": "Schema only"
+    },
     "ForwardSummary": {
       "fields": [
         {
@@ -4157,6 +4307,219 @@
       ],
       "status": "Implemented"
     },
+    "HostInfoRequest": {
+      "fields": [
+        {
+          "default": null,
+          "name": "connection_id",
+          "required": true,
+          "sensitive": false,
+          "type": "ConnectionId"
+        },
+        {
+          "default": "full",
+          "name": "probe",
+          "required": false,
+          "sensitive": false,
+          "type": "HostInfoProbe"
+        }
+      ],
+      "status": "Implemented"
+    },
+    "HostInfoSnapshot": {
+      "fields": [
+        {
+          "default": "",
+          "name": "hostname",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "device_model",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "os_pretty_name",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "kernel",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "uptime_seconds",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[float]"
+        },
+        {
+          "default": "",
+          "name": "boot_time",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": {
+            "bogomips": null,
+            "cores_per_socket": null,
+            "frequency_mhz": null,
+            "logical_processors": null,
+            "model": "",
+            "sockets": null,
+            "threads_per_core": null
+          },
+          "name": "cpu",
+          "required": false,
+          "sensitive": false,
+          "type": "CpuInfo"
+        },
+        {
+          "default": {
+            "available_bytes": null,
+            "buffers_bytes": 0,
+            "cached_bytes": 0,
+            "free_bytes": 0,
+            "swap_free_bytes": 0,
+            "swap_total_bytes": 0,
+            "total_bytes": 0
+          },
+          "name": "memory",
+          "required": false,
+          "sensitive": false,
+          "type": "MemoryInfo"
+        },
+        {
+          "default": null,
+          "name": "load_average",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[LoadAverage]"
+        },
+        {
+          "default": [],
+          "name": "filesystems",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[FilesystemUsage, ...]"
+        },
+        {
+          "default": [],
+          "name": "interfaces",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[NetworkInterface, ...]"
+        },
+        {
+          "default": [],
+          "name": "temperatures",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[TemperatureReading, ...]"
+        },
+        {
+          "default": [],
+          "name": "sessions",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[LoginSession, ...]"
+        },
+        {
+          "default": [],
+          "name": "sockets",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[SocketConnection, ...]"
+        },
+        {
+          "default": "",
+          "name": "default_gateway",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "default_gateway_interface",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": [],
+          "name": "dns_servers",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[str, ...]"
+        },
+        {
+          "default": null,
+          "name": "ssh_port",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": "",
+          "name": "ssh_process",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        }
+      ],
+      "status": "Schema only"
+    },
+    "HostInfoSummary": {
+      "fields": [
+        {
+          "default": null,
+          "name": "operation",
+          "required": true,
+          "sensitive": false,
+          "type": "OperationSummary"
+        },
+        {
+          "default": "full",
+          "name": "probe",
+          "required": false,
+          "sensitive": false,
+          "type": "HostInfoProbe"
+        },
+        {
+          "default": null,
+          "name": "snapshot",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[HostInfoSnapshot]"
+        },
+        {
+          "default": [],
+          "name": "counters",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[InterfaceCounters, ...]"
+        },
+        {
+          "default": null,
+          "name": "failure",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[ServiceFailure]"
+        }
+      ],
+      "status": "Implemented"
+    },
     "HostKeyPrompt": {
       "fields": [
         {
@@ -4569,6 +4932,32 @@
       ],
       "status": "Schema only"
     },
+    "InterfaceCounters": {
+      "fields": [
+        {
+          "default": null,
+          "name": "name",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "rx_bytes",
+          "required": true,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": null,
+          "name": "tx_bytes",
+          "required": true,
+          "sensitive": false,
+          "type": "int"
+        }
+      ],
+      "status": "Schema only"
+    },
     "KeyList": {
       "fields": [
         {
@@ -4784,6 +5173,72 @@
       ],
       "status": "Implemented"
     },
+    "LoadAverage": {
+      "fields": [
+        {
+          "default": null,
+          "name": "one",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        },
+        {
+          "default": null,
+          "name": "five",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        },
+        {
+          "default": null,
+          "name": "fifteen",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        }
+      ],
+      "status": "Schema only"
+    },
+    "LoginSession": {
+      "fields": [
+        {
+          "default": "",
+          "name": "user",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "tty",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "origin",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "since",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": false,
+          "name": "remote",
+          "required": false,
+          "sensitive": false,
+          "type": "bool"
+        }
+      ],
+      "status": "Schema only"
+    },
     "LookupKeyPassphraseRequest": {
       "fields": [
         {
@@ -4795,6 +5250,60 @@
         }
       ],
       "status": "Implemented"
+    },
+    "MemoryInfo": {
+      "fields": [
+        {
+          "default": 0,
+          "name": "total_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": 0,
+          "name": "free_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": null,
+          "name": "available_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": 0,
+          "name": "cached_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": 0,
+          "name": "buffers_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": 0,
+          "name": "swap_total_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": 0,
+          "name": "swap_free_bytes",
+          "required": false,
+          "sensitive": false,
+          "type": "int"
+        }
+      ],
+      "status": "Schema only"
     },
     "MoveConnectionsRequest": {
       "fields": [
@@ -4849,6 +5358,60 @@
         }
       ],
       "status": "Implemented"
+    },
+    "NetworkInterface": {
+      "fields": [
+        {
+          "default": null,
+          "name": "name",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "unknown",
+          "name": "kind",
+          "required": false,
+          "sensitive": false,
+          "type": "NetworkInterfaceKind"
+        },
+        {
+          "default": "unknown",
+          "name": "state",
+          "required": false,
+          "sensitive": false,
+          "type": "NetworkInterfaceState"
+        },
+        {
+          "default": "",
+          "name": "mac_address",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "mtu",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": [],
+          "name": "ipv4_addresses",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[str, ...]"
+        },
+        {
+          "default": [],
+          "name": "ipv6_addresses",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[str, ...]"
+        }
+      ],
+      "status": "Schema only"
     },
     "OpenForwardRequest": {
       "fields": [
@@ -6902,6 +7465,60 @@
       ],
       "status": "Implemented"
     },
+    "SocketConnection": {
+      "fields": [
+        {
+          "default": null,
+          "name": "protocol",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "local_address",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "local_port",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": "",
+          "name": "peer_address",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "peer_port",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        },
+        {
+          "default": "",
+          "name": "process",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "outgoing",
+          "name": "direction",
+          "required": false,
+          "sensitive": false,
+          "type": "SocketDirection"
+        }
+      ],
+      "status": "Schema only"
+    },
     "SplitConnectionRequest": {
       "fields": [
         {
@@ -7240,6 +7857,25 @@
         }
       ],
       "status": "Implemented"
+    },
+    "TemperatureReading": {
+      "fields": [
+        {
+          "default": null,
+          "name": "label",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "celsius",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        }
+      ],
+      "status": "Schema only"
     },
     "TerminalDimensions": {
       "fields": [

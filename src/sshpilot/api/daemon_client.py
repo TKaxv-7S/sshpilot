@@ -392,6 +392,9 @@ DAEMON_IMPLEMENTED_CLIENT_METHOD_CAPABILITIES = {
     "get_plugin_setting": Capability.PLUGIN_SETTINGS_READ,
     "set_plugin_setting": Capability.PLUGIN_SETTINGS_WRITE,
     "subscribe_broadcast_output": Capability.BROADCAST_EVENTS,
+    "start_host_info": Capability.HOST_INFO_READ,
+    "get_host_info": Capability.HOST_INFO_READ,
+    "cancel_host_info": Capability.HOST_INFO_READ,
     "list_sftp_services": Capability.SFTP_READ,
     "get_sftp_service": Capability.SFTP_READ,
     "open_sftp": Capability.SFTP_WRITE,
@@ -2764,6 +2767,50 @@ class DaemonClient:
                 "broadcast.cancel",
                 operation_id_request_to_wire(operation_id),
                 mutation_description="broadcast command cancellation",
+            )
+        )
+
+    def start_host_info(self, request):
+        from sshpilot.api.models.host_info import HostInfoRequest
+        from sshpilot.api.transport.codec import (
+            host_info_request_to_wire,
+            host_info_summary_from_wire,
+        )
+
+        self._require_capability(Capability.HOST_INFO_READ)
+        if type(request) is not HostInfoRequest:
+            raise TypeError("a HostInfoRequest is required")
+        return host_info_summary_from_wire(
+            self._request(
+                "hostinfo.start",
+                host_info_request_to_wire(request),
+                mutation_description="host information probe",
+            )
+        )
+
+    def get_host_info(self, operation_id):
+        from sshpilot.api.transport.codec import (
+            host_info_summary_from_wire,
+            operation_id_request_to_wire,
+        )
+
+        self._require_capability(Capability.HOST_INFO_READ)
+        return host_info_summary_from_wire(
+            self._request("hostinfo.get", operation_id_request_to_wire(operation_id))
+        )
+
+    def cancel_host_info(self, operation_id):
+        from sshpilot.api.transport.codec import (
+            host_info_summary_from_wire,
+            operation_id_request_to_wire,
+        )
+
+        self._require_capability(Capability.HOST_INFO_READ)
+        return host_info_summary_from_wire(
+            self._request(
+                "hostinfo.cancel",
+                operation_id_request_to_wire(operation_id),
+                mutation_description="host information cancellation",
             )
         )
 
