@@ -47,6 +47,7 @@ _GATHER_CMD = (
     'echo "===W==="; w -h 2>/dev/null;'
     'echo "===TEMPS==="; for f in /sys/class/thermal/thermal_zone*/temp; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
     'echo "===TEMP_TYPES==="; for f in /sys/class/thermal/thermal_zone*/type; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
+    'echo "===SENSORS==="; sensors 2>/dev/null;'
     'echo "===CPU_FREQ==="; cat /proc/cpuinfo 2>/dev/null | grep -i "cpu mhz" | head -1;'
     'echo "===CPU_STAT==="; head -1 /proc/stat 2>/dev/null;'
     'echo "===APT_UPGRADABLE==="; apt list --upgradable 2>/dev/null | tail -n +2 | wc -l;'
@@ -290,6 +291,26 @@ def _parse_temps(text: str, types_text: str) -> List[Dict[str, Any]]:
             'label': labels.get(zone, f'zone{zone}'),
             'temp_c': temps[zone] / 1000.0,
         })
+    return result
+
+
+def _parse_sensors(text: str) -> List[Dict[str, Any]]:
+    """Parse `sensors` output as a fallback for thermal_zone."""
+    result: List[Dict[str, Any]] = []
+    adapter = ''
+    for line in text.splitlines():
+        if not line or line.startswith('Adapter:'):
+            continue
+        if not line.startswith(' ') and not line.startswith('\t') and ':' not in line:
+            adapter = line.strip()
+            continue
+        m = re.match(r'^(.+?):\s+\+?([\d.]+)\s*°C', line)
+        if m:
+            label = m.group(1).strip()
+            temp_c = float(m.group(2))
+            if adapter:
+                label = f"{adapter} · {label}"
+            result.append({'label': label, 'temp_c': temp_c})
     return result
 
 
@@ -1198,6 +1219,8 @@ class MachineInfoDialog:
         temps = _parse_temps(
             self._data.get('TEMPS', ''),
             self._data.get('TEMP_TYPES', ''))
+        if not temps:
+            temps = _parse_sensors(self._data.get('SENSORS', ''))
         temp_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         temp_box.append(_section_label(_("Temperatures")))
         temp_card = _card_box()
