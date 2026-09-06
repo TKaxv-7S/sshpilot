@@ -366,3 +366,98 @@ def test_binding_after_the_dialog_closed_is_ignored():
     dialog._bind_interactions("operation-7")
 
     assert dialog._interaction_dialogs.sessions == []
+
+
+def test_every_reported_address_is_shown_not_just_the_first_ipv4():
+    """An interface that answers only over IPv6 must not read as address-less."""
+
+    snapshot = _snapshot(
+        interfaces=(
+            NetworkInterface(
+                name="eth0",
+                kind=NetworkInterfaceKind.ETHERNET,
+                state=NetworkInterfaceState.UP,
+                ipv4_addresses=("10.0.0.5/24", "10.0.0.6/24"),
+                ipv6_addresses=("2001:db8::1/64",),
+            ),
+        )
+    )
+    texts = _texts(_dialog(snapshot)._build_network())
+    for address in ("10.0.0.5/24", "10.0.0.6/24", "2001:db8::1/64"):
+        assert address in texts
+
+
+def test_interface_state_is_readable_without_hovering():
+    """State used to live in an icon tooltip, which touch users cannot reach."""
+
+    snapshot = _snapshot(
+        interfaces=(
+            NetworkInterface(
+                name="eth0",
+                kind=NetworkInterfaceKind.ETHERNET,
+                state=NetworkInterfaceState.NO_CARRIER,
+                mtu=1500,
+            ),
+        )
+    )
+    page = _dialog(snapshot)._build_network()
+    assert any("No carrier" in text for text in _texts(page))
+    assert not [
+        widget for widget in _walk(page)
+        if isinstance(widget, Gtk.Image) and widget.get_tooltip_text()
+    ]
+
+
+def test_the_filesystem_table_reports_what_the_host_says_is_left():
+    """Reserved blocks mean size - used overstates what is actually free."""
+
+    from sshpilot.machine_info_dialog import _format_bytes_si
+
+    snapshot = _snapshot(
+        filesystems=(
+            FilesystemUsage(
+                device="/dev/sda1",
+                mount_point="/",
+                fstype="ext4",
+                size_bytes=2_000_000,
+                used_bytes=1_900_000,
+                available_bytes=50_000,
+            ),
+        )
+    )
+    texts = _texts(_dialog(snapshot)._build_storage())
+    assert "Available" in texts
+    assert _format_bytes_si(50_000) in texts
+    assert _format_bytes_si(100_000) not in texts, "available must not be derived"
+
+
+def test_buffers_is_reported_with_the_other_meminfo_fields():
+    snapshot = _snapshot(
+        memory=MemoryInfo(
+            total_bytes=1024 * 1024 * 512,
+            free_bytes=1024 * 1024 * 64,
+            available_bytes=1024 * 1024 * 128,
+            buffers_bytes=1024 * 1024 * 16,
+        )
+    )
+    texts = _texts(_dialog(snapshot)._build_resources())
+    assert "Buffers" in texts
+    assert "16.0 MiB" in texts
+
+
+def test_a_capped_socket_list_names_the_protocol_and_says_what_it_hid():
+    sockets = tuple(
+        SocketConnection(
+            protocol="udp" if index % 2 else "tcp",
+            local_address="10.0.0.5",
+            local_port=2222 + index,
+            peer_address="10.0.0.9",
+            peer_port=51000 + index,
+            process="sshd",
+            direction=SocketDirection.INCOMING,
+        )
+        for index in range(11)
+    )
+    texts = _texts(_dialog(_snapshot(sockets=sockets))._build_traffic())
+    assert "tcp" in texts and "udp" in texts
+    assert "3 more" in texts

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 22:22+0330\n"
+"POT-Creation-Date: 2026-09-06 22:36+0330\n"
 "PO-Revision-Date: 2026-09-06 00:57+0330\n"
 "Last-Translator: mFat <newmfat@gmail.com>\n"
 "Language-Team: Persian\n"
@@ -1812,7 +1812,7 @@ msgid "Optional sources for IdentityAgent, PKCS#11, and FIDO security keys."
 msgstr "منابع اختیاری برای کلیدهای امنیتی IdentityAgent، PKCS#11 و FIDO."
 
 #: src/sshpilot/connection_dialog.py:3560
-#: src/sshpilot/machine_info_dialog.py:1404
+#: src/sshpilot/machine_info_dialog.py:1436
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:67
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:74
 #: src/sshpilot/shortcut_editor.py:442 src/sshpilot/shortcut_editor.py:456
@@ -4098,8 +4098,8 @@ msgstr ""
 #: src/sshpilot/machine_info_dialog.py:169
 #: src/sshpilot/machine_info_dialog.py:187
 #: src/sshpilot/machine_info_dialog.py:198
-#: src/sshpilot/machine_info_dialog.py:1112
-#: src/sshpilot/machine_info_dialog.py:1274
+#: src/sshpilot/machine_info_dialog.py:1113
+#: src/sshpilot/machine_info_dialog.py:1291
 msgid "N/A"
 msgstr "موجود نیست"
 
@@ -4140,7 +4140,7 @@ msgid "Less than a minute"
 msgstr "کمتر از یک دقیقه"
 
 #: src/sshpilot/machine_info_dialog.py:182
-#: src/sshpilot/machine_info_dialog.py:1288 src/sshpilot/window_dialogs.py:2171
+#: src/sshpilot/machine_info_dialog.py:1305 src/sshpilot/window_dialogs.py:2171
 msgid ", "
 msgstr ", "
 
@@ -4173,7 +4173,7 @@ msgstr "اترنت"
 
 #: src/sshpilot/machine_info_dialog.py:228
 #: src/sshpilot/machine_info_dialog.py:236
-#: src/sshpilot/machine_info_dialog.py:1446
+#: src/sshpilot/machine_info_dialog.py:1478
 msgid "Unknown"
 msgstr "ناشناخته"
 
@@ -4186,7 +4186,6 @@ msgid "Down"
 msgstr "غیرفعال"
 
 #: src/sshpilot/machine_info_dialog.py:235
-#: src/sshpilot/machine_info_dialog.py:1243
 msgid "No carrier"
 msgstr "بدون سیگنال"
 
@@ -4295,7 +4294,7 @@ msgstr "حافظه"
 
 #: src/sshpilot/machine_info_dialog.py:912
 #: src/sshpilot/machine_info_dialog.py:923
-#: src/sshpilot/machine_info_dialog.py:1191
+#: src/sshpilot/machine_info_dialog.py:1193
 #, python-format
 msgid "%(used)s / %(total)s"
 msgstr "%(used)s / %(total)s"
@@ -4314,7 +4313,7 @@ msgid "Hostname"
 msgstr "نام میزبان"
 
 #: src/sshpilot/machine_info_dialog.py:948
-#: src/sshpilot/machine_info_dialog.py:1164
+#: src/sshpilot/machine_info_dialog.py:1165
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:62
 msgid "Device"
 msgstr "دستگاه"
@@ -4396,180 +4395,195 @@ msgid "MemFree"
 msgstr "MemFree"
 
 #: src/sshpilot/machine_info_dialog.py:1062
+msgid "Buffers"
+msgstr "Buffers"
+
+#: src/sshpilot/machine_info_dialog.py:1063
 msgid "Cached"
 msgstr "Cached"
 
-#: src/sshpilot/machine_info_dialog.py:1063
+#: src/sshpilot/machine_info_dialog.py:1064
 msgid "MemAvailable"
 msgstr "MemAvailable"
 
-#: src/sshpilot/machine_info_dialog.py:1084
+#: src/sshpilot/machine_info_dialog.py:1085
 msgid "Swap"
 msgstr "Swap"
 
-#: src/sshpilot/machine_info_dialog.py:1091
+#: src/sshpilot/machine_info_dialog.py:1092
 #, python-format
 msgid "%(used)s / %(total)s · %(percent)s"
 msgstr "%(used)s / %(total)s · %(percent)s"
 
-#: src/sshpilot/machine_info_dialog.py:1108
+#: src/sshpilot/machine_info_dialog.py:1109
 msgid "Temperatures"
 msgstr "دماها"
 
-#: src/sshpilot/machine_info_dialog.py:1144
+#: src/sshpilot/machine_info_dialog.py:1145
 #, python-format
 msgid "%d °C"
 msgstr "%d °C"
 
-#: src/sshpilot/machine_info_dialog.py:1160
+#: src/sshpilot/machine_info_dialog.py:1161
 msgid "Filesystems"
 msgstr "سیستم‌های فایل"
 
-#: src/sshpilot/machine_info_dialog.py:1163
+#: src/sshpilot/machine_info_dialog.py:1164
 msgid "Mount point"
 msgstr "نقطهٔ اتصال"
 
-#: src/sshpilot/machine_info_dialog.py:1165
+#: src/sshpilot/machine_info_dialog.py:1166
 msgid "Usage"
 msgstr "مصرف"
 
-#: src/sshpilot/machine_info_dialog.py:1166
+#: src/sshpilot/machine_info_dialog.py:1167
 msgid "Used / Size"
 msgstr "استفاده‌شده / اندازه"
 
-#: src/sshpilot/machine_info_dialog.py:1180
+#: src/sshpilot/machine_info_dialog.py:1168
+msgid "Available"
+msgstr "در دسترس"
+
+#: src/sshpilot/machine_info_dialog.py:1182
 #, python-format
 msgid "%(device)s · %(fstype)s"
 msgstr "%(device)s · %(fstype)s"
 
-#: src/sshpilot/machine_info_dialog.py:1203
+#: src/sshpilot/machine_info_dialog.py:1218
 msgid "No filesystems reported"
 msgstr "هیچ سیستم فایلی گزارش نشد"
 
-#: src/sshpilot/machine_info_dialog.py:1205
+#: src/sshpilot/machine_info_dialog.py:1220
 msgid "Only physical disks are shown."
 msgstr "تنها دیسک‌های فیزیکی نشان داده می‌شوند."
 
-#: src/sshpilot/machine_info_dialog.py:1214
+#: src/sshpilot/machine_info_dialog.py:1229
 msgid "Interfaces"
 msgstr "رابط‌ها"
 
-#: src/sshpilot/machine_info_dialog.py:1250
+#: src/sshpilot/machine_info_dialog.py:1267
 #, python-format
 msgid "MTU %d"
 msgstr "MTU %d"
 
-#: src/sshpilot/machine_info_dialog.py:1251
-#: src/sshpilot/machine_info_dialog.py:1453
+#: src/sshpilot/machine_info_dialog.py:1268
+#: src/sshpilot/machine_info_dialog.py:1485
 msgid " · "
 msgstr " · "
 
-#: src/sshpilot/machine_info_dialog.py:1261
+#: src/sshpilot/machine_info_dialog.py:1278
 msgid "No interfaces reported"
 msgstr "هیچ رابطی گزارش نشد"
 
-#: src/sshpilot/machine_info_dialog.py:1268
+#: src/sshpilot/machine_info_dialog.py:1285
 msgid "Routing & resolution"
 msgstr "مسیریابی و نام‌گشایی"
 
-#: src/sshpilot/machine_info_dialog.py:1271
+#: src/sshpilot/machine_info_dialog.py:1288
 #, python-format
 msgid "%(gateway)s via %(interface)s"
 msgstr "%(gateway)s از طریق %(interface)s"
 
-#: src/sshpilot/machine_info_dialog.py:1277
+#: src/sshpilot/machine_info_dialog.py:1294
 #, python-format
 msgid "%(port)d/tcp (%(process)s)"
 msgstr "%(port)d/tcp (%(process)s)"
 
-#: src/sshpilot/machine_info_dialog.py:1281
+#: src/sshpilot/machine_info_dialog.py:1298
 #, python-format
 msgid "%d/tcp"
 msgstr "%d/tcp"
 
-#: src/sshpilot/machine_info_dialog.py:1287
+#: src/sshpilot/machine_info_dialog.py:1304
 msgid "Default gateway"
 msgstr "دروازهٔ پیش‌فرض"
 
-#: src/sshpilot/machine_info_dialog.py:1288
+#: src/sshpilot/machine_info_dialog.py:1305
 msgid "DNS servers"
 msgstr "سرورهای DNS"
 
-#: src/sshpilot/machine_info_dialog.py:1289
+#: src/sshpilot/machine_info_dialog.py:1306
 msgid "Listening SSH port"
 msgstr "پورت شنوندهٔ SSH"
 
-#: src/sshpilot/machine_info_dialog.py:1301
+#: src/sshpilot/machine_info_dialog.py:1318
 msgid "Live — sampled every 2 s."
-msgstr "زنده — نمونه‌برداری هر 2 ثانیه."
+msgstr "زنده — نمونه‌برداری هر ۲ ثانیه."
 
-#: src/sshpilot/machine_info_dialog.py:1306
+#: src/sshpilot/machine_info_dialog.py:1323
 msgid "Bandwidth"
 msgstr "پهنای باند"
 
-#: src/sshpilot/machine_info_dialog.py:1309
+#: src/sshpilot/machine_info_dialog.py:1326
 msgid "Network interface"
 msgstr "رابط شبکه"
 
-#: src/sshpilot/machine_info_dialog.py:1310
+#: src/sshpilot/machine_info_dialog.py:1327
 msgid "Received"
 msgstr "دریافت‌شده"
 
-#: src/sshpilot/machine_info_dialog.py:1311
+#: src/sshpilot/machine_info_dialog.py:1328
 msgid "Transmitted"
 msgstr "ارسال‌شده"
 
-#: src/sshpilot/machine_info_dialog.py:1312
+#: src/sshpilot/machine_info_dialog.py:1329
 msgid "Rate ↓"
 msgstr "نرخ ↓"
 
-#: src/sshpilot/machine_info_dialog.py:1313
+#: src/sshpilot/machine_info_dialog.py:1330
 msgid "Rate ↑"
 msgstr "نرخ ↑"
 
-#: src/sshpilot/machine_info_dialog.py:1342
+#: src/sshpilot/machine_info_dialog.py:1359
 msgid "No interface counters reported"
 msgstr "هیچ شمارنده‌ای برای رابط‌ها گزارش نشد"
 
-#: src/sshpilot/machine_info_dialog.py:1344
+#: src/sshpilot/machine_info_dialog.py:1361
 msgid "Totals since boot."
 msgstr "مجموع از زمان راه‌اندازی."
 
-#: src/sshpilot/machine_info_dialog.py:1346
+#: src/sshpilot/machine_info_dialog.py:1363
 msgid "Remote sessions"
 msgstr "نشست‌های راه دور"
 
-#: src/sshpilot/machine_info_dialog.py:1360
+#: src/sshpilot/machine_info_dialog.py:1377
 #, python-format
 msgid "Incoming · %d established"
 msgid_plural "Incoming · %d established"
 msgstr[0] "ورودی · %d برقرار"
 msgstr[1] "ورودی · %d برقرار"
 
-#: src/sshpilot/machine_info_dialog.py:1362
+#: src/sshpilot/machine_info_dialog.py:1379
 #, python-format
 msgid "Outgoing · %d established"
 msgid_plural "Outgoing · %d established"
 msgstr[0] "خروجی · %d برقرار"
 msgstr[1] "خروجی · %d برقرار"
 
-#: src/sshpilot/machine_info_dialog.py:1412
+#: src/sshpilot/machine_info_dialog.py:1429
+#, python-format
+msgid "%d more"
+msgid_plural "%d more"
+msgstr[0] "%d مورد دیگر"
+msgstr[1] "%d مورد دیگر"
+
+#: src/sshpilot/machine_info_dialog.py:1444
 msgid "Some process names need root."
 msgstr "برخی نام‌های فرایند به دسترسی ریشه نیاز دارند."
 
-#: src/sshpilot/machine_info_dialog.py:1419
+#: src/sshpilot/machine_info_dialog.py:1451
 msgid "Logged-in users"
 msgstr "کاربران واردشده"
 
-#: src/sshpilot/machine_info_dialog.py:1431
+#: src/sshpilot/machine_info_dialog.py:1463
 msgid "No remote sessions"
 msgstr "بدون نشست راه دور"
 
-#: src/sshpilot/machine_info_dialog.py:1431
+#: src/sshpilot/machine_info_dialog.py:1463
 msgid "No logged-in users"
 msgstr "هیچ کاربر واردشده‌ای نیست"
 
-#: src/sshpilot/machine_info_dialog.py:1452
+#: src/sshpilot/machine_info_dialog.py:1484
 msgid "local console"
 msgstr "کنسول محلی"
 

@@ -1054,11 +1054,12 @@ class MachineInfoDialog:
 
         readings = Gtk.FlowBox()
         readings.set_selection_mode(Gtk.SelectionMode.NONE)
-        readings.set_max_children_per_line(4)
+        readings.set_max_children_per_line(5)
         readings.set_min_children_per_line(2)
         for key, value in (
             (_("MemTotal"), _format_bytes(memory.total_bytes or None)),
             (_("MemFree"), _format_bytes(memory.free_bytes)),
+            (_("Buffers"), _format_bytes(memory.buffers_bytes)),
             (_("Cached"), _format_bytes(memory.cached_bytes)),
             (_("MemAvailable"), _format_bytes(memory.available_bytes)),
         ):
@@ -1164,6 +1165,7 @@ class MachineInfoDialog:
                 (_("Device"), 0.0, False),
                 (_("Usage"), 0.0, True),
                 (_("Used / Size"), 1.0, False),
+                (_("Available"), 1.0, False),
             )
         )
         filesystems = self._snapshot.filesystems
@@ -1196,8 +1198,21 @@ class MachineInfoDialog:
             )
             size.add_css_class("caption")
 
+            # Reserved blocks mean size - used is not what is left, so the
+            # host's own available figure is reported rather than derived.
+            available = _value_label(
+                _format_bytes_si(filesystem.available_bytes), mono=True
+            )
+            available.add_css_class("caption")
+
             table.add_row(
-                [_value_label(filesystem.mount_point, mono=True), device, usage, size]
+                [
+                    _value_label(filesystem.mount_point, mono=True),
+                    device,
+                    usage,
+                    size,
+                    available,
+                ]
             )
         if not filesystems:
             table.add_empty(_("No filesystems reported"))
@@ -1225,7 +1240,6 @@ class MachineInfoDialog:
             icon.set_pixel_size(16)
             if interface.state is not NetworkInterfaceState.UP:
                 icon.set_opacity(0.5)
-            icon.set_tooltip_text(_interface_state_label(interface.state))
             row.append(icon)
 
             name = _value_label(interface.name, mono=True)
@@ -1235,17 +1249,20 @@ class MachineInfoDialog:
 
             details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
             details.set_hexpand(True)
-            if interface.ipv4_addresses:
-                address = _value_label(interface.ipv4_addresses[0], mono=True)
+            # Every address the host reported, v4 first: an interface that
+            # answers only over IPv6 is invisible when just ipv4[0] is shown.
+            for value in (*interface.ipv4_addresses, *interface.ipv6_addresses):
+                address = _value_label(value, mono=True)
                 address.add_css_class("caption")
                 details.append(address)
-            elif interface.state is NetworkInterfaceState.NO_CARRIER:
-                details.append(_caption(_("No carrier"), dim=0.6))
 
+            # State reads as text. It used to live in the icon's tooltip,
+            # which nobody hovers and a touch user cannot reach at all.
             descriptors = []
             if interface.mac_address:
                 descriptors.append(interface.mac_address)
             descriptors.append(_interface_kind_label(interface.kind))
+            descriptors.append(_interface_state_label(interface.state))
             if interface.mtu:
                 descriptors.append(_("MTU %d") % interface.mtu)
             summary = _value_label(_(" · ").join(descriptors), mono=True)
@@ -1373,6 +1390,12 @@ class MachineInfoDialog:
                 row.set_margin_top(11)
                 row.set_margin_bottom(11)
 
+                protocol = _value_label(socket.protocol, mono=True)
+                protocol.set_size_request(44, -1)
+                protocol.add_css_class("caption")
+                protocol.set_opacity(0.55)
+                row.append(protocol)
+
                 port = _value_label(
                     "—" if socket.local_port is None else f":{socket.local_port}",
                     mono=True,
@@ -1400,6 +1423,15 @@ class MachineInfoDialog:
                 card.append(row)
                 if index < len(shown) - 1:
                     card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+            hidden = len(sockets) - len(shown)
+            if hidden:
+                card.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+                more = Gtk.Label(label=ngettext("%d more", "%d more", hidden) % hidden)
+                more.add_css_class("caption")
+                more.set_opacity(0.55)
+                more.set_margin_top(11)
+                more.set_margin_bottom(11)
+                card.append(more)
             if not shown:
                 empty = Gtk.Label(label=_("None"))
                 empty.add_css_class("dim-label")
