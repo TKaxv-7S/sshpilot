@@ -1,3 +1,13 @@
+sshpilot (6.0.5-1) unstable; urgency=medium
+
+  * Release v6.0.5.
+  * Introducing "Host Info" - detailed info about any host, available
+    from the context menu
+  * New languages: Spanish, Portuguese, Brazilian Portuguese, Chinese,
+    Russian and Persian
+
+ -- Mehdi <mah.fat@gmail.com>  Sun, 06 Sep 2026 19:43:04 +0000
+
 sshpilot (6.0.4-1) unstable; urgency=medium
 
   * Release v6.0.4.
