@@ -24,15 +24,20 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from ...api.models.host_info import (
     CpuInfo,
+    FailedUnit,
     FilesystemUsage,
     HostInfoSnapshot,
+    HostKeyFingerprint,
     InterfaceCounters,
+    ListeningPort,
     LoadAverage,
     LoginSession,
     MemoryInfo,
     NetworkInterface,
     NetworkInterfaceKind,
     NetworkInterfaceState,
+    PressureStall,
+    ProcessUsage,
     SocketConnection,
     SocketDirection,
     TemperatureReading,
@@ -637,6 +642,119 @@ def parse_sensors(text: str) -> Tuple[TemperatureReading, ...]:
 
 
 # ---------------------------------------------------------------------------
+def parse_process_table(text: str) -> Tuple[ProcessUsage, ...]:
+    """Parse a process listing by reading its own header row.
+
+    ``ps -eo pcpu,pmem,comm``, BusyBox ``top`` and procps ``top`` print
+    different columns in different orders, but each names them, so the header
+    decides where to read rather than a per-tool column index.  BusyBox
+    publishes ``%VSZ`` and no ``%MEM``; a share of virtual size is not a share
+    of memory, so it is left unreported rather than relabelled.
+    """
+
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        header = line.split()
+        if "%CPU" in header and "COMMAND" in header:
+            break
+    else:
+        return ()
+
+    cpu_at = header.index("%CPU")
+    command_at = header.index("COMMAND")
+    memory_at = header.index("%MEM") if "%MEM" in header else None
+
+    processes: List[ProcessUsage] = []
+    for line in lines[index + 1:]:
+        fields = line.split()
+        if len(fields) <= command_at:
+            continue
+        command = " ".join(fields[command_at:])
+        if not command:
+            continue
+        processes.append(
+            ProcessUsage(
+                command=command,
+                cpu_percent=_float_or_none(fields[cpu_at]) if cpu_at < len(fields) else None,
+                memory_percent=(
+                    _float_or_none(fields[memory_at])
+                    if memory_at is not None and memory_at < len(fields)
+                    else None
+                ),
+            )
+        )
+    return tuple(processes)
+
+
+def parse_failed_units(text: str) -> Tuple[FailedUnit, ...]:
+    """Parse ``systemctl --failed --no-legend --plain``.
+
+    Only the unit name and the description are read.  The three state columns
+    between them are localized by the remote host's own locale, so matching on
+    their words would work in English and nowhere else.
+    """
+
+    units: List[FailedUnit] = []
+    for line in text.splitlines():
+        fields = line.split(None, 4)
+        if len(fields) < 4:
+            continue
+        units.append(
+            FailedUnit(name=fields[0], description=fields[4] if len(fields) > 4 else "")
+        )
+    return tuple(units)
+
+
+def parse_host_keys(text: str) -> Tuple[HostKeyFingerprint, ...]:
+    """Parse ``ssh-keygen -l`` lines: ``bits fingerprint comment (ALGORITHM)``."""
+
+    keys: List[HostKeyFingerprint] = []
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) < 3:
+            continue
+        algorithm = fields[-1]
+        if not (algorithm.startswith("(") and algorithm.endswith(")")):
+            continue
+        keys.append(
+            HostKeyFingerprint(
+                algorithm=algorithm[1:-1],
+                fingerprint=fields[1],
+                bits=_positive_int_or_none(fields[0]),
+            )
+        )
+    return tuple(keys)
+
+
+def parse_io_pressure(
+    text: str,
+) -> Tuple[Optional[PressureStall], Optional[PressureStall]]:
+    """Parse ``/proc/pressure/io`` into its ``some`` and ``full`` readings."""
+
+    readings: Dict[str, PressureStall] = {}
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) < 4 or fields[0] not in ("some", "full"):
+            continue
+        values: Dict[str, Optional[float]] = {}
+        for token in fields[1:]:
+            key, sep, value = token.partition("=")
+            if sep:
+                values[key] = _float_or_none(value)
+        averages = [values.get(name) for name in ("avg10", "avg60", "avg300")]
+        if any(value is None for value in averages):
+            continue
+        readings[fields[0]] = PressureStall(*averages)
+    return readings.get("some"), readings.get("full")
+
+
+def parse_architecture(uname_text: str) -> str:
+    """The machine field of ``uname -srm``: sysname, release, then machine."""
+
+    fields = uname_text.split()
+    return fields[2] if len(fields) >= 3 else ""
+
+
 # Assembly
 # ---------------------------------------------------------------------------
 
@@ -679,6 +797,13 @@ def parse_host_info(raw: str) -> HostInfoSnapshot:
     if not temperatures:
         temperatures = parse_sensors(sections.get("SENSORS", ""))
 
+    processes = parse_process_table(sections.get("PROCESSES", ""))
+    if not processes:
+        processes = parse_process_table(sections.get("TOP", ""))
+    io_some, io_full = parse_io_pressure(sections.get("IO_PRESSURE", ""))
+    os_release = parse_os_release(sections.get("OS_RELEASE", ""))
+    uname = sections.get("UNAME", "").strip()
+
     gateway, gateway_interface = parse_default_route(sections.get("IP_ROUTE", ""))
     uptime = _float_or_none(sections.get("UPTIME", "").split()[0]) if sections.get(
         "UPTIME", ""
@@ -687,10 +812,8 @@ def parse_host_info(raw: str) -> HostInfoSnapshot:
     return HostInfoSnapshot(
         hostname=sections.get("HOSTNAME", "").strip(),
         device_model=sections.get("DEVICE_MODEL", "").strip(),
-        os_pretty_name=parse_os_release(sections.get("OS_RELEASE", "")).get(
-            "PRETTY_NAME", ""
-        ),
-        kernel=sections.get("UNAME", "").strip(),
+        os_pretty_name=os_release.get("PRETTY_NAME", ""),
+        kernel=uname,
         uptime_seconds=uptime if uptime is not None and uptime >= 0 else None,
         boot_time=_boot_time(sections),
         cpu=parse_cpu(
@@ -714,6 +837,21 @@ def parse_host_info(raw: str) -> HostInfoSnapshot:
         dns_servers=parse_dns_servers(sections.get("DNS", "")),
         ssh_port=ssh_ports[0] if ssh_ports else None,
         ssh_process=listening.get(ssh_ports[0], "") if ssh_ports else "",
+        os_id=os_release.get("ID", ""),
+        os_version_id=os_release.get("VERSION_ID", ""),
+        architecture=parse_architecture(uname),
+        # Every port the host accepts on, not only the one this session
+        # arrived through: what else is exposed is the question an operator
+        # actually opens this dialog with.
+        listening_ports=tuple(
+            ListeningPort(port=port, process=process)
+            for port, process in sorted(listening.items())
+        ),
+        processes=processes,
+        failed_units=parse_failed_units(sections.get("SYSTEMD_FAILED", "")),
+        host_keys=parse_host_keys(sections.get("SSH_HOST_KEYS", "")),
+        io_pressure_some=io_some,
+        io_pressure_full=io_full,
     )
 
 

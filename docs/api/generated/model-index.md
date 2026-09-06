@@ -1636,6 +1636,30 @@ Synthetic representation:
 }
 ```
 
+<!-- api-model: FailedUnit -->
+## `FailedUnit`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One systemd unit in the failed state; hosts without systemd report none.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `name` | `str` | Yes | — | No |
+| `description` | `str` | No | `` | No |
+
+Synthetic representation:
+
+```json
+{
+  "description": "",
+  "name": "example"
+}
+```
+
 <!-- api-model: FilesystemUsage -->
 ## `FilesystemUsage`
 
@@ -2023,11 +2047,21 @@ Synthetic representation:
 | `dns_servers` | `Tuple[str, ...]` | No | `[]` | No |
 | `ssh_port` | `Optional[int]` | No | `null` | No |
 | `ssh_process` | `str` | No | `` | No |
+| `os_id` | `str` | No | `` | No |
+| `os_version_id` | `str` | No | `` | No |
+| `architecture` | `str` | No | `` | No |
+| `listening_ports` | `Tuple[ListeningPort, ...]` | No | `[]` | No |
+| `processes` | `Tuple[ProcessUsage, ...]` | No | `[]` | No |
+| `failed_units` | `Tuple[FailedUnit, ...]` | No | `[]` | No |
+| `host_keys` | `Tuple[HostKeyFingerprint, ...]` | No | `[]` | No |
+| `io_pressure_some` | `Optional[PressureStall]` | No | `null` | No |
+| `io_pressure_full` | `Optional[PressureStall]` | No | `null` | No |
 
 Synthetic representation:
 
 ```json
 {
+  "architecture": "",
   "boot_time": "",
   "cpu": {
     "bogomips": null,
@@ -2042,10 +2076,15 @@ Synthetic representation:
   "default_gateway_interface": "",
   "device_model": "",
   "dns_servers": [],
+  "failed_units": [],
   "filesystems": [],
+  "host_keys": [],
   "hostname": "",
   "interfaces": [],
+  "io_pressure_full": null,
+  "io_pressure_some": null,
   "kernel": "",
+  "listening_ports": [],
   "load_average": null,
   "memory": {
     "available_bytes": null,
@@ -2056,7 +2095,10 @@ Synthetic representation:
     "swap_total_bytes": 0,
     "total_bytes": 0
   },
+  "os_id": "",
   "os_pretty_name": "",
+  "os_version_id": "",
+  "processes": [],
   "sessions": [],
   "sockets": [],
   "ssh_port": null,
@@ -2097,6 +2139,35 @@ Synthetic representation:
   "operation": "status",
   "probe": "full",
   "snapshot": null
+}
+```
+
+<!-- api-model: HostKeyFingerprint -->
+## `HostKeyFingerprint`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** A public SSH host key fingerprint, as ``ssh-keygen -l`` printed it.
+
+Public material only: the probe reads ``/etc/ssh/*.pub`` and never a
+private key file.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `algorithm` | `str` | Yes | — | No |
+| `fingerprint` | `str` | Yes | — | No |
+| `bits` | `Optional[int]` | No | `null` | No |
+
+Synthetic representation:
+
+```json
+{
+  "algorithm": {},
+  "bits": null,
+  "fingerprint": {}
 }
 ```
 
@@ -2661,6 +2732,30 @@ Synthetic representation:
 ```json
 {
   "scope": "default"
+}
+```
+
+<!-- api-model: ListeningPort -->
+## `ListeningPort`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One TCP port the host accepts connections on.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `port` | `int` | Yes | — | No |
+| `process` | `str` | No | `` | No |
+
+Synthetic representation:
+
+```json
+{
+  "port": 22,
+  "process": ""
 }
 ```
 
@@ -3317,6 +3412,66 @@ Synthetic representation:
 ```json
 {
   "text": "example"
+}
+```
+
+<!-- api-model: PressureStall -->
+## `PressureStall`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One ``/proc/pressure`` line: percent of a window spent stalled.
+
+``some`` means at least one task was waiting; ``full`` means every
+non-idle task was.  Kernels before 4.20 and builds without PSI publish
+nothing, which is why the snapshot holds ``None`` rather than zeros.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `avg10` | `float` | Yes | — | No |
+| `avg60` | `float` | Yes | — | No |
+| `avg300` | `float` | Yes | — | No |
+
+Synthetic representation:
+
+```json
+{
+  "avg10": {},
+  "avg300": {},
+  "avg60": {}
+}
+```
+
+<!-- api-model: ProcessUsage -->
+## `ProcessUsage`
+
+**Status:** Schema only
+**Introduced:** Protocol v1
+**Purpose:** One process as the host ranked it, by CPU share.
+
+``cpu_percent`` is a share of one CPU as the host reports it, so a busy
+multi-threaded process can exceed 100 on a multi-core box.  Both readings
+are ``None`` when the host published a name but no numbers.
+
+**Related methods:** None
+**Related events:** None
+
+| Field | Type | Required | Default | Sensitive |
+| --- | --- | ---: | --- | ---: |
+| `command` | `str` | Yes | — | No |
+| `cpu_percent` | `Optional[float]` | No | `null` | No |
+| `memory_percent` | `Optional[float]` | No | `null` | No |
+
+Synthetic representation:
+
+```json
+{
+  "command": {},
+  "cpu_percent": null,
+  "memory_percent": null
 }
 ```
 

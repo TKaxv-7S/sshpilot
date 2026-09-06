@@ -1,5 +1,5 @@
 {
-  "api_implementation_version": "0.52",
+  "api_implementation_version": "0.53",
   "client_method_contract": {
     "add_agent_key": {
       "capability": "identity.operate",
@@ -3816,6 +3816,25 @@
       ],
       "status": "Implemented"
     },
+    "FailedUnit": {
+      "fields": [
+        {
+          "default": null,
+          "name": "name",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "description",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        }
+      ],
+      "status": "Schema only"
+    },
     "FilesystemUsage": {
       "fields": [
         {
@@ -4476,6 +4495,69 @@
           "required": false,
           "sensitive": false,
           "type": "str"
+        },
+        {
+          "default": "",
+          "name": "os_id",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "os_version_id",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": "",
+          "name": "architecture",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": [],
+          "name": "listening_ports",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[ListeningPort, ...]"
+        },
+        {
+          "default": [],
+          "name": "processes",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[ProcessUsage, ...]"
+        },
+        {
+          "default": [],
+          "name": "failed_units",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[FailedUnit, ...]"
+        },
+        {
+          "default": [],
+          "name": "host_keys",
+          "required": false,
+          "sensitive": false,
+          "type": "Tuple[HostKeyFingerprint, ...]"
+        },
+        {
+          "default": null,
+          "name": "io_pressure_some",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[PressureStall]"
+        },
+        {
+          "default": null,
+          "name": "io_pressure_full",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[PressureStall]"
         }
       ],
       "status": "Schema only"
@@ -4519,6 +4601,32 @@
         }
       ],
       "status": "Implemented"
+    },
+    "HostKeyFingerprint": {
+      "fields": [
+        {
+          "default": null,
+          "name": "algorithm",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "fingerprint",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "bits",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[int]"
+        }
+      ],
+      "status": "Schema only"
     },
     "HostKeyPrompt": {
       "fields": [
@@ -5172,6 +5280,25 @@
         }
       ],
       "status": "Implemented"
+    },
+    "ListeningPort": {
+      "fields": [
+        {
+          "default": null,
+          "name": "port",
+          "required": true,
+          "sensitive": false,
+          "type": "int"
+        },
+        {
+          "default": "",
+          "name": "process",
+          "required": false,
+          "sensitive": false,
+          "type": "str"
+        }
+      ],
+      "status": "Schema only"
     },
     "LoadAverage": {
       "fields": [
@@ -6072,6 +6199,58 @@
           "required": true,
           "sensitive": false,
           "type": "str"
+        }
+      ],
+      "status": "Schema only"
+    },
+    "PressureStall": {
+      "fields": [
+        {
+          "default": null,
+          "name": "avg10",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        },
+        {
+          "default": null,
+          "name": "avg60",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        },
+        {
+          "default": null,
+          "name": "avg300",
+          "required": true,
+          "sensitive": false,
+          "type": "float"
+        }
+      ],
+      "status": "Schema only"
+    },
+    "ProcessUsage": {
+      "fields": [
+        {
+          "default": null,
+          "name": "command",
+          "required": true,
+          "sensitive": false,
+          "type": "str"
+        },
+        {
+          "default": null,
+          "name": "cpu_percent",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[float]"
+        },
+        {
+          "default": null,
+          "name": "memory_percent",
+          "required": false,
+          "sensitive": false,
+          "type": "Optional[float]"
         }
       ],
       "status": "Schema only"

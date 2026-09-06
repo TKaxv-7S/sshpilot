@@ -9,10 +9,15 @@ from sshpilot.api.models.host_info import (
 )
 from sshpilot.core.host_info import parse_counters_probe, parse_host_info
 from sshpilot.core.host_info.parser import (
+    parse_architecture,
+    parse_failed_units,
     parse_filesystems,
+    parse_host_keys,
+    parse_io_pressure,
     parse_listening_ports,
     parse_meminfo,
     parse_network_counters,
+    parse_process_table,
     parse_sockets,
     parse_w,
     parse_who,
@@ -360,3 +365,130 @@ def test_the_device_model_survives_a_devicetree_nul():
     assert parse_host_info(_probe(DEVICE_MODEL="Raspberry Pi 4 Model B\n")).device_model == (
         "Raspberry Pi 4 Model B"
     )
+
+
+# ---------------------------------------------------------------------------
+# API 0.53 sections
+# ---------------------------------------------------------------------------
+
+PS_PROCESSES = (
+    "%CPU %MEM COMMAND\n"
+    " 457  5.1 codebase-memory\n"
+    "50.8  3.1 chrome\n"
+)
+
+BUSYBOX_TOP = (
+    "Mem: 123456K used, 78901K free, 0K shrd, 1234K buff, 56789K cached\n"
+    "CPU:  0.4% usr  0.4% sys  0.0% nic 99.0% idle\n"
+    "Load average: 0.00 0.01 0.05 1/49 3456\n"
+    "  PID  PPID USER     STAT   VSZ %VSZ %CPU COMMAND\n"
+    " 1234     1 root     S     2345   2.3  1.2 /usr/sbin/hostapd -P /var/run/wifi.pid\n"
+)
+
+
+def test_a_process_listing_is_read_through_its_own_header():
+    """ps, BusyBox top and procps top order their columns differently."""
+
+    assert [
+        (item.command, item.cpu_percent, item.memory_percent)
+        for item in parse_process_table(PS_PROCESSES)
+    ] == [("codebase-memory", 457.0, 5.1), ("chrome", 50.8, 3.1)]
+    busybox = parse_process_table(BUSYBOX_TOP)
+    assert busybox[0].command == "/usr/sbin/hostapd -P /var/run/wifi.pid"
+    assert busybox[0].cpu_percent == 1.2
+
+
+def test_busybox_vsz_is_not_reported_as_memory():
+    """%VSZ is a share of virtual size; relabelling it as memory would lie."""
+
+    assert parse_process_table(BUSYBOX_TOP)[0].memory_percent is None
+
+
+def test_a_host_without_ps_options_falls_back_to_top():
+    snapshot = parse_host_info(_probe(PROCESSES="", TOP=BUSYBOX_TOP))
+    assert [item.command for item in snapshot.processes] == [
+        "/usr/sbin/hostapd -P /var/run/wifi.pid"
+    ]
+
+
+def test_ps_wins_over_top_when_both_answered():
+    snapshot = parse_host_info(_probe(PROCESSES=PS_PROCESSES, TOP=BUSYBOX_TOP))
+    assert snapshot.processes[0].command == "codebase-memory"
+
+
+def test_a_failed_unit_is_read_without_matching_localized_state_words():
+    """systemctl prints its state columns in the host's own language."""
+
+    units = parse_failed_units(
+        "logrotate.service loaded failed failed Rotate log files\n"
+        "dnsmasq.service   geladen fehlgeschlagen fehlgeschlagen DNS-Weiterleitung\n"
+    )
+    assert [(unit.name, unit.description) for unit in units] == [
+        ("logrotate.service", "Rotate log files"),
+        ("dnsmasq.service", "DNS-Weiterleitung"),
+    ]
+
+
+def test_a_host_without_systemd_reports_no_failed_units():
+    assert parse_failed_units("") == ()
+
+
+def test_host_key_fingerprints_carry_their_algorithm_and_size():
+    keys = parse_host_keys(
+        "256 SHA256:abc root@router (ED25519)\n"
+        "3072 SHA256:def root@router (RSA)\n"
+        "ssh-keygen: /etc/ssh/ssh_host_dsa_key.pub: No such file\n"
+    )
+    assert [(key.algorithm, key.bits, key.fingerprint) for key in keys] == [
+        ("ED25519", 256, "SHA256:abc"),
+        ("RSA", 3072, "SHA256:def"),
+    ]
+
+
+def test_io_pressure_reads_both_lines_and_stays_absent_without_psi():
+    some, full = parse_io_pressure(
+        "some avg10=1.10 avg60=0.73 avg300=0.38 total=1673788839\n"
+        "full avg10=0.33 avg60=0.46 avg300=0.29 total=1243020175\n"
+    )
+    assert (some.avg10, some.avg60, some.avg300) == (1.10, 0.73, 0.38)
+    assert full.avg10 == 0.33
+    assert parse_io_pressure("") == (None, None)
+
+
+def test_a_truncated_pressure_line_is_not_half_reported():
+    assert parse_io_pressure("some avg10=1.10 avg60=0.73 total=5\n") == (None, None)
+
+
+def test_the_architecture_is_the_machine_field_of_uname():
+    assert parse_architecture("Linux 5.15.134 mips") == "mips"
+    assert parse_architecture("Linux 5.15.134") == ""
+
+
+def test_every_listening_port_is_reported_not_only_sshd():
+    """The listening table was parsed for direction and then thrown away."""
+
+    snapshot = parse_host_info(
+        _probe(
+            SS_LISTEN=(
+                "State  Recv-Q Send-Q Local Address:Port Peer Address:Port Process\n"
+                'LISTEN 0      128          0.0.0.0:22        0.0.0.0:* users:(("sshd",pid=1,fd=3))\n'
+                'LISTEN 0      128          0.0.0.0:8080      0.0.0.0:* users:(("uhttpd",pid=2,fd=4))\n'
+            )
+        )
+    )
+    assert [(item.port, item.process) for item in snapshot.listening_ports] == [
+        (22, "sshd"),
+        (8080, "uhttpd"),
+    ]
+
+
+def test_the_distro_identifier_and_version_survive_the_pretty_name():
+    snapshot = parse_host_info(
+        _probe(
+            OS_RELEASE='PRETTY_NAME="OpenWrt 23.05.5"\nID="openwrt"\nVERSION_ID="23.05.5"\n',
+            UNAME="Linux 5.15.134 mips",
+        )
+    )
+    assert (snapshot.os_id, snapshot.os_version_id) == ("openwrt", "23.05.5")
+    assert snapshot.architecture == "mips"
+    assert snapshot.os_pretty_name == "OpenWrt 23.05.5"

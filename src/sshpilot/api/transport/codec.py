@@ -7193,6 +7193,107 @@ def _socket_connection_from_wire(value: Any) -> Any:
     )
 
 
+def _listening_port_to_wire(item: Any) -> Dict[str, Any]:
+    return {"port": item.port, "process": item.process}
+
+
+def _listening_port_from_wire(value: Any) -> Any:
+    from ..models.host_info import ListeningPort
+
+    data = _strict_fields(
+        value, required={"port", "process"}, context="host info listening port"
+    )
+    return ListeningPort(
+        port=_integer(data["port"], "listening port"),
+        process=_text(data["process"], "listening port process", allow_empty=True),
+    )
+
+
+def _process_usage_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "command": item.command,
+        "cpu_percent": item.cpu_percent,
+        "memory_percent": item.memory_percent,
+    }
+
+
+def _process_usage_from_wire(value: Any) -> Any:
+    from ..models.host_info import ProcessUsage
+
+    data = _strict_fields(
+        value,
+        required={"command", "cpu_percent", "memory_percent"},
+        context="host info process",
+    )
+    return ProcessUsage(
+        command=_text(data["command"], "process command", allow_empty=True),
+        cpu_percent=_host_info_optional_number(data["cpu_percent"], "process cpu"),
+        memory_percent=_host_info_optional_number(data["memory_percent"], "process memory"),
+    )
+
+
+def _failed_unit_to_wire(item: Any) -> Dict[str, Any]:
+    return {"name": item.name, "description": item.description}
+
+
+def _failed_unit_from_wire(value: Any) -> Any:
+    from ..models.host_info import FailedUnit
+
+    data = _strict_fields(
+        value, required={"name", "description"}, context="host info failed unit"
+    )
+    return FailedUnit(
+        name=_text(data["name"], "failed unit name", allow_empty=True),
+        description=_text(data["description"], "failed unit description", allow_empty=True),
+    )
+
+
+def _host_key_to_wire(item: Any) -> Dict[str, Any]:
+    return {
+        "algorithm": item.algorithm,
+        "fingerprint": item.fingerprint,
+        "bits": item.bits,
+    }
+
+
+def _host_key_from_wire(value: Any) -> Any:
+    from ..models.host_info import HostKeyFingerprint
+
+    data = _strict_fields(
+        value,
+        required={"algorithm", "fingerprint", "bits"},
+        context="host info host key",
+    )
+    return HostKeyFingerprint(
+        algorithm=_text(data["algorithm"], "host key algorithm", allow_empty=True),
+        fingerprint=_text(data["fingerprint"], "host key fingerprint", allow_empty=True),
+        bits=_host_info_optional_int(data["bits"], "host key bits"),
+    )
+
+
+def _pressure_stall_to_wire(item: Any) -> Optional[Dict[str, Any]]:
+    if item is None:
+        return None
+    return {"avg10": item.avg10, "avg60": item.avg60, "avg300": item.avg300}
+
+
+def _pressure_stall_from_wire(value: Any) -> Any:
+    from ..models.host_info import PressureStall
+
+    if value is None:
+        return None
+    data = _strict_fields(
+        value, required={"avg10", "avg60", "avg300"}, context="host info pressure"
+    )
+    averages = [
+        _host_info_optional_number(data[name], "pressure average")
+        for name in ("avg10", "avg60", "avg300")
+    ]
+    if any(average is None for average in averages):
+        raise ValueError("host info pressure averages must be numbers")
+    return PressureStall(*averages)
+
+
 def host_info_snapshot_to_wire(snapshot: Any) -> Optional[Dict[str, Any]]:
     from ..models.host_info import HostInfoSnapshot
 
@@ -7220,6 +7321,17 @@ def host_info_snapshot_to_wire(snapshot: Any) -> Optional[Dict[str, Any]]:
         "dns_servers": list(snapshot.dns_servers),
         "ssh_port": snapshot.ssh_port,
         "ssh_process": snapshot.ssh_process,
+        "os_id": snapshot.os_id,
+        "os_version_id": snapshot.os_version_id,
+        "architecture": snapshot.architecture,
+        "listening_ports": [
+            _listening_port_to_wire(item) for item in snapshot.listening_ports
+        ],
+        "processes": [_process_usage_to_wire(item) for item in snapshot.processes],
+        "failed_units": [_failed_unit_to_wire(item) for item in snapshot.failed_units],
+        "host_keys": [_host_key_to_wire(item) for item in snapshot.host_keys],
+        "io_pressure_some": _pressure_stall_to_wire(snapshot.io_pressure_some),
+        "io_pressure_full": _pressure_stall_to_wire(snapshot.io_pressure_full),
     }
 
 
@@ -7250,10 +7362,29 @@ def host_info_snapshot_from_wire(value: Any) -> Any:
             "dns_servers",
             "ssh_port",
             "ssh_process",
+            "os_id",
+            "os_version_id",
+            "architecture",
+            "listening_ports",
+            "processes",
+            "failed_units",
+            "host_keys",
+            "io_pressure_some",
+            "io_pressure_full",
         },
         context="host info snapshot",
     )
-    for name in ("filesystems", "interfaces", "temperatures", "sessions", "sockets"):
+    for name in (
+        "filesystems",
+        "interfaces",
+        "temperatures",
+        "sessions",
+        "sockets",
+        "listening_ports",
+        "processes",
+        "failed_units",
+        "host_keys",
+    ):
         if type(data[name]) is not list:
             raise ValueError(f"host info {name} must be an array")
     return HostInfoSnapshot(
@@ -7278,6 +7409,17 @@ def host_info_snapshot_from_wire(value: Any) -> Any:
         dns_servers=_host_info_text_list(data["dns_servers"], "dns servers"),
         ssh_port=_host_info_optional_int(data["ssh_port"], "ssh port"),
         ssh_process=_text(data["ssh_process"], "ssh process", allow_empty=True),
+        os_id=_text(data["os_id"], "os id", allow_empty=True),
+        os_version_id=_text(data["os_version_id"], "os version id", allow_empty=True),
+        architecture=_text(data["architecture"], "architecture", allow_empty=True),
+        listening_ports=tuple(
+            _listening_port_from_wire(item) for item in data["listening_ports"]
+        ),
+        processes=tuple(_process_usage_from_wire(item) for item in data["processes"]),
+        failed_units=tuple(_failed_unit_from_wire(item) for item in data["failed_units"]),
+        host_keys=tuple(_host_key_from_wire(item) for item in data["host_keys"]),
+        io_pressure_some=_pressure_stall_from_wire(data["io_pressure_some"]),
+        io_pressure_full=_pressure_stall_from_wire(data["io_pressure_full"]),
     )
 
 

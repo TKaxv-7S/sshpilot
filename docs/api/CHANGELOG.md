@@ -16,7 +16,40 @@ notes remain separate.
   correctness fixes within the current contract; no downgrade or
   frontend backend fallback is supported.
 
-## API 0.52 (current)
+## API 0.53 (current)
+
+### API 0.53 host information beyond what one session can see
+
+- `HostInfoSnapshot` gained `os_id`, `os_version_id` and `architecture`. The
+  distro identifier and version come from `/etc/os-release`, which the probe
+  already read for `os_pretty_name`, and the architecture is the machine field
+  of `uname -srm`, which `kernel` already carried. Inventory work needs the
+  identifier and the architecture as fields, not as substrings of a display
+  name.
+- `listening_ports` reports every TCP port the host accepts on as
+  `ListeningPort(port, process)`. The listening table was already parsed to
+  decide socket direction and the SSH port, and everything else was discarded.
+  The process name is empty when the host answered without privilege to name
+  it.
+- `processes` reports the host's own CPU ranking as `ProcessUsage(command,
+  cpu_percent, memory_percent)`. `cpu_percent` is a share of one CPU as the
+  host reports it, so it exceeds 100 for a busy multi-threaded process.
+  BusyBox publishes no `%MEM`, so `memory_percent` is `null` there rather than
+  carrying a share of virtual size under a memory label.
+- `failed_units` reports systemd units in the failed state as
+  `FailedUnit(name, description)`. A host without systemd reports none, which
+  is indistinguishable from a healthy host -- neither has any to report.
+- `host_keys` reports public SSH host key fingerprints as
+  `HostKeyFingerprint(algorithm, fingerprint, bits)`. Public material only:
+  the probe reads `/etc/ssh/ssh_host_*_key.pub` through `ssh-keygen -l` and
+  never opens a private key.
+- `io_pressure_some` and `io_pressure_full` carry `/proc/pressure/io` as
+  `PressureStall(avg10, avg60, avg300)`, the share of each window spent
+  stalled on I/O. Both are `null` before Linux 4.20 and on kernels built
+  without PSI. Cumulative counters were considered and rejected: read once
+  they describe the whole uptime rather than the present.
+
+## API 0.52
 
 ### API 0.52 daemon-owned remote host information
 

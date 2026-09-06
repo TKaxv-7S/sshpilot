@@ -34,6 +34,10 @@ FULL_PROBE_COMMAND = (
     'echo "===CPUINFO==="; cat /proc/cpuinfo 2>/dev/null;'
     'echo "===MEMINFO==="; cat /proc/meminfo 2>/dev/null;'
     'echo "===DF==="; df -T -B1 2>/dev/null || df 2>/dev/null;'
+    # Pressure stall information: the share of the last 10/60/300 seconds
+    # spent waiting on I/O.  Absent before Linux 4.20 and on builds without
+    # CONFIG_PSI, which is why an absent reading stays absent.
+    'echo "===IO_PRESSURE==="; cat /proc/pressure/io 2>/dev/null;'
     'echo "===NET_DEV==="; cat /proc/net/dev 2>/dev/null;'
     'echo "===IP_ADDR==="; ip -o addr show 2>/dev/null;'
     'echo "===IP_LINK==="; ip -o link show 2>/dev/null;'
@@ -43,6 +47,20 @@ FULL_PROBE_COMMAND = (
     'echo "===SS_ESTAB==="; ss -tunap state established 2>/dev/null || netstat -tunap 2>/dev/null;'
     'echo "===WHO==="; who 2>/dev/null;'
     'echo "===W==="; w -h 2>/dev/null;'
+    # Ranked by CPU share.  BusyBox ps has neither -o nor --sort, so OpenWrt
+    # leaves PROCESSES empty and the parser reads TOP instead -- the same
+    # two-section fallback WHO and W use.
+    'echo "===PROCESSES==="; ps -eo pcpu,pmem,comm --sort=-pcpu 2>/dev/null | head -n 11;'
+    # head swallows the exit status of the pipeline above, so the same
+    # invocation decides whether top is needed at all.  Repeating it costs a
+    # few milliseconds; running top where ps already answered costs half a
+    # second on every gather.
+    'echo "===TOP==="; ps -eo pcpu,pmem,comm --sort=-pcpu >/dev/null 2>&1'
+    ' || top -bn1 2>/dev/null | head -n 16;'
+    # systemd only.  A host running procd, OpenRC or sysvinit reports nothing
+    # here, which reads as "no failed units" -- the same as a healthy host,
+    # because neither has any to report.
+    'echo "===SYSTEMD_FAILED==="; systemctl --failed --no-legend --plain 2>/dev/null;'
     'echo "===TEMPS==="; for f in /sys/class/thermal/thermal_zone*/temp; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
     'echo "===TEMP_TYPES==="; for f in /sys/class/thermal/thermal_zone*/type; do echo "$f:$(cat "$f" 2>/dev/null)"; done 2>/dev/null;'
     'echo "===SENSORS==="; sensors 2>/dev/null;'
@@ -52,6 +70,11 @@ FULL_PROBE_COMMAND = (
     # A wireless interface has a wireless/phy80211 node; the name is not
     # evidence of anything.
     'echo "===WIRELESS==="; ls -d /sys/class/net/*/wireless /sys/class/net/*/phy80211 2>/dev/null;'
+    # Public key material only: these are the .pub files, never a private key.
+    # ssh-keygen -l takes one file at a time, so the glob is walked here
+    # rather than handed over as a pattern.
+    'echo "===SSH_HOST_KEYS==="; for f in /etc/ssh/ssh_host_*_key.pub;'
+    ' do ssh-keygen -l -f "$f" 2>/dev/null; done;'
     'echo "===END===";'
 )
 

@@ -11,15 +11,20 @@ from gi.repository import Gtk
 
 from sshpilot.api.models.host_info import (
     CpuInfo,
+    FailedUnit,
     FilesystemUsage,
     HostInfoSnapshot,
+    HostKeyFingerprint,
     InterfaceCounters,
+    ListeningPort,
     LoadAverage,
     LoginSession,
     MemoryInfo,
     NetworkInterface,
     NetworkInterfaceKind,
     NetworkInterfaceState,
+    PressureStall,
+    ProcessUsage,
     SocketConnection,
     SocketDirection,
     TemperatureReading,
@@ -461,3 +466,67 @@ def test_a_capped_socket_list_names_the_protocol_and_says_what_it_hid():
     texts = _texts(_dialog(_snapshot(sockets=sockets))._build_traffic())
     assert "tcp" in texts and "udp" in texts
     assert "3 more" in texts
+
+
+def test_the_system_tab_reports_what_the_host_exposes():
+    snapshot = _snapshot(
+        os_id="openwrt",
+        os_version_id="23.05.5",
+        architecture="mips",
+        listening_ports=(
+            ListeningPort(port=22, process="sshd"),
+            ListeningPort(port=8080, process="uhttpd"),
+        ),
+        failed_units=(FailedUnit(name="logrotate.service", description="Rotate logs"),),
+        host_keys=(
+            HostKeyFingerprint(algorithm="ED25519", fingerprint="SHA256:abc", bits=256),
+        ),
+    )
+    texts = _texts(_dialog(snapshot)._build_system())
+    assert "openwrt 23.05.5" in texts and "mips" in texts
+    assert "8080/tcp" in texts and "uhttpd" in texts
+    assert "logrotate.service" in texts
+    assert "SHA256:abc" in texts and "ED25519" in texts
+
+
+def test_a_host_with_nothing_to_report_says_so_rather_than_showing_blanks():
+    texts = _texts(_dialog(_snapshot())._build_system())
+    for message in (
+        "No listening services reported",
+        "No failed units",
+        "No host keys reported",
+    ):
+        assert message in texts
+
+
+def test_a_multi_threaded_process_may_exceed_one_hundred_percent():
+    """A share of one CPU, so 457% is a reading and not an overflow."""
+
+    snapshot = _snapshot(
+        processes=(ProcessUsage(command="ffmpeg", cpu_percent=457.0, memory_percent=5.1),)
+    )
+    texts = _texts(_dialog(snapshot)._build_resources())
+    assert "457.0%" in texts
+
+
+def test_a_process_without_a_memory_reading_shows_na_not_zero():
+    snapshot = _snapshot(processes=(ProcessUsage(command="procd", cpu_percent=0.5),))
+    texts = _texts(_dialog(snapshot)._build_resources())
+    assert "0.5%" in texts
+    assert any("N/A" in text for text in texts)
+
+
+def test_io_pressure_is_shown_when_the_kernel_publishes_it():
+    snapshot = _snapshot(
+        io_pressure_some=PressureStall(1.1, 0.73, 0.38),
+        io_pressure_full=PressureStall(0.33, 0.46, 0.29),
+    )
+    texts = _texts(_dialog(snapshot)._build_storage())
+    assert "1.1%" in texts and "0.4%" in texts
+    assert "Some tasks stalled" in texts and "All tasks stalled" in texts
+
+
+def test_a_kernel_without_psi_says_so_rather_than_showing_zeroes():
+    texts = _texts(_dialog(_snapshot())._build_storage())
+    assert "This host does not report I/O pressure" in texts
+    assert "0.0%" not in texts

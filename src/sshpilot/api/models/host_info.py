@@ -28,6 +28,10 @@ MAX_HOST_INFO_SESSIONS = 512
 MAX_HOST_INFO_SOCKETS = 1024
 MAX_HOST_INFO_ADDRESSES = 64
 MAX_HOST_INFO_DNS_SERVERS = 32
+MAX_HOST_INFO_LISTENING_PORTS = 1024
+MAX_HOST_INFO_PROCESSES = 64
+MAX_HOST_INFO_FAILED_UNITS = 256
+MAX_HOST_INFO_HOST_KEYS = 16
 
 
 def _require_text(value: object, field_name: str) -> str:
@@ -317,6 +321,90 @@ class SocketConnection:
 
 
 @dataclass(frozen=True)
+class ListeningPort:
+    """One TCP port the host accepts connections on."""
+
+    port: int
+    process: str = ""
+
+    def __post_init__(self) -> None:
+        if type(self.port) is not int or isinstance(self.port, bool) or not (
+            0 <= self.port <= 65535
+        ):
+            raise ValueError("listening port must be a TCP port")
+        _require_text(self.process, "listening port process")
+
+
+@dataclass(frozen=True)
+class ProcessUsage:
+    """One process as the host ranked it, by CPU share.
+
+    ``cpu_percent`` is a share of one CPU as the host reports it, so a busy
+    multi-threaded process can exceed 100 on a multi-core box.  Both readings
+    are ``None`` when the host published a name but no numbers.
+    """
+
+    command: str
+    cpu_percent: Optional[float] = None
+    memory_percent: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        _require_text(self.command, "process command")
+        _require_optional_number(self.cpu_percent, "process cpu percent")
+        _require_optional_number(self.memory_percent, "process memory percent")
+
+
+@dataclass(frozen=True)
+class FailedUnit:
+    """One systemd unit in the failed state; hosts without systemd report none."""
+
+    name: str
+    description: str = ""
+
+    def __post_init__(self) -> None:
+        _require_text(self.name, "failed unit name")
+        _require_text(self.description, "failed unit description")
+
+
+@dataclass(frozen=True)
+class HostKeyFingerprint:
+    """A public SSH host key fingerprint, as ``ssh-keygen -l`` printed it.
+
+    Public material only: the probe reads ``/etc/ssh/*.pub`` and never a
+    private key file.
+    """
+
+    algorithm: str
+    fingerprint: str
+    bits: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        _require_text(self.algorithm, "host key algorithm")
+        _require_text(self.fingerprint, "host key fingerprint")
+        _require_optional_count(self.bits, "host key bits")
+
+
+@dataclass(frozen=True)
+class PressureStall:
+    """One ``/proc/pressure`` line: percent of a window spent stalled.
+
+    ``some`` means at least one task was waiting; ``full`` means every
+    non-idle task was.  Kernels before 4.20 and builds without PSI publish
+    nothing, which is why the snapshot holds ``None`` rather than zeros.
+    """
+
+    avg10: float
+    avg60: float
+    avg300: float
+
+    def __post_init__(self) -> None:
+        for name in ("avg10", "avg60", "avg300"):
+            value = getattr(self, name)
+            if type(value) not in (int, float) or isinstance(value, bool) or value < 0:
+                raise ValueError(f"pressure {name} must be a non-negative number")
+
+
+@dataclass(frozen=True)
 class HostInfoSnapshot:
     """Everything one full probe observed about a remote host."""
 
@@ -339,6 +427,15 @@ class HostInfoSnapshot:
     dns_servers: Tuple[str, ...] = ()
     ssh_port: Optional[int] = None
     ssh_process: str = ""
+    os_id: str = ""
+    os_version_id: str = ""
+    architecture: str = ""
+    listening_ports: Tuple[ListeningPort, ...] = ()
+    processes: Tuple[ProcessUsage, ...] = ()
+    failed_units: Tuple[FailedUnit, ...] = ()
+    host_keys: Tuple[HostKeyFingerprint, ...] = ()
+    io_pressure_some: Optional[PressureStall] = None
+    io_pressure_full: Optional[PressureStall] = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -350,6 +447,9 @@ class HostInfoSnapshot:
             "default_gateway",
             "default_gateway_interface",
             "ssh_process",
+            "os_id",
+            "os_version_id",
+            "architecture",
         ):
             _require_text(getattr(self, name), f"host info {name}")
         if self.uptime_seconds is not None and (
@@ -370,6 +470,10 @@ class HostInfoSnapshot:
             ("temperatures", TemperatureReading, MAX_HOST_INFO_TEMPERATURES),
             ("sessions", LoginSession, MAX_HOST_INFO_SESSIONS),
             ("sockets", SocketConnection, MAX_HOST_INFO_SOCKETS),
+            ("listening_ports", ListeningPort, MAX_HOST_INFO_LISTENING_PORTS),
+            ("processes", ProcessUsage, MAX_HOST_INFO_PROCESSES),
+            ("failed_units", FailedUnit, MAX_HOST_INFO_FAILED_UNITS),
+            ("host_keys", HostKeyFingerprint, MAX_HOST_INFO_HOST_KEYS),
         ):
             value = getattr(self, name)
             if type(value) is not tuple:
@@ -381,6 +485,10 @@ class HostInfoSnapshot:
                     raise TypeError(f"host info {name} entries are the wrong type")
         _require_text_tuple(self.dns_servers, "dns servers", MAX_HOST_INFO_DNS_SERVERS)
         _require_port(self.ssh_port, "ssh port")
+        for name in ("io_pressure_some", "io_pressure_full"):
+            value = getattr(self, name)
+            if value is not None and type(value) is not PressureStall:
+                raise TypeError(f"host info {name} must be a PressureStall or None")
 
     @property
     def root_filesystem(self) -> Optional[FilesystemUsage]:

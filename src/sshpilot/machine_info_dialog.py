@@ -194,6 +194,16 @@ def _format_percent(fraction: Optional[float]) -> str:
     return "—" if fraction is None else _("%d%%") % int(round(fraction * 100))
 
 
+def _format_reported_percent(value: Optional[float]) -> str:
+    """Format a percentage the host itself reported.
+
+    Unlike :func:`_format_percent` this takes no fraction: a CPU share above
+    100 is a real reading on a multi-core host, not an error to clamp.
+    """
+
+    return _("N/A") if value is None else _("%.1f%%") % value
+
+
 def _or_na(text: str) -> str:
     return text.strip() or _("N/A")
 
@@ -1030,11 +1040,43 @@ class MachineInfoDialog:
             )
         )
 
+        page.append(self._processes_section())
+
         # Full width and stacked: the memory readings and the sensor labels
         # both wrap badly in a half-width column.
         page.append(self._memory_section())
         page.append(self._temperature_section())
         return page
+
+    def _processes_section(self) -> Gtk.Box:
+        section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        section.append(_section_label(_("Top processes")))
+        table = _Table(
+            (
+                (_("Process"), 0.0, True),
+                (_("CPU"), 1.0, False),
+                (_("Memory"), 1.0, False),
+            )
+        )
+        processes = self._snapshot.processes[:5]
+        for process in processes:
+            command = _value_label(process.command, mono=True)
+            command.add_css_class("caption")
+            cpu = _value_label(_format_reported_percent(process.cpu_percent), mono=True)
+            cpu.add_css_class("caption")
+            memory = _value_label(
+                _format_reported_percent(process.memory_percent), mono=True
+            )
+            memory.add_css_class("caption")
+            memory.set_opacity(0.75)
+            table.add_row([command, cpu, memory])
+        if not processes:
+            table.add_empty(_("No process list reported"))
+        section.append(table.widget)
+        # Above 100% is a real reading, not an overflow: the host measures a
+        # share of one CPU, and a threaded process uses several.
+        section.append(_caption(_("A share of one CPU, ranked by the host.")))
+        return section
 
     def _memory_section(self) -> Gtk.Box:
         memory = self._snapshot.memory
@@ -1218,7 +1260,51 @@ class MachineInfoDialog:
             table.add_empty(_("No filesystems reported"))
         page.append(table.widget)
         page.append(_caption(_("Only physical disks are shown.")))
+        page.append(self._io_pressure_section())
         return page
+
+    def _io_pressure_section(self) -> Gtk.Box:
+        section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        section.append(_section_label(_("I/O pressure")))
+        snapshot = self._snapshot
+        if snapshot.io_pressure_some is None and snapshot.io_pressure_full is None:
+            card = _card()
+            empty = Gtk.Label(label=_("This host does not report I/O pressure"))
+            empty.add_css_class("dim-label")
+            empty.set_margin_top(16)
+            empty.set_margin_bottom(16)
+            card.append(empty)
+            section.append(card)
+            return section
+
+        table = _Table(
+            (
+                ("", 0.0, True),
+                (_("10 s"), 1.0, False),
+                (_("60 s"), 1.0, False),
+                (_("300 s"), 1.0, False),
+            )
+        )
+        for title, stall in (
+            (_("Some tasks stalled"), snapshot.io_pressure_some),
+            (_("All tasks stalled"), snapshot.io_pressure_full),
+        ):
+            name = _value_label(title)
+            name.add_css_class("caption")
+            cells = [name]
+            for value in (
+                (stall.avg10, stall.avg60, stall.avg300) if stall is not None
+                else (None, None, None)
+            ):
+                reading = _value_label(_format_reported_percent(value), mono=True)
+                reading.add_css_class("caption")
+                cells.append(reading)
+            table.add_row(cells)
+        section.append(table.widget)
+        section.append(
+            _caption(_("Share of each window spent waiting on storage."))
+        )
+        return section
 
     # -- Network --------------------------------------------------------
 
@@ -1447,7 +1533,84 @@ class MachineInfoDialog:
     # -- System ---------------------------------------------------------
 
     def _build_system(self) -> Gtk.Box:
+        snapshot = self._snapshot
         page = _page()
+
+        identity = _card()
+        distribution = " ".join(
+            part for part in (snapshot.os_id, snapshot.os_version_id) if part
+        )
+        _key_value_rows(
+            identity,
+            [
+                (_("Distribution"), _or_na(distribution), True),
+                (_("Architecture"), _or_na(snapshot.architecture), True),
+            ],
+        )
+        page.append(identity)
+
+        page.append(_section_label(_("Listening services")))
+        listening = _Table(
+            (
+                (_("Port"), 0.0, False),
+                (_("Service"), 0.0, True),
+            )
+        )
+        for entry in snapshot.listening_ports:
+            port = _value_label(_("%d/tcp") % entry.port, mono=True)
+            port.add_css_class("caption")
+            service = _value_label(_or_na(entry.process), mono=True)
+            service.add_css_class("caption")
+            service.set_opacity(0.75)
+            listening.add_row([port, service])
+        if not snapshot.listening_ports:
+            listening.add_empty(_("No listening services reported"))
+        page.append(listening.widget)
+        page.append(_caption(_("Some process names need root.")))
+
+        page.append(_section_label(_("Failed units")))
+        units = _card()
+        if snapshot.failed_units:
+            _key_value_rows(
+                units,
+                [
+                    (unit.name, unit.description, False)
+                    for unit in snapshot.failed_units
+                ],
+            )
+        else:
+            # Also what a host without systemd looks like: neither has a
+            # failed unit to report.
+            empty = Gtk.Label(label=_("No failed units"))
+            empty.add_css_class("dim-label")
+            empty.set_margin_top(16)
+            empty.set_margin_bottom(16)
+            units.append(empty)
+        page.append(units)
+
+        page.append(_section_label(_("SSH host keys")))
+        keys = _Table(
+            (
+                (_("Algorithm"), 0.0, False),
+                (_("Fingerprint"), 0.0, True),
+                (_("Bits"), 1.0, False),
+            )
+        )
+        for host_key in snapshot.host_keys:
+            algorithm = _value_label(host_key.algorithm, mono=True)
+            algorithm.add_css_class("caption")
+            fingerprint = _value_label(host_key.fingerprint, mono=True)
+            fingerprint.add_css_class("caption")
+            fingerprint.set_opacity(0.75)
+            bits = _value_label(
+                _("N/A") if host_key.bits is None else str(host_key.bits), mono=True
+            )
+            bits.add_css_class("caption")
+            keys.add_row([algorithm, fingerprint, bits])
+        if not snapshot.host_keys:
+            keys.add_empty(_("No host keys reported"))
+        page.append(keys.widget)
+
         page.append(_section_label(_("Logged-in users")))
         page.append(self._sessions_card(remote_only=False))
         return page

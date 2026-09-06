@@ -9,18 +9,23 @@ import pytest
 from sshpilot.api.models.common import ConnectionId
 from sshpilot.api.models.host_info import (
     CpuInfo,
+    FailedUnit,
     FilesystemUsage,
     HostInfoProbe,
     HostInfoRequest,
     HostInfoSnapshot,
     HostInfoSummary,
+    HostKeyFingerprint,
     InterfaceCounters,
+    ListeningPort,
     LoadAverage,
     LoginSession,
     MemoryInfo,
     NetworkInterface,
     NetworkInterfaceKind,
     NetworkInterfaceState,
+    PressureStall,
+    ProcessUsage,
     SocketConnection,
     SocketDirection,
     TemperatureReading,
@@ -101,6 +106,23 @@ def _snapshot() -> HostInfoSnapshot:
         dns_servers=("1.1.1.1", "9.9.9.9"),
         ssh_port=22,
         ssh_process="sshd",
+        os_id="openwrt",
+        os_version_id="23.05.5",
+        architecture="mips",
+        listening_ports=(
+            ListeningPort(port=22, process="sshd"),
+            ListeningPort(port=53, process=""),
+        ),
+        processes=(
+            ProcessUsage(command="hostapd", cpu_percent=137.5, memory_percent=1.5),
+            ProcessUsage(command="procd", cpu_percent=0.5),
+        ),
+        failed_units=(FailedUnit(name="logrotate.service", description="Rotate logs"),),
+        host_keys=(
+            HostKeyFingerprint(algorithm="ED25519", fingerprint="SHA256:abc", bits=256),
+        ),
+        io_pressure_some=PressureStall(1.5, 0.75, 0.25),
+        io_pressure_full=PressureStall(0.5, 0.25, 0.0),
     )
 
 
@@ -167,3 +189,38 @@ def test_models_reject_out_of_range_values():
         FilesystemUsage(device="d", mount_point="/", use_percent=101)
     with pytest.raises(ValueError):
         MemoryInfo(total_bytes=-1)
+
+
+def test_a_kernel_without_psi_round_trips_as_absent():
+    """Absent pressure is null on the wire, never a zeroed reading."""
+
+    snapshot = _snapshot()
+    without = HostInfoSnapshot(
+        **{
+            **{
+                field: getattr(snapshot, field)
+                for field in snapshot.__dataclass_fields__
+            },
+            "io_pressure_some": None,
+            "io_pressure_full": None,
+        }
+    )
+    wire = host_info_snapshot_to_wire(without)
+    assert wire["io_pressure_some"] is None and wire["io_pressure_full"] is None
+    assert host_info_snapshot_from_wire(wire) == without
+
+
+def test_a_partial_pressure_reading_is_rejected():
+    wire = host_info_snapshot_to_wire(_snapshot())
+    wire["io_pressure_some"]["avg60"] = None
+    with pytest.raises(ValueError):
+        host_info_snapshot_from_wire(wire)
+
+
+def test_models_reject_impossible_host_information():
+    with pytest.raises(ValueError):
+        ListeningPort(port=70000)
+    with pytest.raises(ValueError):
+        PressureStall(-1.0, 0.0, 0.0)
+    with pytest.raises(TypeError):
+        HostInfoSnapshot(io_pressure_some=(1.0, 2.0, 3.0))
