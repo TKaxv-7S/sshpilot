@@ -1119,7 +1119,7 @@ class MachineInfoDialog:
 
         page.append(load_grid)
 
-        note = Gtk.Label(label=_("Relative to %d logical CPUs") % nproc)
+        note = Gtk.Label(label=_("Based on %d CPUs") % nproc)
         note.set_xalign(0)
         note.add_css_class("caption")
         note.set_opacity(0.55)
@@ -1379,7 +1379,7 @@ class MachineInfoDialog:
         page.append(card)
 
         note = Gtk.Label(
-            label=_("Excludes tmpfs, devtmpfs and overlay mounts."))
+            label=_("Only physical disks are shown."))
         note.set_xalign(0)
         note.add_css_class("caption")
         note.set_opacity(0.55)
@@ -1644,8 +1644,7 @@ class MachineInfoDialog:
         page.append(bw_card)
 
         bw_note = Gtk.Label(
-            label=_("Totals are cumulative since boot. Rates update"
-                    " every 2 s while this tab is visible."))
+            label=_("Totals since boot."))
         bw_note.set_xalign(0)
         bw_note.add_css_class("caption")
         bw_note.set_opacity(0.55)
@@ -1834,8 +1833,7 @@ class MachineInfoDialog:
         page.append(two_col)
 
         note = Gtk.Label(label=_(
-            "Sockets from ss -tunap; process names for other users’"
-            " sockets need root and are shown blank otherwise."))
+            "Some process names may require root to display."))
         note.set_xalign(0)
         note.add_css_class("caption")
         note.set_opacity(0.55)
