@@ -7095,6 +7095,16 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
         except Exception as e:
             logger.error(f"Failed to delete connection: {e}")
 
+    def on_machine_info_action(self, action=None, param=None):
+        connection = getattr(self, '_context_menu_connection', None)
+        if connection is None:
+            row = self.connection_list.get_selected_row()
+            connection = getattr(row, 'connection', None) if row else None
+        if connection is None:
+            return
+        from .machine_info_dialog import MachineInfoDialog
+        MachineInfoDialog(self, connection)
+
     def on_open_in_system_terminal_action(self, action, param=None):
         """Handle open in system terminal action from context menu"""
         try:
