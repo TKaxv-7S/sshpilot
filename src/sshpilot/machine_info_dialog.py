@@ -52,11 +52,6 @@ _GATHER_CMD = (
     'echo "===SENSORS==="; sensors 2>/dev/null;'
     'echo "===CPU_FREQ==="; cat /proc/cpuinfo 2>/dev/null | grep -i "cpu mhz" | head -1;'
     'echo "===CPU_STAT==="; head -1 /proc/stat 2>/dev/null;'
-    'echo "===APT_UPGRADABLE==="; apt list --upgradable 2>/dev/null | tail -n +2 | wc -l;'
-    'echo "===APT_SECURITY==="; apt list --upgradable 2>/dev/null | grep -ci security;'
-    'echo "===OPKG_UPGRADABLE==="; opkg list-upgradable 2>/dev/null | wc -l;'
-    'echo "===REBOOT_REQ==="; cat /var/run/reboot-required 2>/dev/null || echo "no";'
-    'echo "===APT_STAMP==="; stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null;'
     'echo "===END===";'
 )
 
@@ -2038,44 +2033,4 @@ class MachineInfoDialog:
             users_card.append(empty)
 
         page.append(users_card)
-
-        # Updates
-        page.append(_section_label(_("Updates")))
-        updates_card = _card_box()
-
-        apt_up = self._data.get('APT_UPGRADABLE', '').strip()
-        apt_sec = self._data.get('APT_SECURITY', '').strip()
-        opkg_up = self._data.get('OPKG_UPGRADABLE', '').strip()
-        reboot = self._data.get('REBOOT_REQ', '').strip()
-        apt_stamp = self._data.get('APT_STAMP', '').strip()
-
-        pkg_up = apt_up or opkg_up or '0'
-        updates_card.append(_kv_row(
-            _("Upgradable packages"), pkg_up, mono=True))
-        if apt_sec:
-            updates_card.append(_kv_row(
-                _("Security updates"), apt_sec, mono=True))
-
-        reboot_text = _("No")
-        if reboot and reboot != 'no':
-            reboot_text = _("Yes — %s") % reboot
-
-        last_update = ''
-        if apt_stamp:
-            try:
-                ts = int(apt_stamp)
-                last_update = datetime.fromtimestamp(
-                    ts, tz=timezone.utc).strftime('%d %b %Y, %H:%M')
-            except (ValueError, OSError):
-                last_update = apt_stamp
-
-        if last_update:
-            updates_card.append(_kv_row(_("Reboot required"), reboot_text))
-            updates_card.append(_kv_row(
-                _("Last update check"), last_update, mono=True, last=True))
-        else:
-            updates_card.append(
-                _kv_row(_("Reboot required"), reboot_text, last=True))
-
-        page.append(updates_card)
         return page
