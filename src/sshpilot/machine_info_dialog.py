@@ -1279,9 +1279,9 @@ class MachineInfoDialog:
         stats.set_homogeneous(False)
         stats.set_max_children_per_line(4)
         stats.set_min_children_per_line(2)
-        for k, v in [(_("Used"), _fmt_bytes(mem_used)),
-                     (_("Cache"), _fmt_bytes(mem_cached)),
+        for k, v in [(_("Total"), _fmt_bytes(mem_total)),
                      (_("Free"), _fmt_bytes(mem_free)),
+                     (_("Cached"), _fmt_bytes(mem.get('Cached', 0))),
                      (_("Available"), _fmt_bytes(mem_avail))]:
             item = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
             kl = Gtk.Label(label=k)
