@@ -126,6 +126,9 @@ class _PendingRemember:
     interaction_type: InteractionType
     key: str
     secret: bytearray
+    # Set once this credential's loss has been reported, so the teardown
+    # warning does not repeat what was already logged when it was queued.
+    loss_reported: bool = False
 
     def clear(self) -> None:
         self.secret[:] = b"\0" * len(self.secret)
@@ -153,6 +156,9 @@ class _AskpassContext:
     confirmation_secret: Optional[bytearray] = None
     cancelled: bool = False
     closed: bool = False
+    # True once ``mark_authenticated`` has run for this session. Credentials
+    # remembered after that point have missed their only commit and are lost.
+    commit_point_passed: bool = False
 
 
 class InteractionBroker:
@@ -1329,6 +1335,29 @@ class InteractionBroker:
             )
             context.confirmation_secret.clear()
             context.confirmation_secret = None
+        unreported = [
+            pending
+            for pending in context.pending_remember
+            if not pending.loss_reported
+        ]
+        if unreported:
+            # The user asked to remember these, but ``mark_authenticated``
+            # never ran for this session, so they were never committed. Say so
+            # — otherwise a credential the user explicitly chose to save is
+            # discarded without a trace anywhere in the logs.
+            logger.warning(
+                "Remembered credentials discarded unstored count=%d types=%s "
+                "connection=%s session=%s target=%s@%s: the session never "
+                "reported successful authentication",
+                len(unreported),
+                ",".join(
+                    sorted({pending.interaction_type.value for pending in unreported})
+                ),
+                context.connection_id,
+                context.session_id,
+                context.username or "unknown",
+                context.hostname,
+            )
         for pending in context.pending_remember:
             pending.clear()
         context.pending_remember.clear()
@@ -1820,11 +1849,28 @@ class InteractionBroker:
                                 retained.append(pending)
                         current.pending_remember.clear()
                         current.pending_remember.extend(retained)
+                    if current.commit_point_passed:
+                        # ``mark_authenticated`` already ran for this session,
+                        # and it never runs twice. Nothing will commit this
+                        # credential, and we know that now rather than at
+                        # teardown — say so while the user is still watching.
+                        logger.warning(
+                            "Remembered credential cannot be stored type=%s "
+                            "connection=%s session=%s target=%s@%s: the session "
+                            "reported authentication before the credential was "
+                            "entered, so its only commit point has passed",
+                            interaction_type.value,
+                            current.connection_id,
+                            current.session_id,
+                            current.username or "unknown",
+                            current.hostname,
+                        )
                     current.pending_remember.append(
                         _PendingRemember(
                             interaction_type=interaction_type,
                             key=key_path,
                             secret=bytearray(secret),
+                            loss_reported=current.commit_point_passed,
                         )
                     )
         result.clear()
@@ -1837,22 +1883,37 @@ class InteractionBroker:
                 return
             pending = tuple(context.pending_remember)
             context.pending_remember.clear()
+            # This is the session's one and only commit point.
+            context.commit_point_passed = True
             connection_id = context.connection_id
+            hostname = context.hostname
+            username = context.username
         for item in pending:
             try:
                 value = item.secret.decode("utf-8")
                 stored = False
                 if item.interaction_type is InteractionType.PASSWORD:
-                    if self._password_store is not None:
-                        stored = bool(self._password_store(connection_id, value))
-                elif self._passphrase_store is not None and item.key:
+                    if self._password_store is None:
+                        raise RuntimeError("no password store is configured")
+                    stored = bool(self._password_store(connection_id, value))
+                elif self._passphrase_store is None:
+                    raise RuntimeError("no passphrase store is configured")
+                elif not item.key:
+                    raise RuntimeError("the passphrase has no key path")
+                else:
                     stored = bool(self._passphrase_store(item.key, value))
                 if not stored:
                     raise RuntimeError("credential storage did not commit")
             except Exception:
                 logger.warning(
-                    "Remembered SSH credential could not be stored type=%s",
+                    "Remembered SSH credential could not be stored type=%s "
+                    "connection=%s target=%s@%s key=%s",
                     item.interaction_type.value,
+                    connection_id,
+                    username or "unknown",
+                    hostname,
+                    item.key or "<none>",
+                    exc_info=True,
                 )
             finally:
                 item.clear()

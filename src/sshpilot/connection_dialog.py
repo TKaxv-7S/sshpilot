@@ -4824,10 +4824,28 @@ Host {getattr(self, 'nickname_row', None).get_text().strip() if hasattr(self, 'n
                     self._clear_save_checkpoint()
                     self.close()
             elif getattr(self, '_save_meta_error', None):
+                logger.warning(
+                    "Connection secret save did not complete for %r: %s",
+                    getattr(self.connection, 'nickname', ''),
+                    self._save_meta_error,
+                )
                 self.show_error(self._save_meta_error)
             elif not settings_saved:
+                logger.warning(
+                    "Connection settings could not be saved for %r; secrets "
+                    "were not written",
+                    getattr(self.connection, 'nickname', ''),
+                )
                 self.show_error(_("The connection settings could not be saved."))
             else:
+                # The worker reported a plain failure (no exception, so nothing
+                # was logged there). Record it — the user is told to try again
+                # and needs a log line to match that against.
+                logger.warning(
+                    "Secure storage rejected a password or passphrase for %r; "
+                    "the connection settings were saved without it",
+                    getattr(self.connection, 'nickname', ''),
+                )
                 self.show_error(_(
                     "The connection settings were saved, but secure storage rejected "
                     "a password or passphrase. Please try saving again."

@@ -2008,7 +2008,7 @@ class PreferencesWindow(Adw.NavigationPage):
         # Logging group ------------------------------------------------
         logging_group = Adw.PreferencesGroup(title=_("Logging"))
         logging_group.set_description(
-            _("Controls how verbose sshPilot is in the console and the rotated log file. "
+            _("Controls how verbose SSH Pilot is in the console and the rotated log file. "
             "The command-line flags --verbose / --quiet always override this.")
         )
 
@@ -2037,10 +2037,10 @@ class PreferencesWindow(Adw.NavigationPage):
         secrets_group = Adw.PreferencesGroup(
             title=_("Secret Storage"),
             description=_(
-                "Where sshPilot stores passwords and key passphrases. "
+                "Where SSH Pilot stores passwords and key passphrases. "
                 "Switching does not migrate existing secrets.\n"
                 "Note: Bitwarden/Vaultwarden keep the unlocked session token in the "
-                "environment while sshPilot runs, so other programs running as your "
+                "environment while SSH Pilot runs, so other programs running as your "
                 "user can read the vault until you quit."
             ),
         )
@@ -2219,7 +2219,7 @@ class PreferencesWindow(Adw.NavigationPage):
         self.agent_no_store_row = Adw.ActionRow()
         self.agent_no_store_row.set_title(_("No secret storage"))
         self.agent_no_store_row.set_subtitle(_(
-            "Passwords and passphrases are not saved by sshPilot. Use ssh-agent "
+            "Passwords and passphrases are not saved by SSH Pilot. Use ssh-agent "
             "and SSH's own prompts instead."
         ))
         secrets_group.add(self.agent_no_store_row)
@@ -2238,9 +2238,7 @@ class PreferencesWindow(Adw.NavigationPage):
         identity_group = Adw.PreferencesGroup(
             title=_("SSH Identity"),
             description=_(
-                "Default identity provider whose agent/keys are offered to "
-                "connections. The per-connection key is set on each connection "
-                "(IdentityFile); this is the global default."
+                "Default identity provider."
             ),
         )
         self.identity_provider_row = Adw.ComboRow()
@@ -2600,7 +2598,7 @@ class PreferencesWindow(Adw.NavigationPage):
         if has_internal_file_manager():
             file_manager_group = Adw.PreferencesGroup(title=_("File Manager Options"))
             file_manager_group.set_description(
-                _("These preferences only affect sshPilot's built-in SFTP file manager.")
+                _("These preferences only affect SSH Pilot's built-in SFTP file manager.")
             )
 
             self.open_file_manager_externally_row = Adw.SwitchRow()
@@ -2660,7 +2658,7 @@ class PreferencesWindow(Adw.NavigationPage):
 
             sftp_advanced_group = Adw.PreferencesGroup(title=_("Advanced SFTP Settings"))
             sftp_advanced_group.set_description(
-                _("Fine-tune options that only apply to sshPilot's built-in SFTP file manager.")
+                _("Fine-tune options that only apply to SSH Pilot's built-in SFTP file manager.")
             )
 
 
@@ -3148,7 +3146,7 @@ class PreferencesWindow(Adw.NavigationPage):
             if install_path:
                 return _(
                     "The “bw” command was not found.\n\n"
-                    "sshPilot installs the CLI to:\n    {path}"
+                    "SSH Pilot installs the CLI to:\n    {path}"
                 ).format(path=install_path)
             return _("The “bw” command was not found.")
         path_line = ""
@@ -4900,7 +4898,7 @@ class PreferencesWindow(Adw.NavigationPage):
             body.append(lbl)
         note = Gtk.Label(label=_("Permissions are declared by the author for "
                                  "transparency; they are not enforced. Changes "
-                                 "take effect after restarting sshPilot."))
+                                 "take effect after restarting SSH Pilot."))
         note.add_css_class('dim-label')
         note.add_css_class('caption')
         note.set_halign(Gtk.Align.START)
@@ -5239,30 +5237,12 @@ class PreferencesWindow(Adw.NavigationPage):
 
         group = Adw.PreferencesGroup(title=_("Behavior"))
 
-        always_show_row = Adw.SwitchRow()
-        always_show_row.set_title(_("Open on Startup"))
-        always_show_row.set_subtitle(_("Open Command Snippets when the window starts"))
-        always_show_row.set_active(bool(self.config.get_setting('command_blocks.always_show_sidebar', False)))
-        always_show_row.connect('notify::active', lambda r, _: self.config.set_setting('command_blocks.always_show_sidebar', r.get_active()))
-        group.add(always_show_row)
-
         insert_only_row = Adw.SwitchRow()
         insert_only_row.set_title(_("Insert Only (no execute)"))
         insert_only_row.set_subtitle(_("Paste the command into the terminal without running it"))
         insert_only_row.set_active(bool(self.config.get_setting('command_blocks.insert_only', False)))
         insert_only_row.connect('notify::active', lambda r, _: self.config.set_setting('command_blocks.insert_only', r.get_active()))
         group.add(insert_only_row)
-
-        auto_hide_row = Adw.SwitchRow()
-        auto_hide_row.set_title(_("Close After Sending"))
-        auto_hide_row.set_subtitle(_("Close Command Snippets after sending a command"))
-        auto_hide_row.set_active(bool(self.config.get_setting('command_blocks.auto_hide_sidebar', False)))
-        self._cb_auto_hide_row = auto_hide_row
-        auto_hide_row.connect(
-            'notify::active',
-            lambda r, _p: self.config.set_setting('command_blocks.auto_hide_sidebar', r.get_active()),
-        )
-        group.add(auto_hide_row)
 
         page.add(group)
         return page

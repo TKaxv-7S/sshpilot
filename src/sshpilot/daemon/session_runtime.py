@@ -595,12 +595,31 @@ class SessionRuntime:
         record: _SessionRecord,
         maximum_bytes: int = 4000,
     ) -> str:
+        """Recent terminal output, cut on a line boundary.
+
+        The window is a byte slice of the replay ring, so unless it starts at
+        the very first byte of the session it opens mid-line. That fragment
+        must not be classified: the evidence classifier recognises local SSH
+        chatter by line *prefix* (``debug1:``, ``ssh:``, ``warning:``), so a
+        headless tail like ``configuration data /home/u/.ssh/config`` matches
+        no prefix and falls through to its catch-all "connected" verdict. A
+        session running ``ssh -v`` emits more than ``maximum_bytes`` of
+        ``debug1:`` lines before the password prompt, which is enough to
+        promote it as authenticated before the user has even been asked.
+        """
         end = record.replay.end_sequence
         start = max(record.replay.start_sequence, end - maximum_bytes)
         replay = record.replay.replay(start, maximum_bytes)
-        return b"".join(chunk for _sequence, chunk in replay.chunks).decode(
-            "utf-8", errors="replace"
-        )
+        data = b"".join(chunk for _sequence, chunk in replay.chunks)
+        if replay.returned_start > 0:
+            # Drop the leading partial line. A window that is one unterminated
+            # fragment carries no classifiable line at all.
+            cut = min(
+                (index for index in (data.find(b"\n"), data.find(b"\r")) if index >= 0),
+                default=-1,
+            )
+            data = data[cut + 1 :] if cut >= 0 else b""
+        return data.decode("utf-8", errors="replace")
 
     def start_session(self, session_id: SessionId) -> None:
         """Run the potentially blocking startup step on a command worker."""

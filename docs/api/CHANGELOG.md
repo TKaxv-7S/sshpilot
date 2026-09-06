@@ -16,7 +16,68 @@ notes remain separate.
   correctness fixes within the current contract; no downgrade or
   frontend backend fallback is supported.
 
-## API 0.51 (current)
+## API 0.53 (current)
+
+### API 0.53 host information beyond what one session can see
+
+- `HostInfoSnapshot` gained `os_id`, `os_version_id` and `architecture`. The
+  distro identifier and version come from `/etc/os-release`, which the probe
+  already read for `os_pretty_name`, and the architecture is the machine field
+  of `uname -srm`, which `kernel` already carried. Inventory work needs the
+  identifier and the architecture as fields, not as substrings of a display
+  name.
+- `listening_ports` reports every TCP port the host accepts on as
+  `ListeningPort(port, process)`. The listening table was already parsed to
+  decide socket direction and the SSH port, and everything else was discarded.
+  The process name is empty when the host answered without privilege to name
+  it.
+- `processes` reports the host's own CPU ranking as `ProcessUsage(command,
+  cpu_percent, memory_percent)`. `cpu_percent` is a share of one CPU as the
+  host reports it, so it exceeds 100 for a busy multi-threaded process.
+  BusyBox publishes no `%MEM`, so `memory_percent` is `null` there rather than
+  carrying a share of virtual size under a memory label.
+- `failed_units` reports systemd units in the failed state as
+  `FailedUnit(name, description)`. A host without systemd reports none, which
+  is indistinguishable from a healthy host -- neither has any to report.
+- `host_keys` reports public SSH host key fingerprints as
+  `HostKeyFingerprint(algorithm, fingerprint, bits)`. Public material only:
+  the probe reads `/etc/ssh/ssh_host_*_key.pub` through `ssh-keygen -l` and
+  never opens a private key.
+- `io_pressure_some` and `io_pressure_full` carry `/proc/pressure/io` as
+  `PressureStall(avg10, avg60, avg300)`, the share of each window spent
+  stalled on I/O. Both are `null` before Linux 4.20 and on kernels built
+  without PSI. Cumulative counters were considered and rejected: read once
+  they describe the whole uptime rather than the present.
+
+## API 0.52
+
+### API 0.52 daemon-owned remote host information
+
+- Added `start_host_info`, `get_host_info`, and `cancel_host_info` with the new
+  `host_info.read` capability, served by daemon methods `hostinfo.start`,
+  `hostinfo.get`, and `hostinfo.cancel`. The capability is advertised exactly
+  when broadcast execution is available, because host information is a
+  projection over the same daemon-owned execution path.
+- The daemon owns the probe text and its parsing. Clients send a
+  `HostInfoRequest` naming a connection and a `HostInfoProbe` (`full` or
+  `network_counters`) and receive a typed `HostInfoSummary`; no frontend
+  carries shell text or parses remote output.
+- `HostInfoSnapshot` and its members (`CpuInfo`, `MemoryInfo`, `LoadAverage`,
+  `FilesystemUsage`, `NetworkInterface`, `InterfaceCounters`,
+  `TemperatureReading`, `LoginSession`, `SocketConnection`) carry values only:
+  bytes as integers, temperatures as numbers, no localized or formatted text.
+  A reading the host does not publish is `null` rather than a substituted
+  default, so frontends can distinguish "unknown" from "zero".
+- `operation.state_changed` is now delivered over the daemon event stream to
+  the client that owns the operation. The event type, its payload, and the
+  codec were already part of the contract, but the daemon forwarded no
+  operation events, so a client could not observe its own long-running work
+  finishing without polling. Delivery is scoped to the owning client because an
+  `OperationSummary` names its owner and may carry a result.
+- Additive only: no existing method, model, capability, or error changed, and
+  the wire protocol stays at `1.0`.
+
+## API 0.51
 
 ### API 0.51 structured builtin plugin session launch failures
 

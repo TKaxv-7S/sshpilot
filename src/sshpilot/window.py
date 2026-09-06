@@ -5413,7 +5413,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             detail_text = str(detail)
         self._error_dialog(
             _("Daemon unavailable"),
-            _("Connect to the sshPilot daemon and retry this operation."),
+            _("Connect to the SSH Pilot daemon and retry this operation."),
             detail=detail_text or "",
         )
 
@@ -6208,7 +6208,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if not self._is_quitting:
                 self._error_dialog(
                     _("Daemon unavailable"),
-                    _("Connect to the sshPilot daemon and retry the deletion."),
+                    _("Connect to the SSH Pilot daemon and retry the deletion."),
                 )
             return
         pending = iter(connection for connection in connections if connection)
@@ -7008,19 +7008,6 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
         except Exception as e:
             logger.error(f"Failed to edit connection: {e}")
 
-    def on_verify_configuration_action(self, action=None, param=None):
-        """Open the effective-config viewer for the context-menu connection."""
-        try:
-            connection = getattr(self, '_context_menu_connection', None)
-            if connection is None:
-                row = self.connection_list.get_selected_row()
-                connection = getattr(row, 'connection', None) if row else None
-            if connection is None:
-                return
-            self.show_effective_config_for_connection(connection)
-        except Exception:
-            logger.debug("Failed to open effective config viewer", exc_info=True)
-
     def on_copy_ssh_command_action(self, action=None, param=None):
         """Copy the SSH command this connection actually runs to the clipboard.
 
@@ -7095,6 +7082,16 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
         except Exception as e:
             logger.error(f"Failed to delete connection: {e}")
 
+    def on_machine_info_action(self, action=None, param=None):
+        connection = getattr(self, '_context_menu_connection', None)
+        if connection is None:
+            row = self.connection_list.get_selected_row()
+            connection = getattr(row, 'connection', None) if row else None
+        if connection is None:
+            return
+        from .machine_info_dialog import MachineInfoDialog
+        MachineInfoDialog(self, connection)
+
     def on_open_in_system_terminal_action(self, action, param=None):
         """Handle open in system terminal action from context menu"""
         try:
@@ -7167,7 +7164,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before moving connections."),
+                    _("Connect to the SSH Pilot daemon before moving connections."),
                 )
                 return
 
@@ -7225,7 +7222,7 @@ class MainWindow(Adw.ApplicationWindow, WindowBroadcastMixin, WindowSessionMixin
             if controller is None:
                 self._simple_dialog(
                     _("Service unavailable"),
-                    _("Connect to the sshPilot daemon before moving connections."),
+                    _("Connect to the SSH Pilot daemon before moving connections."),
                 )
                 return
             controller.run(

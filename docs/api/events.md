@@ -147,9 +147,12 @@ local `error.occurred` continuity notification where delivery remains possible.
 - **Status / review:** Shared daemon operation lifecycle completed and reviewed;
   identity operation producers remain pending their separate phase review.
 - **Trigger / payload:** An operation changes lifecycle state;
-  `OperationSummary` contains safe state and identifiers only.
+  `OperationSummary` contains safe state and identifiers only. The operation is
+  named by `operation_id`.
 - **Ordering / delivery:** Delivered through the daemon event stream according
-  to the negotiated event and capability contract.
+  to the negotiated event and capability contract, and **only to the client
+  that started the operation** — a summary names its owner and may carry a
+  result, so it is never fanned out to other connected clients.
 - **Security:** No private keys, credentials, or secret values are included.
 
 <!-- api-event: connection.deleted -->

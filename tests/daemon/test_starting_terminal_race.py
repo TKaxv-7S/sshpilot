@@ -266,3 +266,64 @@ def test_connection_evidence_gate_turns_unconfirmed_failure_into_failed_state():
 
     runtime.shutdown()
     core.close()
+
+
+def test_verbose_ssh_chatter_past_the_evidence_window_is_not_connected():
+    """A truncated debug line must not read as remote output.
+
+    ``ssh -v`` emits more than the evidence window (4000 bytes) of ``debug1:``
+    lines before the password prompt. The window is a byte slice, so it opens
+    mid-line, and that fragment matches none of the local-chatter prefixes the
+    classifier recognises — it used to fall through to "connected" and promote
+    the session before the user had even been asked for a password, spending
+    the one commit point that stores a remembered credential.
+    """
+
+    repo = make_test_repository()
+    core = ConnectionApplicationService(repo, client_name="evidence-window")
+    runner = _EvidenceTerminalRunner()
+    runtime = SessionRuntime(core, runner=runner)
+    runtime.enable_connection_evidence_gate()
+    authenticated: list[str] = []
+    runtime.set_authenticated_callback(lambda session_id: authenticated.append(session_id))
+
+    prepared = runtime.prepare_open_session(
+        OpenSessionRequest(
+            connection_id=core.list_connections()[0].id,
+            dimensions=TerminalDimensions(rows=24, columns=80),
+        ),
+        client_id=ClientId("client:a"),
+    )
+    runtime.attach_session(
+        AttachSessionRequest(
+            session_id=prepared.id,
+            request_input=True,
+            want_terminal_output=True,
+        ),
+        client_id=ClientId("client:a"),
+    )
+    runtime.start_session(prepared.id)
+    assert runner.started.wait(1)
+
+    # Real OpenSSH pre-authentication chatter, past the 4000-byte window.
+    chatter = b"".join(
+        b"debug1: identity file /home/alice/.ssh/id_ed25519_%04d type -1\r\n" % index
+        for index in range(80)
+    )
+    assert len(chatter) > 4000
+    runner.emit(chatter)
+    assert runtime.get_session(prepared.id).state is SessionState.STARTING
+    assert authenticated == []
+
+    # The prompt itself is still not evidence, however much precedes it.
+    runner.emit(b"alice@example.test's password: ")
+    assert runtime.get_session(prepared.id).state is SessionState.STARTING
+    assert authenticated == []
+
+    # Genuine post-login output still promotes, and only then.
+    runner.emit(b"\r\nalice@host:~$ ")
+    assert runtime.get_session(prepared.id).state is SessionState.RUNNING
+    assert authenticated == [prepared.id]
+
+    runtime.shutdown()
+    core.close()

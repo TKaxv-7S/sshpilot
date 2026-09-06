@@ -157,6 +157,7 @@ from .models.daemon import (
     OperationModeResult,
     SetOperationModeRequest,
 )
+from .models.host_info import HostInfoRequest, HostInfoSummary
 from .models.settings import (
     GlobalSshOverrides,
     UpdateGlobalSshOverridesRequest,
@@ -610,6 +611,18 @@ class SshPilotClient(Protocol):
         ...
 
     def cancel_operation(self, operation_id: OperationId) -> OperationSummary:
+        ...
+
+    def start_host_info(self, request: HostInfoRequest) -> HostInfoSummary:
+        """Begin a read-only host-information probe on one connection."""
+        ...
+
+    def get_host_info(self, operation_id: OperationId) -> HostInfoSummary:
+        """Read the current state and parsed result of a host-info probe."""
+        ...
+
+    def cancel_host_info(self, operation_id: OperationId) -> HostInfoSummary:
+        """Cancel a host-info probe that is still running."""
         ...
 
     def get_global_ssh_overrides(self) -> GlobalSshOverrides:

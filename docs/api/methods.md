@@ -16,6 +16,9 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 <!-- api-method: set_plugin_setting -->
 <!-- api-method: clear_session_connection_password -->
 <!-- api-method-contract: clear_session_connection_password status=implemented capability=connections.secrets.write -->
+<!-- api-method: start_host_info -->
+<!-- api-method: get_host_info -->
+<!-- api-method: cancel_host_info -->
 <!-- api-method: get_broadcast_command -->
 <!-- api-method: cancel_broadcast_command -->
 <!-- api-method: set_daemon_log_level -->
@@ -25,6 +28,9 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 <!-- api-method-contract: get_broadcast_command status=schema-only capability=broadcast.read -->
 <!-- api-method-contract: cancel_broadcast_command status=schema-only capability=broadcast.write -->
 <!-- api-method-contract: broadcast_terminal_input status=daemon-only capability=terminal.input -->
+<!-- api-method-contract: start_host_info status=daemon-only capability=host_info.read -->
+<!-- api-method-contract: get_host_info status=daemon-only capability=host_info.read -->
+<!-- api-method-contract: cancel_host_info status=daemon-only capability=host_info.read -->
 <!-- api-daemon-method: broadcast.start capability=broadcast.write -->
 <!-- api-daemon-method: plugins.settings.get capability=plugins.settings.read -->
 <!-- api-daemon-method: plugins.settings.set capability=plugins.settings.write -->
@@ -32,6 +38,9 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 <!-- api-daemon-method: broadcast.get capability=broadcast.read -->
 <!-- api-daemon-method: broadcast.cancel capability=broadcast.write -->
 <!-- api-daemon-method: terminal.broadcast_input capability=terminal.input -->
+<!-- api-daemon-method: hostinfo.start capability=host_info.read -->
+<!-- api-daemon-method: hostinfo.get capability=host_info.read -->
+<!-- api-daemon-method: hostinfo.cancel capability=host_info.read -->
 
 `SshPilotClient` is synchronous. Production uses the daemon transport only;
 direct core service compositions are test-only and are not client choices.
@@ -83,6 +92,9 @@ direct core service compositions are test-only and are not client choices.
 | `release_terminal_input` | Daemon only | `terminal.input` |
 | `subscribe_terminal` | Daemon only | `terminal.output` |
 | `subscribe_broadcast_output` | Daemon only | `broadcast.events` |
+| `start_host_info` | Daemon only | `host_info.read` |
+| `get_host_info` | Daemon only | `host_info.read` |
+| `cancel_host_info` | Daemon only | `host_info.read` |
 | `get_plugin_setting` | Daemon only | `plugins.settings.read` |
 | `set_plugin_setting` | Daemon only | `plugins.settings.write` |
 | `list_interactions` | Daemon only | `interactions.read` |
@@ -365,6 +377,9 @@ The dispatcher is an explicit allowlist; it never reflects over Python objects.
 | `terminal.replay` | `terminal.replay` | Implemented |
 | `terminal.resize` | `terminal.resize` | Implemented |
 | `terminal.broadcast_input` | `terminal.input` | Implemented |
+| `hostinfo.start` | `host_info.read` | Implemented |
+| `hostinfo.get` | `host_info.read` | Implemented |
+| `hostinfo.cancel` | `host_info.read` | Implemented |
 | `terminal.claim_input` | `terminal.input` | Implemented |
 | `terminal.release_input` | `terminal.input` | Implemented |
 | `sftp.list_services` | `sftp.read` | Implemented |
@@ -1534,6 +1549,76 @@ client.broadcast_terminal_input(
         command="uptime",
     )
 )
+```
+
+<!-- api-method: start_host_info -->
+## `start_host_info`
+
+- **Status / introduced:** Daemon-only / Protocol v1, API 0.52.
+- **Capability / purpose:** `host_info.read`; begin one read-only system
+  information probe on a saved connection. The daemon owns the probe text and
+  its parsing; the client names a connection and a `HostInfoProbe`, never a
+  command.
+- **Parameters / return:** `HostInfoRequest`; returns a `HostInfoSummary`
+  whose `operation` is `pending`/`running`. `HostInfoProbe.FULL` gathers the
+  complete snapshot; `HostInfoProbe.NETWORK_COUNTERS` reads only byte counters
+  so bandwidth can be sampled cheaply.
+- **Errors:** `unsupported_capability` when broadcast execution is
+  unavailable, `invalid_request` for a malformed request or unreadable remote
+  output, plus connection, authentication, and transport errors.
+- **Ordering / threading:** Returns as soon as the operation is created.
+  Completion is observed through `operation.state_changed`, which the daemon
+  delivers to the owning client; the result is then read with `get_host_info`.
+  A `FULL` probe may raise an interaction (passphrase, password, MFA); a
+  counters probe is autofill-only and never prompts.
+- **Side effects / security:** The probe only reads. Process names in the
+  returned sockets are visible only to a privileged remote user, and no
+  credential or secret value is included.
+
+```python
+summary = client.start_host_info(
+    HostInfoRequest(connection_id, HostInfoProbe.FULL)
+)
+```
+
+<!-- api-method: get_host_info -->
+## `get_host_info`
+
+- **Status / introduced:** Daemon-only / Protocol v1, API 0.52.
+- **Capability / purpose:** `host_info.read`; read the current state and, once
+  the probe has succeeded, the parsed result.
+- **Parameters / return:** `OperationId`; returns a `HostInfoSummary`. A
+  succeeded `FULL` probe carries a `HostInfoSnapshot` in `snapshot` and byte
+  counters in `counters`; a counters probe carries `counters` only. A probe
+  that failed carries a `ServiceFailure` in `failure` and no snapshot.
+- **Errors:** `operation_not_found` for an unknown or forgotten probe, plus
+  transport errors. Finished probes stay readable for a bounded number of
+  operations so a completion event can always be followed by a read.
+- **Ordering / threading:** Safe to call repeatedly; parsing is repeated from
+  the retained result rather than re-run on the host.
+- **Side effects / security:** None; this is a pure read.
+
+```python
+summary = client.get_host_info(summary.operation.operation_id)
+snapshot = summary.snapshot
+```
+
+<!-- api-method: cancel_host_info -->
+## `cancel_host_info`
+
+- **Status / introduced:** Daemon-only / Protocol v1, API 0.52.
+- **Capability / purpose:** `host_info.read`; cancel a probe that is still
+  running.
+- **Parameters / return:** `OperationId`; returns the resulting
+  `HostInfoSummary`.
+- **Errors:** `operation_not_found`, plus transport errors. Cancelling a probe
+  that already finished is not an error.
+- **Ordering / threading:** The remote child is terminated by the operation
+  runtime; the call does not wait for it to be reaped.
+- **Side effects / security:** No partial snapshot is returned.
+
+```python
+client.cancel_host_info(summary.operation.operation_id)
 ```
 
 <!-- api-method: claim_terminal_input -->

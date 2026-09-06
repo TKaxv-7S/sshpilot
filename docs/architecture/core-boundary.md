@@ -17,6 +17,7 @@ src/sshpilot/core/
     interaction/       # askpass / prompt policy (no dialogs)
     keys/              # discovery / generation service
     known_hosts/       # parse, filter, atomic save
+    host_info/         # remote host probe text + pure parsing
     secrets/           # backend selection / unlock policy + protocols
     plugins/           # headless plugin contracts
     import_export/     # schema, plan, merge, atomic write

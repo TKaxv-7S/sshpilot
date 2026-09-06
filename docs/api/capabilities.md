@@ -1,13 +1,15 @@
 # Capabilities
 
-Broadcast execution advertises `broadcast.read`, `broadcast.write`, and
-`broadcast.events` when the daemon has the operation runtime, canonical SSH
+Broadcast execution advertises `broadcast.read`, `broadcast.write`,
+`broadcast.events`, and `host_info.read` when the daemon has the operation
+runtime, canonical SSH
 launch provider, protected interaction broker, and typed output forwarding.
 Absence never enables a frontend fallback.
 
 <!-- api-capability: broadcast.read -->
 <!-- api-capability: broadcast.write -->
 <!-- api-capability: broadcast.events -->
+<!-- api-capability: host_info.read -->
 <!-- api-capability: plugins.settings.read -->
 <!-- api-capability: plugins.settings.write -->
 <!-- api-capability: operation.mode -->

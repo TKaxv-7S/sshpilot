@@ -75,6 +75,7 @@ class Capability(str, Enum):
     BROADCAST_READ = "broadcast.read"
     BROADCAST_WRITE = "broadcast.write"
     BROADCAST_EVENTS = "broadcast.events"
+    HOST_INFO_READ = "host_info.read"
     SSH_OVERRIDES_READ = "ssh_overrides.read"
     SSH_OVERRIDES_WRITE = "ssh_overrides.write"
     PLUGINS = "plugins"

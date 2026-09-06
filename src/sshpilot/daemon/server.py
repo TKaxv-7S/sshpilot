@@ -171,6 +171,16 @@ _FORWARDED_EVENT_TYPES = frozenset(
         EventType.FORWARD_FAILED,
         EventType.DAEMON_STATE_CHANGED,
         EventType.BROADCAST_OUTPUT,
+        EventType.OPERATION_STATE_CHANGED,
+    }
+)
+
+# Operation lifecycle carries the owning client's id and, for some kinds, its
+# result. It is delivered only to the client that started the operation, which
+# is the only client entitled to read it back with ``operations.get``.
+_OPERATION_OWNER_ONLY_EVENT_TYPES = frozenset(
+    {
+        EventType.OPERATION_STATE_CHANGED,
     }
 )
 _INTERACTION_CANCELLING_EVENT_TYPES = frozenset(
@@ -2497,6 +2507,12 @@ class DaemonServer:
                             state.protocol.client_id,
                         )
                     )
+                ):
+                    continue
+                if event.type in _OPERATION_OWNER_ONLY_EVENT_TYPES and (
+                    state.protocol.client_id is None
+                    or getattr(event.payload, "owner_client_id", None)
+                    != state.protocol.client_id
                 ):
                     continue
                 if state.queued_event_count >= self.client_event_queue_limit:

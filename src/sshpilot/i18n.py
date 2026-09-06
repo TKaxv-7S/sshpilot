@@ -154,14 +154,93 @@ def ui_language_codes() -> List[str]:
     return []
 
 
+# Scripts written right to left. GTK works out its default text direction by
+# translating a marker string in its *own* catalogue, which follows the C
+# library's LC_MESSAGES -- not ``LANGUAGE``. So picking a language in
+# Preferences translates every string while leaving the interface laid out left
+# to right: Persian text, but the search placeholder, entry alignment and
+# margins all still mirrored the wrong way. The direction has to be set
+# explicitly for the in-app preference to mean anything.
+RTL_LANGUAGES = frozenset({
+    'ar', 'ckb', 'dv', 'fa', 'he', 'iw', 'ji', 'ps', 'sd', 'ug', 'ur', 'yi',
+})
+
+
+def is_rtl_language(code: Optional[str]) -> bool:
+    """Whether *code* names a right-to-left language.
+
+    Accepts anything the environment may hold -- ``fa``, ``pt_BR``,
+    ``ar_EG.UTF-8``, ``sr-Latn`` -- and looks only at the language subtag.
+    """
+    tag = str(code or '').split(':')[0].split('.')[0].split('@')[0]
+    tag = tag.replace('-', '_').split('_')[0].lower()
+    return bool(tag) and tag in RTL_LANGUAGES
+
+
+def apply_text_direction() -> Optional[str]:
+    """Point GTK's text direction at the language the UI actually runs in.
+
+    Returns the language code the direction was taken from, or ``None`` when
+    there was nothing to go on and GTK's own default was left alone. Must run
+    before the first widget exists -- the default direction is read at
+    construction time, so a later change would leave built widgets behind.
+
+    This deliberately follows :func:`ui_language_codes`, which puts ``LANGUAGE``
+    first: when the two disagree, the messages the user sees come from
+    ``LANGUAGE``, so that is the one the layout has to match.
+    """
+    codes = ui_language_codes()
+    if not codes:
+        return None
+    code = codes[0]
+    try:
+        from gi.repository import Gtk
+
+        Gtk.Widget.set_default_direction(
+            Gtk.TextDirection.RTL if is_rtl_language(code)
+            else Gtk.TextDirection.LTR
+        )
+    except Exception as exc:  # pragma: no cover - GTK missing or too old
+        logger.debug("Could not set the interface text direction: %s", exc)
+        return None
+    return code
+
+
+# Where the session's own ``LANGUAGE`` is parked while an explicit choice
+# overrides it. "Restart Now" re-execs through ``os.execv``, which keeps the
+# environment, so an override outlives the preference that set it: choosing a
+# language and then going back to "System Default" left ``LANGUAGE`` behind and
+# the interface came back up in the old language, which only picking a language
+# explicitly could clear. Stashing the original is what makes the way back work.
+_ORIGINAL_LANGUAGE_VAR = 'SSHPILOT_ORIGINAL_LANGUAGE'
+
+
 def apply_language(code: Optional[str] = None) -> str:
     """Export ``LANGUAGE`` for the chosen code. Returns what was applied.
 
-    Must be called before the first ``_()`` in the process. An empty code (the
-    default setting) leaves the environment untouched.
+    Must be called before the first ``_()`` in the process.
+
+    An empty code means "system default", which has to *undo* any override this
+    application put in the environment -- not merely skip setting one -- because
+    the process may have inherited that override from the instance it replaced.
+    Whatever ``LANGUAGE`` the session itself provided is restored; a session that
+    set none gets none back. An empty code in a process that never overrode
+    anything leaves the environment alone, so the user's own setting stands.
     """
     if code is None:
         code = configured_language()
     if code:
+        # Only the first override records the original: later ones are replacing
+        # our own value, not the session's.
+        os.environ.setdefault(_ORIGINAL_LANGUAGE_VAR, os.environ.get('LANGUAGE', ''))
         os.environ['LANGUAGE'] = code
+        return code
+
+    original = os.environ.pop(_ORIGINAL_LANGUAGE_VAR, None)
+    if original is None:
+        return code
+    if original:
+        os.environ['LANGUAGE'] = original
+    else:
+        os.environ.pop('LANGUAGE', None)
     return code

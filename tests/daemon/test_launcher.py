@@ -153,6 +153,7 @@ def test_real_on_demand_process_is_ready_via_handshake_and_owned(tmp_path):
                 Capability.BROADCAST_READ,
                     Capability.BROADCAST_WRITE,
                     Capability.BROADCAST_EVENTS,
+                    Capability.HOST_INFO_READ,
                     Capability.PLUGIN_SETTINGS_READ,
                     Capability.PLUGIN_SETTINGS_WRITE,
                 Capability.INTERACTIONS_READ,
