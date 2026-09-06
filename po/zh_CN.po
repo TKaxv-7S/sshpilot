@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:45+0330\n"
+"POT-Creation-Date: 2026-09-06 22:22+0330\n"
 "PO-Revision-Date: 2026-09-05 11:35+0330\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -145,11 +145,11 @@ msgid "Split View — {name}"
 msgstr "分屏视图 — {name}"
 
 #: src/sshpilot/actions.py:385 src/sshpilot/actions.py:513
-#: src/sshpilot/connection_dialog.py:4901 src/sshpilot/file_manager/pane.py:55
+#: src/sshpilot/connection_dialog.py:4919 src/sshpilot/file_manager/pane.py:55
 #: src/sshpilot/file_manager/pane.py:63 src/sshpilot/terminal.py:1022
 #: src/sshpilot/terminal_manager.py:1011 src/sshpilot/text_editor.py:1812
 #: src/sshpilot/window.py:1401 src/sshpilot/window.py:5706
-#: src/sshpilot/window.py:7213 src/sshpilot/window.py:7237
+#: src/sshpilot/window.py:7210 src/sshpilot/window.py:7234
 #: src/sshpilot/window_broadcast.py:200 src/sshpilot/window_dialogs.py:2384
 #: src/sshpilot/window_dialogs.py:2410 src/sshpilot/window_dialogs.py:2455
 #: src/sshpilot/window_dialogs.py:2490 src/sshpilot/window_dialogs.py:2526
@@ -170,7 +170,7 @@ msgstr ""
 "{error}"
 
 #: src/sshpilot/actions.py:388 src/sshpilot/actions.py:717
-#: src/sshpilot/actions.py:984 src/sshpilot/connection_dialog.py:4904
+#: src/sshpilot/actions.py:984 src/sshpilot/connection_dialog.py:4922
 #: src/sshpilot/daemon_quit_policy.py:531 src/sshpilot/file_manager/pane.py:56
 #: src/sshpilot/file_manager/pane.py:65 src/sshpilot/file_manager/pane.py:1933
 #: src/sshpilot/file_manager/pane.py:2336
@@ -186,8 +186,8 @@ msgstr ""
 #: src/sshpilot/window.py:1419 src/sshpilot/window.py:1430
 #: src/sshpilot/window.py:5403 src/sshpilot/window.py:5450
 #: src/sshpilot/window.py:5470 src/sshpilot/window.py:5675
-#: src/sshpilot/window.py:5708 src/sshpilot/window.py:7401
-#: src/sshpilot/window.py:7462 src/sshpilot/window_broadcast.py:184
+#: src/sshpilot/window.py:5708 src/sshpilot/window.py:7398
+#: src/sshpilot/window.py:7459 src/sshpilot/window_broadcast.py:184
 #: src/sshpilot/window_broadcast.py:203 src/sshpilot/window_dialogs.py:398
 #: src/sshpilot/window_dialogs.py:605 src/sshpilot/window_dialogs.py:1053
 #: src/sshpilot/window_dialogs.py:2192 src/sshpilot/window_dialogs.py:2795
@@ -210,7 +210,7 @@ msgid "Wake-on-LAN sent to {n} hosts"
 msgstr "已向 {n} 台主机发送网络唤醒 (Wake-on-LAN)"
 
 #: src/sshpilot/actions.py:502 src/sshpilot/actions.py:615
-#: src/sshpilot/window.py:7169 src/sshpilot/window.py:7227
+#: src/sshpilot/window.py:7166 src/sshpilot/window.py:7224
 #: src/sshpilot/window_dialogs.py:2389 src/sshpilot/window_dialogs.py:2460
 #: src/sshpilot/window_dialogs.py:2578 src/sshpilot/window_dialogs.py:2630
 msgid "Service unavailable"
@@ -409,6 +409,7 @@ msgstr "安全密钥"
 #: src/sshpilot/askpass_utils.py:846
 #: src/sshpilot/daemon_interaction_dialogs.py:367
 #: src/sshpilot/daemon_sessions_dialog.py:35
+#: src/sshpilot/machine_info_dialog.py:522
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:444
 #: src/sshpilot/preferences.py:4875 src/sshpilot/sshcopyid_window.py:559
 #: src/sshpilot/terminal.py:1059 src/sshpilot/welcome_page.py:708
@@ -1772,6 +1773,7 @@ msgid "Optional sources for IdentityAgent, PKCS#11, and FIDO security keys."
 msgstr "IdentityAgent、PKCS#11 和 FIDO 安全密钥的可选来源。"
 
 #: src/sshpilot/connection_dialog.py:3560
+#: src/sshpilot/machine_info_dialog.py:1404
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:67
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:74
 #: src/sshpilot/shortcut_editor.py:442 src/sshpilot/shortcut_editor.py:456
@@ -2080,7 +2082,7 @@ msgstr "{field} 为必填项"
 
 #: src/sshpilot/connection_dialog.py:4348
 #: src/sshpilot/connection_dialog.py:4638
-#: src/sshpilot/connection_dialog.py:4829
+#: src/sshpilot/connection_dialog.py:4839
 msgid "The connection settings could not be saved."
 msgstr "无法保存连接设置。"
 
@@ -2118,33 +2120,33 @@ msgstr ""
 "连接设置已保存，但安全存储未及时响应。密码可能仍已保存 — 请在重新保存前重新打"
 "开连接进行检查。"
 
-#: src/sshpilot/connection_dialog.py:4832
+#: src/sshpilot/connection_dialog.py:4850
 msgid ""
 "The connection settings were saved, but secure storage rejected a password "
 "or passphrase. Please try saving again."
 msgstr "连接设置已保存，但安全存储拒绝了密码或口令。请尝试重新保存。"
 
-#: src/sshpilot/connection_dialog.py:4924
+#: src/sshpilot/connection_dialog.py:4942
 msgid ""
 "The connection could not be loaded from the service. You can retry or close "
 "the editor."
 msgstr "无法从服务加载连接。您可以重试或关闭编辑器。"
 
-#: src/sshpilot/connection_dialog.py:4927
+#: src/sshpilot/connection_dialog.py:4945
 msgid ""
 "The connection could not be loaded from the service. Please close the editor "
 "and try again."
 msgstr "无法从服务加载连接。请关闭编辑器并重试。"
 
-#: src/sshpilot/connection_dialog.py:4931
+#: src/sshpilot/connection_dialog.py:4949
 msgid "Could not load connection"
 msgstr "无法加载连接"
 
-#: src/sshpilot/connection_dialog.py:4935
+#: src/sshpilot/connection_dialog.py:4953
 msgid "_Retry"
 msgstr "重试(_R)"
 
-#: src/sshpilot/connection_dialog.py:4940
+#: src/sshpilot/connection_dialog.py:4958
 msgid "_Close"
 msgstr "关闭(_C)"
 
@@ -3055,8 +3057,8 @@ msgid "Public-key deployment is unavailable."
 msgstr "公钥部署不可用。"
 
 #: src/sshpilot/gtk/identity_failure_messages.py:16
-#: src/sshpilot/gtk/scp_failure_messages.py:19 src/sshpilot/window.py:7349
-#: src/sshpilot/window.py:7374
+#: src/sshpilot/gtk/scp_failure_messages.py:19 src/sshpilot/window.py:7346
+#: src/sshpilot/window.py:7371
 msgid "The selected connection no longer exists in the daemon."
 msgstr "所选连接在守护进程中已不存在。"
 
@@ -3923,7 +3925,7 @@ msgstr "守护进程"
 msgid "Crash"
 msgstr "崩溃"
 
-#: src/sshpilot/log_viewer.py:574
+#: src/sshpilot/log_viewer.py:574 src/sshpilot/machine_info_dialog.py:526
 #: src/sshpilot/plugins/builtin/docker_manager/page.py:620
 #: src/sshpilot/preferences.py:864
 msgid "Refresh"
@@ -4006,6 +4008,477 @@ msgid ""
 "Log lines may contain hostnames, usernames, and file paths. Review before "
 "sharing."
 msgstr "日志行可能包含主机名、用户名和文件路径。分享前请核对。"
+
+#: src/sshpilot/machine_info_dialog.py:125
+#: src/sshpilot/machine_info_dialog.py:141
+#: src/sshpilot/machine_info_dialog.py:169
+#: src/sshpilot/machine_info_dialog.py:187
+#: src/sshpilot/machine_info_dialog.py:198
+#: src/sshpilot/machine_info_dialog.py:1112
+#: src/sshpilot/machine_info_dialog.py:1274
+msgid "N/A"
+msgstr "不可用"
+
+#: src/sshpilot/machine_info_dialog.py:127
+#: src/sshpilot/machine_info_dialog.py:143
+#, python-format
+msgid "%d B"
+msgstr "%d B"
+
+#: src/sshpilot/machine_info_dialog.py:157
+#, python-format
+msgid "%d B/s"
+msgstr "%d B/s"
+
+#: src/sshpilot/machine_info_dialog.py:175
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d 天"
+
+#: src/sshpilot/machine_info_dialog.py:177
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d 小时"
+
+#: src/sshpilot/machine_info_dialog.py:179
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d 分钟"
+
+#: src/sshpilot/machine_info_dialog.py:181
+msgid "Less than a minute"
+msgstr "不到一分钟"
+
+#: src/sshpilot/machine_info_dialog.py:182
+#: src/sshpilot/machine_info_dialog.py:1288 src/sshpilot/window_dialogs.py:2171
+msgid ", "
+msgstr ", "
+
+#: src/sshpilot/machine_info_dialog.py:189
+#, python-format
+msgid "%.2f GHz"
+msgstr "%.2f GHz"
+
+#: src/sshpilot/machine_info_dialog.py:190
+#, python-format
+msgid "%.0f MHz"
+msgstr "%.0f MHz"
+
+#: src/sshpilot/machine_info_dialog.py:194
+#, python-format
+msgid "%d%%"
+msgstr "%d%%"
+
+#: src/sshpilot/machine_info_dialog.py:225
+msgid "Loopback"
+msgstr "回环"
+
+#: src/sshpilot/machine_info_dialog.py:226
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#: src/sshpilot/machine_info_dialog.py:227
+msgid "Ethernet"
+msgstr "以太网"
+
+#: src/sshpilot/machine_info_dialog.py:228
+#: src/sshpilot/machine_info_dialog.py:236
+#: src/sshpilot/machine_info_dialog.py:1446
+msgid "Unknown"
+msgstr "未知"
+
+#: src/sshpilot/machine_info_dialog.py:233
+msgid "Up"
+msgstr "已启用"
+
+#: src/sshpilot/machine_info_dialog.py:234
+msgid "Down"
+msgstr "已停用"
+
+#: src/sshpilot/machine_info_dialog.py:235
+#: src/sshpilot/machine_info_dialog.py:1243
+msgid "No carrier"
+msgstr "无载波"
+
+#: src/sshpilot/machine_info_dialog.py:490
+#: src/sshpilot/machine_info_dialog.py:645
+msgid "Gathering host information…"
+msgstr "正在收集主机信息…"
+
+#: src/sshpilot/machine_info_dialog.py:508
+msgid "Host Info"
+msgstr "主机信息"
+
+#: src/sshpilot/machine_info_dialog.py:528
+msgid "Refresh host information"
+msgstr "刷新主机信息"
+
+#: src/sshpilot/machine_info_dialog.py:543
+#, python-format
+msgid "%(nickname)s — %(user)s@%(host)s"
+msgstr "%(nickname)s — %(user)s@%(host)s"
+
+#: src/sshpilot/machine_info_dialog.py:547
+#, python-format
+msgid "%(nickname)s — %(host)s"
+msgstr "%(nickname)s — %(host)s"
+
+#: src/sshpilot/machine_info_dialog.py:639
+msgid "Daemon connection unavailable."
+msgstr "守护进程连接不可用。"
+
+#: src/sshpilot/machine_info_dialog.py:654
+#: src/sshpilot/machine_info_dialog.py:675
+#, python-format
+msgid ""
+"Could not gather host information.\n"
+"\n"
+"%s"
+msgstr ""
+"无法收集主机信息。\n"
+"\n"
+"%s"
+
+#: src/sshpilot/machine_info_dialog.py:658
+msgid "The host returned no system information."
+msgstr "主机未返回系统信息。"
+
+#: src/sshpilot/machine_info_dialog.py:727
+#, python-format
+msgid "Updated %d second ago"
+msgid_plural "Updated %d seconds ago"
+msgstr[0] "%d 秒前更新"
+
+#: src/sshpilot/machine_info_dialog.py:733
+#, python-format
+msgid "Updated %d minute ago"
+msgid_plural "Updated %d minutes ago"
+msgstr[0] "%d 分钟前更新"
+
+#: src/sshpilot/machine_info_dialog.py:819
+#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:103
+msgid "Overview"
+msgstr "概览"
+
+#: src/sshpilot/machine_info_dialog.py:820
+msgid "Resources"
+msgstr "资源"
+
+#: src/sshpilot/machine_info_dialog.py:821
+msgid "Storage"
+msgstr "存储"
+
+#: src/sshpilot/machine_info_dialog.py:822
+#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:352
+msgid "Network"
+msgstr "网络"
+
+#: src/sshpilot/machine_info_dialog.py:823
+msgid "Traffic"
+msgstr "流量"
+
+#: src/sshpilot/machine_info_dialog.py:824
+msgid "System"
+msgstr "系统"
+
+#: src/sshpilot/machine_info_dialog.py:881
+#, python-format
+msgid "load %(one).2f · %(five).2f · %(fifteen).2f"
+msgstr "负载 %(one).2f · %(five).2f · %(fifteen).2f"
+
+#: src/sshpilot/machine_info_dialog.py:894
+msgid "CPU"
+msgstr "CPU"
+
+#: src/sshpilot/machine_info_dialog.py:904
+#, python-format
+msgid "swap %(used)s / %(total)s"
+msgstr "交换 %(used)s / %(total)s"
+
+#: src/sshpilot/machine_info_dialog.py:911
+#: src/sshpilot/machine_info_dialog.py:955
+#: src/sshpilot/machine_info_dialog.py:1042
+msgid "Memory"
+msgstr "内存"
+
+#: src/sshpilot/machine_info_dialog.py:912
+#: src/sshpilot/machine_info_dialog.py:923
+#: src/sshpilot/machine_info_dialog.py:1191
+#, python-format
+msgid "%(used)s / %(total)s"
+msgstr "%(used)s / %(total)s"
+
+#: src/sshpilot/machine_info_dialog.py:928
+#, python-format
+msgid "%(fstype)s on %(device)s"
+msgstr "%(fstype)s 位于 %(device)s"
+
+#: src/sshpilot/machine_info_dialog.py:936
+msgid "Root filesystem"
+msgstr "根文件系统"
+
+#: src/sshpilot/machine_info_dialog.py:945
+msgid "Hostname"
+msgstr "主机名"
+
+#: src/sshpilot/machine_info_dialog.py:948
+#: src/sshpilot/machine_info_dialog.py:1164
+#: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:62
+msgid "Device"
+msgstr "设备"
+
+#: src/sshpilot/machine_info_dialog.py:951
+msgid "Operating system"
+msgstr "操作系统"
+
+#: src/sshpilot/machine_info_dialog.py:952
+msgid "Kernel"
+msgstr "内核"
+
+#: src/sshpilot/machine_info_dialog.py:953
+msgid "Processor"
+msgstr "处理器"
+
+#: src/sshpilot/machine_info_dialog.py:954
+msgid "CPU frequency"
+msgstr "CPU 频率"
+
+#: src/sshpilot/machine_info_dialog.py:956
+msgid "Uptime"
+msgstr "运行时间"
+
+#: src/sshpilot/machine_info_dialog.py:957
+msgid "Booted"
+msgstr "启动时间"
+
+#: src/sshpilot/machine_info_dialog.py:969
+#, python-format
+msgid "%(cores)d cores · %(threads)d threads · %(sockets)d sockets"
+msgstr "%(cores)d 核心 · %(threads)d 线程 · %(sockets)d 插槽"
+
+#: src/sshpilot/machine_info_dialog.py:975
+#, python-format
+msgid "%d core"
+msgid_plural "%d cores"
+msgstr[0] "%d 核心"
+
+#: src/sshpilot/machine_info_dialog.py:979
+#, python-format
+msgid "%(model)s (%(topology)s)"
+msgstr "%(model)s (%(topology)s)"
+
+#: src/sshpilot/machine_info_dialog.py:991
+msgid "Load average"
+msgstr "平均负载"
+
+#: src/sshpilot/machine_info_dialog.py:995
+msgid "1 min"
+msgstr "1 分钟"
+
+#: src/sshpilot/machine_info_dialog.py:996
+msgid "5 min"
+msgstr "5 分钟"
+
+#: src/sshpilot/machine_info_dialog.py:997
+msgid "15 min"
+msgstr "15 分钟"
+
+#: src/sshpilot/machine_info_dialog.py:1026
+#, python-format
+msgid "Based on %d CPU"
+msgid_plural "Based on %d CPUs"
+msgstr[0] "基于 %d 个 CPU"
+
+#: src/sshpilot/machine_info_dialog.py:1029
+msgid "CPU count unavailable."
+msgstr "无法获取 CPU 数量。"
+
+#: src/sshpilot/machine_info_dialog.py:1060
+msgid "MemTotal"
+msgstr "MemTotal"
+
+#: src/sshpilot/machine_info_dialog.py:1061
+msgid "MemFree"
+msgstr "MemFree"
+
+#: src/sshpilot/machine_info_dialog.py:1062
+msgid "Cached"
+msgstr "Cached"
+
+#: src/sshpilot/machine_info_dialog.py:1063
+msgid "MemAvailable"
+msgstr "MemAvailable"
+
+#: src/sshpilot/machine_info_dialog.py:1084
+msgid "Swap"
+msgstr "Swap"
+
+#: src/sshpilot/machine_info_dialog.py:1091
+#, python-format
+msgid "%(used)s / %(total)s · %(percent)s"
+msgstr "%(used)s / %(total)s · %(percent)s"
+
+#: src/sshpilot/machine_info_dialog.py:1108
+msgid "Temperatures"
+msgstr "温度"
+
+#: src/sshpilot/machine_info_dialog.py:1144
+#, python-format
+msgid "%d °C"
+msgstr "%d °C"
+
+#: src/sshpilot/machine_info_dialog.py:1160
+msgid "Filesystems"
+msgstr "文件系统"
+
+#: src/sshpilot/machine_info_dialog.py:1163
+msgid "Mount point"
+msgstr "挂载点"
+
+#: src/sshpilot/machine_info_dialog.py:1165
+msgid "Usage"
+msgstr "使用率"
+
+#: src/sshpilot/machine_info_dialog.py:1166
+msgid "Used / Size"
+msgstr "已用 / 容量"
+
+#: src/sshpilot/machine_info_dialog.py:1180
+#, python-format
+msgid "%(device)s · %(fstype)s"
+msgstr "%(device)s · %(fstype)s"
+
+#: src/sshpilot/machine_info_dialog.py:1203
+msgid "No filesystems reported"
+msgstr "未报告文件系统"
+
+#: src/sshpilot/machine_info_dialog.py:1205
+msgid "Only physical disks are shown."
+msgstr "仅显示物理磁盘。"
+
+#: src/sshpilot/machine_info_dialog.py:1214
+msgid "Interfaces"
+msgstr "网络接口"
+
+#: src/sshpilot/machine_info_dialog.py:1250
+#, python-format
+msgid "MTU %d"
+msgstr "MTU %d"
+
+#: src/sshpilot/machine_info_dialog.py:1251
+#: src/sshpilot/machine_info_dialog.py:1453
+msgid " · "
+msgstr " · "
+
+#: src/sshpilot/machine_info_dialog.py:1261
+msgid "No interfaces reported"
+msgstr "未报告网络接口"
+
+#: src/sshpilot/machine_info_dialog.py:1268
+msgid "Routing & resolution"
+msgstr "路由与解析"
+
+#: src/sshpilot/machine_info_dialog.py:1271
+#, python-format
+msgid "%(gateway)s via %(interface)s"
+msgstr "%(gateway)s 经由 %(interface)s"
+
+#: src/sshpilot/machine_info_dialog.py:1277
+#, python-format
+msgid "%(port)d/tcp (%(process)s)"
+msgstr "%(port)d/tcp (%(process)s)"
+
+#: src/sshpilot/machine_info_dialog.py:1281
+#, python-format
+msgid "%d/tcp"
+msgstr "%d/tcp"
+
+#: src/sshpilot/machine_info_dialog.py:1287
+msgid "Default gateway"
+msgstr "默认网关"
+
+#: src/sshpilot/machine_info_dialog.py:1288
+msgid "DNS servers"
+msgstr "DNS 服务器"
+
+#: src/sshpilot/machine_info_dialog.py:1289
+msgid "Listening SSH port"
+msgstr "监听的 SSH 端口"
+
+#: src/sshpilot/machine_info_dialog.py:1301
+msgid "Live — sampled every 2 s."
+msgstr "实时 — 每 2 秒采样一次。"
+
+#: src/sshpilot/machine_info_dialog.py:1306
+msgid "Bandwidth"
+msgstr "带宽"
+
+#: src/sshpilot/machine_info_dialog.py:1309
+msgid "Network interface"
+msgstr "网络接口"
+
+#: src/sshpilot/machine_info_dialog.py:1310
+msgid "Received"
+msgstr "已接收"
+
+#: src/sshpilot/machine_info_dialog.py:1311
+msgid "Transmitted"
+msgstr "已发送"
+
+#: src/sshpilot/machine_info_dialog.py:1312
+msgid "Rate ↓"
+msgstr "速率 ↓"
+
+#: src/sshpilot/machine_info_dialog.py:1313
+msgid "Rate ↑"
+msgstr "速率 ↑"
+
+#: src/sshpilot/machine_info_dialog.py:1342
+msgid "No interface counters reported"
+msgstr "未报告接口计数器"
+
+#: src/sshpilot/machine_info_dialog.py:1344
+msgid "Totals since boot."
+msgstr "自启动以来的累计值。"
+
+#: src/sshpilot/machine_info_dialog.py:1346
+msgid "Remote sessions"
+msgstr "远程会话"
+
+#: src/sshpilot/machine_info_dialog.py:1360
+#, python-format
+msgid "Incoming · %d established"
+msgid_plural "Incoming · %d established"
+msgstr[0] "入站 · 已建立 %d 个"
+
+#: src/sshpilot/machine_info_dialog.py:1362
+#, python-format
+msgid "Outgoing · %d established"
+msgid_plural "Outgoing · %d established"
+msgstr[0] "出站 · 已建立 %d 个"
+
+#: src/sshpilot/machine_info_dialog.py:1412
+msgid "Some process names need root."
+msgstr "部分进程名称需要 root 权限。"
+
+#: src/sshpilot/machine_info_dialog.py:1419
+msgid "Logged-in users"
+msgstr "已登录用户"
+
+#: src/sshpilot/machine_info_dialog.py:1431
+msgid "No remote sessions"
+msgstr "无远程会话"
+
+#: src/sshpilot/machine_info_dialog.py:1431
+msgid "No logged-in users"
+msgstr "无已登录用户"
+
+#: src/sshpilot/machine_info_dialog.py:1452
+msgid "local console"
+msgstr "本地控制台"
 
 #: src/sshpilot/macos_menubar.py:51 src/sshpilot/sidebar.py:4094
 #: src/sshpilot/window.py:3844
@@ -4232,10 +4705,6 @@ msgstr "复制 JSON"
 msgid "Copy full inspect JSON"
 msgstr "复制完整的 inspect JSON"
 
-#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:103
-msgid "Overview"
-msgstr "概览"
-
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:110
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:123
 msgid "Environment"
@@ -4293,10 +4762,6 @@ msgstr "环境（KEY = value）"
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:349
 msgid "Advanced options"
 msgstr "高级选项"
-
-#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:352
-msgid "Network"
-msgstr "网络"
 
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:359
 msgid "Keep STDIN open (-i)"
@@ -4806,10 +5271,6 @@ msgstr "端口必须在 1 到 65535 之间。"
 #: src/sshpilot/plugins/builtin/mosh_protocol/__init__.py:74
 msgid "Port must be a number."
 msgstr "端口必须是数字。"
-
-#: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:62
-msgid "Device"
-msgstr "设备"
 
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:64
 msgid "Baud rate"
@@ -7295,8 +7756,8 @@ msgid "Copy SSH Command"
 msgstr "复制 SSH 命令"
 
 #: src/sshpilot/sidebar.py:4455
-msgid "Verify Configuration"
-msgstr "验证配置"
+msgid "Host Info…"
+msgstr "主机信息…"
 
 #: src/sshpilot/sidebar.py:4474
 msgid "Manage authorized_keys…"
@@ -8703,66 +9164,66 @@ msgstr "关闭应用程序将终止所有正在运行的进程。"
 msgid "Quit Anyway"
 msgstr "仍然退出"
 
-#: src/sshpilot/window.py:7065
+#: src/sshpilot/window.py:7052
 msgid "SSH command copied"
 msgstr "已复制 SSH 命令"
 
-#: src/sshpilot/window.py:7074 src/sshpilot/window.py:7080
+#: src/sshpilot/window.py:7061 src/sshpilot/window.py:7067
 msgid "SSH command unavailable"
 msgstr "SSH 命令不可用"
 
-#: src/sshpilot/window.py:7075
+#: src/sshpilot/window.py:7062
 msgid "This daemon cannot prepare the SSH command for this connection."
 msgstr "此守护进程无法为此连接准备 SSH 命令。"
 
-#: src/sshpilot/window.py:7081
+#: src/sshpilot/window.py:7068
 msgid "The SSH command for this connection could not be prepared."
 msgstr "无法为此连接准备 SSH 命令。"
 
-#: src/sshpilot/window.py:7170 src/sshpilot/window.py:7228
+#: src/sshpilot/window.py:7167 src/sshpilot/window.py:7225
 msgid "Connect to the SSH Pilot daemon before moving connections."
 msgstr "移动连接前请先连接到 SSH Pilot 守护进程。"
 
-#: src/sshpilot/window.py:7214 src/sshpilot/window.py:7238
+#: src/sshpilot/window.py:7211 src/sshpilot/window.py:7235
 #, python-brace-format
 msgid "Failed to move connection: {error}"
 msgstr "移动连接失败：{error}"
 
-#: src/sshpilot/window.py:7307 src/sshpilot/window.py:7343
-#: src/sshpilot/window.py:7363
+#: src/sshpilot/window.py:7304 src/sshpilot/window.py:7340
+#: src/sshpilot/window.py:7360
 msgid "External terminal unavailable"
 msgstr "外部终端不可用"
 
-#: src/sshpilot/window.py:7308 src/sshpilot/window.py:7344
+#: src/sshpilot/window.py:7305 src/sshpilot/window.py:7341
 msgid "This daemon cannot prepare an external SSH launch."
 msgstr "此守护进程无法准备外部 SSH 启动。"
 
-#: src/sshpilot/window.py:7348 src/sshpilot/window.py:7373
+#: src/sshpilot/window.py:7345 src/sshpilot/window.py:7370
 msgid "Connection unavailable"
 msgstr "连接不可用"
 
-#: src/sshpilot/window.py:7364
+#: src/sshpilot/window.py:7361
 msgid "The daemon could not prepare this SSH launch."
 msgstr "守护进程无法准备此 SSH 启动。"
 
-#: src/sshpilot/window.py:7376 src/sshpilot/window.py:7386
-#: src/sshpilot/window.py:8233
+#: src/sshpilot/window.py:7373 src/sshpilot/window.py:7383
+#: src/sshpilot/window.py:8230
 msgid "Effective configuration unavailable"
 msgstr "生效配置不可用"
 
-#: src/sshpilot/window.py:7377
+#: src/sshpilot/window.py:7374
 msgid "This daemon does not provide effective SSH configuration comparison."
 msgstr "此守护进程不提供生效 SSH 配置的对比。"
 
-#: src/sshpilot/window.py:7387
+#: src/sshpilot/window.py:7384
 msgid "SSH Pilot could not resolve or compare the effective SSH configuration."
 msgstr "SSH Pilot 无法解析或对比生效的 SSH 配置。"
 
-#: src/sshpilot/window.py:7397
+#: src/sshpilot/window.py:7394
 msgid "No Terminal Found"
 msgstr "未找到终端"
 
-#: src/sshpilot/window.py:7398
+#: src/sshpilot/window.py:7395
 msgid ""
 "Could not find a suitable terminal application. Please install a terminal "
 "like gnome-terminal, konsole, or xterm."
@@ -8770,64 +9231,64 @@ msgstr ""
 "找不到合适的终端应用程序。请安装诸如 gnome-terminal、konsole 或 xterm 等终"
 "端。"
 
-#: src/sshpilot/window.py:7417
+#: src/sshpilot/window.py:7414
 msgid "SSH Connection Failed"
 msgstr "SSH 连接失败"
 
-#: src/sshpilot/window.py:7418
+#: src/sshpilot/window.py:7415
 msgid "Could not establish SSH connection to the server. Please check:"
 msgstr "无法建立到服务器的 SSH 连接。请检查："
 
-#: src/sshpilot/window.py:7421
+#: src/sshpilot/window.py:7418
 msgid "• Server is running and accessible"
 msgstr "• 服务器正在运行且可访问"
 
-#: src/sshpilot/window.py:7422
+#: src/sshpilot/window.py:7419
 msgid "• SSH service is enabled on the server"
 msgstr "• 服务器上已启用 SSH 服务"
 
-#: src/sshpilot/window.py:7423
+#: src/sshpilot/window.py:7420
 msgid "• Firewall allows SSH connections"
 msgstr "• 防火墙允许 SSH 连接"
 
-#: src/sshpilot/window.py:7424
+#: src/sshpilot/window.py:7421
 msgid "• Your SSH keys or credentials are correct"
 msgstr "• 您的 SSH 密钥或凭据正确"
 
-#: src/sshpilot/window.py:7425
+#: src/sshpilot/window.py:7422
 msgid "• Network connectivity to the server"
 msgstr "• 到服务器的网络连通性"
 
-#: src/sshpilot/window.py:7428
+#: src/sshpilot/window.py:7425
 msgid "File Manager Error"
 msgstr "文件管理器错误"
 
-#: src/sshpilot/window.py:7429
+#: src/sshpilot/window.py:7426
 msgid "Failed to open file manager for remote server."
 msgstr "无法打开远程服务器的文件管理器。"
 
-#: src/sshpilot/window.py:7431
+#: src/sshpilot/window.py:7428
 msgid "• Try again in a moment"
 msgstr "• 请稍后重试"
 
-#: src/sshpilot/window.py:7432
+#: src/sshpilot/window.py:7429
 msgid "• Check if the server is accessible"
 msgstr "• 检查服务器是否可访问"
 
-#: src/sshpilot/window.py:7433
+#: src/sshpilot/window.py:7430
 msgid "• Ensure you have proper permissions"
 msgstr "• 确保您拥有适当的权限"
 
-#: src/sshpilot/window.py:7573 src/sshpilot/window.py:7960
-#: src/sshpilot/window.py:7970
+#: src/sshpilot/window.py:7570 src/sshpilot/window.py:7957
+#: src/sshpilot/window.py:7967
 msgid "Saved, but tags/Wake-on-LAN settings could not be stored."
 msgstr "已保存，但无法存储标签/局域网唤醒 (Wake-on-LAN) 设置。"
 
-#: src/sshpilot/window.py:8212
+#: src/sshpilot/window.py:8209
 msgid "Failed to save connection"
 msgstr "保存连接失败"
 
-#: src/sshpilot/window.py:8234
+#: src/sshpilot/window.py:8231
 msgid ""
 "The daemon could not resolve or compare this connection's effective SSH "
 "configuration."
@@ -9352,10 +9813,6 @@ msgstr "{count} 个私钥"
 #, python-brace-format
 msgid "Restored {items}."
 msgstr "已恢复 {items}。"
-
-#: src/sshpilot/window_dialogs.py:2171
-msgid ", "
-msgstr "，"
 
 #: src/sshpilot/window_dialogs.py:2173
 msgid ""
@@ -10722,6 +11179,9 @@ msgstr "直通"
 #: src/sshpilot/resources/ui/sshcopyid_window.ui:21
 msgid "Copy key to Server"
 msgstr "复制密钥到服务器"
+
+#~ msgid "Verify Configuration"
+#~ msgstr "验证配置"
 
 #~ msgid ""
 #~ "Default identity provider whose agent/keys are offered to connections. "

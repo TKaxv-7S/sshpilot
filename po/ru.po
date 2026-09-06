@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sshpilot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-06 01:45+0330\n"
+"POT-Creation-Date: 2026-09-06 22:22+0330\n"
 "PO-Revision-Date: 2026-09-05 11:35+0330\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -146,11 +146,11 @@ msgid "Split View — {name}"
 msgstr "Разделенный вид — {name}"
 
 #: src/sshpilot/actions.py:385 src/sshpilot/actions.py:513
-#: src/sshpilot/connection_dialog.py:4901 src/sshpilot/file_manager/pane.py:55
+#: src/sshpilot/connection_dialog.py:4919 src/sshpilot/file_manager/pane.py:55
 #: src/sshpilot/file_manager/pane.py:63 src/sshpilot/terminal.py:1022
 #: src/sshpilot/terminal_manager.py:1011 src/sshpilot/text_editor.py:1812
 #: src/sshpilot/window.py:1401 src/sshpilot/window.py:5706
-#: src/sshpilot/window.py:7213 src/sshpilot/window.py:7237
+#: src/sshpilot/window.py:7210 src/sshpilot/window.py:7234
 #: src/sshpilot/window_broadcast.py:200 src/sshpilot/window_dialogs.py:2384
 #: src/sshpilot/window_dialogs.py:2410 src/sshpilot/window_dialogs.py:2455
 #: src/sshpilot/window_dialogs.py:2490 src/sshpilot/window_dialogs.py:2526
@@ -171,7 +171,7 @@ msgstr ""
 "{error}"
 
 #: src/sshpilot/actions.py:388 src/sshpilot/actions.py:717
-#: src/sshpilot/actions.py:984 src/sshpilot/connection_dialog.py:4904
+#: src/sshpilot/actions.py:984 src/sshpilot/connection_dialog.py:4922
 #: src/sshpilot/daemon_quit_policy.py:531 src/sshpilot/file_manager/pane.py:56
 #: src/sshpilot/file_manager/pane.py:65 src/sshpilot/file_manager/pane.py:1933
 #: src/sshpilot/file_manager/pane.py:2336
@@ -187,8 +187,8 @@ msgstr ""
 #: src/sshpilot/window.py:1419 src/sshpilot/window.py:1430
 #: src/sshpilot/window.py:5403 src/sshpilot/window.py:5450
 #: src/sshpilot/window.py:5470 src/sshpilot/window.py:5675
-#: src/sshpilot/window.py:5708 src/sshpilot/window.py:7401
-#: src/sshpilot/window.py:7462 src/sshpilot/window_broadcast.py:184
+#: src/sshpilot/window.py:5708 src/sshpilot/window.py:7398
+#: src/sshpilot/window.py:7459 src/sshpilot/window_broadcast.py:184
 #: src/sshpilot/window_broadcast.py:203 src/sshpilot/window_dialogs.py:398
 #: src/sshpilot/window_dialogs.py:605 src/sshpilot/window_dialogs.py:1053
 #: src/sshpilot/window_dialogs.py:2192 src/sshpilot/window_dialogs.py:2795
@@ -211,7 +211,7 @@ msgid "Wake-on-LAN sent to {n} hosts"
 msgstr "Пакет Wake-on-LAN отправлен на {n} хостов"
 
 #: src/sshpilot/actions.py:502 src/sshpilot/actions.py:615
-#: src/sshpilot/window.py:7169 src/sshpilot/window.py:7227
+#: src/sshpilot/window.py:7166 src/sshpilot/window.py:7224
 #: src/sshpilot/window_dialogs.py:2389 src/sshpilot/window_dialogs.py:2460
 #: src/sshpilot/window_dialogs.py:2578 src/sshpilot/window_dialogs.py:2630
 msgid "Service unavailable"
@@ -414,6 +414,7 @@ msgstr "Ключ безопасности"
 #: src/sshpilot/askpass_utils.py:846
 #: src/sshpilot/daemon_interaction_dialogs.py:367
 #: src/sshpilot/daemon_sessions_dialog.py:35
+#: src/sshpilot/machine_info_dialog.py:522
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:444
 #: src/sshpilot/preferences.py:4875 src/sshpilot/sshcopyid_window.py:559
 #: src/sshpilot/terminal.py:1059 src/sshpilot/welcome_page.py:708
@@ -1823,6 +1824,7 @@ msgstr ""
 "FIDO."
 
 #: src/sshpilot/connection_dialog.py:3560
+#: src/sshpilot/machine_info_dialog.py:1404
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:67
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:74
 #: src/sshpilot/shortcut_editor.py:442 src/sshpilot/shortcut_editor.py:456
@@ -2143,7 +2145,7 @@ msgstr "Поле «{field}» обязательно для заполнения"
 
 #: src/sshpilot/connection_dialog.py:4348
 #: src/sshpilot/connection_dialog.py:4638
-#: src/sshpilot/connection_dialog.py:4829
+#: src/sshpilot/connection_dialog.py:4839
 msgid "The connection settings could not be saved."
 msgstr "Не удалось сохранить настройки подключения."
 
@@ -2182,7 +2184,7 @@ msgstr ""
 "вовремя. Возможно, пароль все же был сохранен — откройте подключение снова, "
 "чтобы проверить это перед повторным сохранением."
 
-#: src/sshpilot/connection_dialog.py:4832
+#: src/sshpilot/connection_dialog.py:4850
 msgid ""
 "The connection settings were saved, but secure storage rejected a password "
 "or passphrase. Please try saving again."
@@ -2190,7 +2192,7 @@ msgstr ""
 "Настройки подключения сохранены, но защищенное хранилище отклонило пароль "
 "или парольную фразу. Попробуйте сохранить снова."
 
-#: src/sshpilot/connection_dialog.py:4924
+#: src/sshpilot/connection_dialog.py:4942
 msgid ""
 "The connection could not be loaded from the service. You can retry or close "
 "the editor."
@@ -2198,7 +2200,7 @@ msgstr ""
 "Не удалось загрузить подключение из службы. Вы можете повторить попытку или "
 "закрыть редактор."
 
-#: src/sshpilot/connection_dialog.py:4927
+#: src/sshpilot/connection_dialog.py:4945
 msgid ""
 "The connection could not be loaded from the service. Please close the editor "
 "and try again."
@@ -2206,15 +2208,15 @@ msgstr ""
 "Не удалось загрузить подключение из службы. Закройте редактор и повторите "
 "попытку."
 
-#: src/sshpilot/connection_dialog.py:4931
+#: src/sshpilot/connection_dialog.py:4949
 msgid "Could not load connection"
 msgstr "Не удалось загрузить подключение"
 
-#: src/sshpilot/connection_dialog.py:4935
+#: src/sshpilot/connection_dialog.py:4953
 msgid "_Retry"
 msgstr "_Повторить"
 
-#: src/sshpilot/connection_dialog.py:4940
+#: src/sshpilot/connection_dialog.py:4958
 msgid "_Close"
 msgstr "_Закрыть"
 
@@ -3129,8 +3131,8 @@ msgid "Public-key deployment is unavailable."
 msgstr "Развёртывание открытого ключа недоступно."
 
 #: src/sshpilot/gtk/identity_failure_messages.py:16
-#: src/sshpilot/gtk/scp_failure_messages.py:19 src/sshpilot/window.py:7349
-#: src/sshpilot/window.py:7374
+#: src/sshpilot/gtk/scp_failure_messages.py:19 src/sshpilot/window.py:7346
+#: src/sshpilot/window.py:7371
 msgid "The selected connection no longer exists in the daemon."
 msgstr "Выбранное подключение больше не существует в демоне."
 
@@ -4041,7 +4043,7 @@ msgstr "Демон"
 msgid "Crash"
 msgstr "Сбои"
 
-#: src/sshpilot/log_viewer.py:574
+#: src/sshpilot/log_viewer.py:574 src/sshpilot/machine_info_dialog.py:526
 #: src/sshpilot/plugins/builtin/docker_manager/page.py:620
 #: src/sshpilot/preferences.py:864
 msgid "Refresh"
@@ -4129,6 +4131,495 @@ msgid ""
 msgstr ""
 "Строки журнала могут содержать имена узлов, имена пользователей и пути к "
 "файлам. Проверьте перед отправкой."
+
+#: src/sshpilot/machine_info_dialog.py:125
+#: src/sshpilot/machine_info_dialog.py:141
+#: src/sshpilot/machine_info_dialog.py:169
+#: src/sshpilot/machine_info_dialog.py:187
+#: src/sshpilot/machine_info_dialog.py:198
+#: src/sshpilot/machine_info_dialog.py:1112
+#: src/sshpilot/machine_info_dialog.py:1274
+msgid "N/A"
+msgstr "Н/Д"
+
+#: src/sshpilot/machine_info_dialog.py:127
+#: src/sshpilot/machine_info_dialog.py:143
+#, python-format
+msgid "%d B"
+msgstr "%d B"
+
+#: src/sshpilot/machine_info_dialog.py:157
+#, python-format
+msgid "%d B/s"
+msgstr "%d B/s"
+
+#: src/sshpilot/machine_info_dialog.py:175
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d день"
+msgstr[1] "%d дня"
+msgstr[2] "%d дней"
+
+#: src/sshpilot/machine_info_dialog.py:177
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d час"
+msgstr[1] "%d часа"
+msgstr[2] "%d часов"
+
+#: src/sshpilot/machine_info_dialog.py:179
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d минута"
+msgstr[1] "%d минуты"
+msgstr[2] "%d минут"
+
+#: src/sshpilot/machine_info_dialog.py:181
+msgid "Less than a minute"
+msgstr "Меньше минуты"
+
+#: src/sshpilot/machine_info_dialog.py:182
+#: src/sshpilot/machine_info_dialog.py:1288 src/sshpilot/window_dialogs.py:2171
+msgid ", "
+msgstr ", "
+
+#: src/sshpilot/machine_info_dialog.py:189
+#, python-format
+msgid "%.2f GHz"
+msgstr "%.2f GHz"
+
+#: src/sshpilot/machine_info_dialog.py:190
+#, python-format
+msgid "%.0f MHz"
+msgstr "%.0f MHz"
+
+#: src/sshpilot/machine_info_dialog.py:194
+#, python-format
+msgid "%d%%"
+msgstr "%d%%"
+
+#: src/sshpilot/machine_info_dialog.py:225
+msgid "Loopback"
+msgstr "Локальная петля"
+
+#: src/sshpilot/machine_info_dialog.py:226
+msgid "Wi-Fi"
+msgstr "Wi-Fi"
+
+#: src/sshpilot/machine_info_dialog.py:227
+msgid "Ethernet"
+msgstr "Ethernet"
+
+#: src/sshpilot/machine_info_dialog.py:228
+#: src/sshpilot/machine_info_dialog.py:236
+#: src/sshpilot/machine_info_dialog.py:1446
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: src/sshpilot/machine_info_dialog.py:233
+msgid "Up"
+msgstr "Активен"
+
+#: src/sshpilot/machine_info_dialog.py:234
+msgid "Down"
+msgstr "Отключён"
+
+#: src/sshpilot/machine_info_dialog.py:235
+#: src/sshpilot/machine_info_dialog.py:1243
+msgid "No carrier"
+msgstr "Нет несущей"
+
+#: src/sshpilot/machine_info_dialog.py:490
+#: src/sshpilot/machine_info_dialog.py:645
+msgid "Gathering host information…"
+msgstr "Сбор сведений об узле…"
+
+#: src/sshpilot/machine_info_dialog.py:508
+msgid "Host Info"
+msgstr "Сведения об узле"
+
+#: src/sshpilot/machine_info_dialog.py:528
+msgid "Refresh host information"
+msgstr "Обновить сведения об узле"
+
+#: src/sshpilot/machine_info_dialog.py:543
+#, python-format
+msgid "%(nickname)s — %(user)s@%(host)s"
+msgstr "%(nickname)s — %(user)s@%(host)s"
+
+#: src/sshpilot/machine_info_dialog.py:547
+#, python-format
+msgid "%(nickname)s — %(host)s"
+msgstr "%(nickname)s — %(host)s"
+
+#: src/sshpilot/machine_info_dialog.py:639
+msgid "Daemon connection unavailable."
+msgstr "Нет соединения с демоном."
+
+#: src/sshpilot/machine_info_dialog.py:654
+#: src/sshpilot/machine_info_dialog.py:675
+#, python-format
+msgid ""
+"Could not gather host information.\n"
+"\n"
+"%s"
+msgstr ""
+"Не удалось собрать сведения об узле.\n"
+"\n"
+"%s"
+
+#: src/sshpilot/machine_info_dialog.py:658
+msgid "The host returned no system information."
+msgstr "Узел не вернул сведений о системе."
+
+#: src/sshpilot/machine_info_dialog.py:727
+#, python-format
+msgid "Updated %d second ago"
+msgid_plural "Updated %d seconds ago"
+msgstr[0] "Обновлено %d секунду назад"
+msgstr[1] "Обновлено %d секунды назад"
+msgstr[2] "Обновлено %d секунд назад"
+
+#: src/sshpilot/machine_info_dialog.py:733
+#, python-format
+msgid "Updated %d minute ago"
+msgid_plural "Updated %d minutes ago"
+msgstr[0] "Обновлено %d минуту назад"
+msgstr[1] "Обновлено %d минуты назад"
+msgstr[2] "Обновлено %d минут назад"
+
+#: src/sshpilot/machine_info_dialog.py:819
+#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:103
+msgid "Overview"
+msgstr "Обзор"
+
+#: src/sshpilot/machine_info_dialog.py:820
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: src/sshpilot/machine_info_dialog.py:821
+msgid "Storage"
+msgstr "Хранилище"
+
+#: src/sshpilot/machine_info_dialog.py:822
+#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:352
+msgid "Network"
+msgstr "Сеть"
+
+#: src/sshpilot/machine_info_dialog.py:823
+msgid "Traffic"
+msgstr "Трафик"
+
+#: src/sshpilot/machine_info_dialog.py:824
+msgid "System"
+msgstr "Система"
+
+#: src/sshpilot/machine_info_dialog.py:881
+#, python-format
+msgid "load %(one).2f · %(five).2f · %(fifteen).2f"
+msgstr "нагрузка %(one).2f · %(five).2f · %(fifteen).2f"
+
+#: src/sshpilot/machine_info_dialog.py:894
+msgid "CPU"
+msgstr "CPU"
+
+#: src/sshpilot/machine_info_dialog.py:904
+#, python-format
+msgid "swap %(used)s / %(total)s"
+msgstr "подкачка %(used)s / %(total)s"
+
+#: src/sshpilot/machine_info_dialog.py:911
+#: src/sshpilot/machine_info_dialog.py:955
+#: src/sshpilot/machine_info_dialog.py:1042
+msgid "Memory"
+msgstr "Память"
+
+#: src/sshpilot/machine_info_dialog.py:912
+#: src/sshpilot/machine_info_dialog.py:923
+#: src/sshpilot/machine_info_dialog.py:1191
+#, python-format
+msgid "%(used)s / %(total)s"
+msgstr "%(used)s / %(total)s"
+
+#: src/sshpilot/machine_info_dialog.py:928
+#, python-format
+msgid "%(fstype)s on %(device)s"
+msgstr "%(fstype)s на %(device)s"
+
+#: src/sshpilot/machine_info_dialog.py:936
+msgid "Root filesystem"
+msgstr "Корневая файловая система"
+
+#: src/sshpilot/machine_info_dialog.py:945
+msgid "Hostname"
+msgstr "Имя узла"
+
+#: src/sshpilot/machine_info_dialog.py:948
+#: src/sshpilot/machine_info_dialog.py:1164
+#: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:62
+msgid "Device"
+msgstr "Устройство"
+
+#: src/sshpilot/machine_info_dialog.py:951
+msgid "Operating system"
+msgstr "Операционная система"
+
+#: src/sshpilot/machine_info_dialog.py:952
+msgid "Kernel"
+msgstr "Ядро"
+
+#: src/sshpilot/machine_info_dialog.py:953
+msgid "Processor"
+msgstr "Процессор"
+
+#: src/sshpilot/machine_info_dialog.py:954
+msgid "CPU frequency"
+msgstr "Частота ЦП"
+
+#: src/sshpilot/machine_info_dialog.py:956
+msgid "Uptime"
+msgstr "Время работы"
+
+#: src/sshpilot/machine_info_dialog.py:957
+msgid "Booted"
+msgstr "Загружен"
+
+#: src/sshpilot/machine_info_dialog.py:969
+#, python-format
+msgid "%(cores)d cores · %(threads)d threads · %(sockets)d sockets"
+msgstr "%(cores)d ядер · %(threads)d потоков · %(sockets)d сокетов"
+
+#: src/sshpilot/machine_info_dialog.py:975
+#, python-format
+msgid "%d core"
+msgid_plural "%d cores"
+msgstr[0] "%d ядро"
+msgstr[1] "%d ядра"
+msgstr[2] "%d ядер"
+
+#: src/sshpilot/machine_info_dialog.py:979
+#, python-format
+msgid "%(model)s (%(topology)s)"
+msgstr "%(model)s (%(topology)s)"
+
+#: src/sshpilot/machine_info_dialog.py:991
+msgid "Load average"
+msgstr "Средняя нагрузка"
+
+#: src/sshpilot/machine_info_dialog.py:995
+msgid "1 min"
+msgstr "1 мин"
+
+#: src/sshpilot/machine_info_dialog.py:996
+msgid "5 min"
+msgstr "5 мин"
+
+#: src/sshpilot/machine_info_dialog.py:997
+msgid "15 min"
+msgstr "15 мин"
+
+#: src/sshpilot/machine_info_dialog.py:1026
+#, python-format
+msgid "Based on %d CPU"
+msgid_plural "Based on %d CPUs"
+msgstr[0] "На основе %d ЦП"
+msgstr[1] "На основе %d ЦП"
+msgstr[2] "На основе %d ЦП"
+
+#: src/sshpilot/machine_info_dialog.py:1029
+msgid "CPU count unavailable."
+msgstr "Количество ЦП недоступно."
+
+#: src/sshpilot/machine_info_dialog.py:1060
+msgid "MemTotal"
+msgstr "MemTotal"
+
+#: src/sshpilot/machine_info_dialog.py:1061
+msgid "MemFree"
+msgstr "MemFree"
+
+#: src/sshpilot/machine_info_dialog.py:1062
+msgid "Cached"
+msgstr "Cached"
+
+#: src/sshpilot/machine_info_dialog.py:1063
+msgid "MemAvailable"
+msgstr "MemAvailable"
+
+#: src/sshpilot/machine_info_dialog.py:1084
+msgid "Swap"
+msgstr "Swap"
+
+#: src/sshpilot/machine_info_dialog.py:1091
+#, python-format
+msgid "%(used)s / %(total)s · %(percent)s"
+msgstr "%(used)s / %(total)s · %(percent)s"
+
+#: src/sshpilot/machine_info_dialog.py:1108
+msgid "Temperatures"
+msgstr "Температуры"
+
+#: src/sshpilot/machine_info_dialog.py:1144
+#, python-format
+msgid "%d °C"
+msgstr "%d °C"
+
+#: src/sshpilot/machine_info_dialog.py:1160
+msgid "Filesystems"
+msgstr "Файловые системы"
+
+#: src/sshpilot/machine_info_dialog.py:1163
+msgid "Mount point"
+msgstr "Точка монтирования"
+
+#: src/sshpilot/machine_info_dialog.py:1165
+msgid "Usage"
+msgstr "Использование"
+
+#: src/sshpilot/machine_info_dialog.py:1166
+msgid "Used / Size"
+msgstr "Занято / Размер"
+
+#: src/sshpilot/machine_info_dialog.py:1180
+#, python-format
+msgid "%(device)s · %(fstype)s"
+msgstr "%(device)s · %(fstype)s"
+
+#: src/sshpilot/machine_info_dialog.py:1203
+msgid "No filesystems reported"
+msgstr "Файловые системы не обнаружены"
+
+#: src/sshpilot/machine_info_dialog.py:1205
+msgid "Only physical disks are shown."
+msgstr "Показаны только физические диски."
+
+#: src/sshpilot/machine_info_dialog.py:1214
+msgid "Interfaces"
+msgstr "Интерфейсы"
+
+#: src/sshpilot/machine_info_dialog.py:1250
+#, python-format
+msgid "MTU %d"
+msgstr "MTU %d"
+
+#: src/sshpilot/machine_info_dialog.py:1251
+#: src/sshpilot/machine_info_dialog.py:1453
+msgid " · "
+msgstr " · "
+
+#: src/sshpilot/machine_info_dialog.py:1261
+msgid "No interfaces reported"
+msgstr "Интерфейсы не обнаружены"
+
+#: src/sshpilot/machine_info_dialog.py:1268
+msgid "Routing & resolution"
+msgstr "Маршрутизация и разрешение имён"
+
+#: src/sshpilot/machine_info_dialog.py:1271
+#, python-format
+msgid "%(gateway)s via %(interface)s"
+msgstr "%(gateway)s через %(interface)s"
+
+#: src/sshpilot/machine_info_dialog.py:1277
+#, python-format
+msgid "%(port)d/tcp (%(process)s)"
+msgstr "%(port)d/tcp (%(process)s)"
+
+#: src/sshpilot/machine_info_dialog.py:1281
+#, python-format
+msgid "%d/tcp"
+msgstr "%d/tcp"
+
+#: src/sshpilot/machine_info_dialog.py:1287
+msgid "Default gateway"
+msgstr "Шлюз по умолчанию"
+
+#: src/sshpilot/machine_info_dialog.py:1288
+msgid "DNS servers"
+msgstr "Серверы DNS"
+
+#: src/sshpilot/machine_info_dialog.py:1289
+msgid "Listening SSH port"
+msgstr "Прослушиваемый порт SSH"
+
+#: src/sshpilot/machine_info_dialog.py:1301
+msgid "Live — sampled every 2 s."
+msgstr "В реальном времени — опрос каждые 2 с."
+
+#: src/sshpilot/machine_info_dialog.py:1306
+msgid "Bandwidth"
+msgstr "Пропускная способность"
+
+#: src/sshpilot/machine_info_dialog.py:1309
+msgid "Network interface"
+msgstr "Сетевой интерфейс"
+
+#: src/sshpilot/machine_info_dialog.py:1310
+msgid "Received"
+msgstr "Получено"
+
+#: src/sshpilot/machine_info_dialog.py:1311
+msgid "Transmitted"
+msgstr "Передано"
+
+#: src/sshpilot/machine_info_dialog.py:1312
+msgid "Rate ↓"
+msgstr "Скорость ↓"
+
+#: src/sshpilot/machine_info_dialog.py:1313
+msgid "Rate ↑"
+msgstr "Скорость ↑"
+
+#: src/sshpilot/machine_info_dialog.py:1342
+msgid "No interface counters reported"
+msgstr "Счётчики интерфейсов не обнаружены"
+
+#: src/sshpilot/machine_info_dialog.py:1344
+msgid "Totals since boot."
+msgstr "Итоги с момента загрузки."
+
+#: src/sshpilot/machine_info_dialog.py:1346
+msgid "Remote sessions"
+msgstr "Удалённые сеансы"
+
+#: src/sshpilot/machine_info_dialog.py:1360
+#, python-format
+msgid "Incoming · %d established"
+msgid_plural "Incoming · %d established"
+msgstr[0] "Входящие · %d установлено"
+msgstr[1] "Входящие · %d установлено"
+msgstr[2] "Входящие · %d установлено"
+
+#: src/sshpilot/machine_info_dialog.py:1362
+#, python-format
+msgid "Outgoing · %d established"
+msgid_plural "Outgoing · %d established"
+msgstr[0] "Исходящие · %d установлено"
+msgstr[1] "Исходящие · %d установлено"
+msgstr[2] "Исходящие · %d установлено"
+
+#: src/sshpilot/machine_info_dialog.py:1412
+msgid "Some process names need root."
+msgstr "Для части имён процессов нужны права root."
+
+#: src/sshpilot/machine_info_dialog.py:1419
+msgid "Logged-in users"
+msgstr "Вошедшие пользователи"
+
+#: src/sshpilot/machine_info_dialog.py:1431
+msgid "No remote sessions"
+msgstr "Нет удалённых сеансов"
+
+#: src/sshpilot/machine_info_dialog.py:1431
+msgid "No logged-in users"
+msgstr "Нет вошедших пользователей"
+
+#: src/sshpilot/machine_info_dialog.py:1452
+msgid "local console"
+msgstr "локальная консоль"
 
 #: src/sshpilot/macos_menubar.py:51 src/sshpilot/sidebar.py:4094
 #: src/sshpilot/window.py:3844
@@ -4357,10 +4848,6 @@ msgstr "Скопировать JSON"
 msgid "Copy full inspect JSON"
 msgstr "Скопировать полный JSON инспекции"
 
-#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:103
-msgid "Overview"
-msgstr "Обзор"
-
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:110
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:123
 msgid "Environment"
@@ -4419,10 +4906,6 @@ msgstr "Переменные окружения (КЛЮЧ = значение)"
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:349
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
-
-#: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:352
-msgid "Network"
-msgstr "Сеть"
 
 #: src/sshpilot/plugins/builtin/docker_manager/dialogs.py:359
 msgid "Keep STDIN open (-i)"
@@ -4938,10 +5421,6 @@ msgstr "Port должен быть в диапазоне от 1 до 65535."
 #: src/sshpilot/plugins/builtin/mosh_protocol/__init__.py:74
 msgid "Port must be a number."
 msgstr "Port должен быть числом."
-
-#: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:62
-msgid "Device"
-msgstr "Устройство"
 
 #: src/sshpilot/plugins/builtin/serial_protocol/__init__.py:64
 msgid "Baud rate"
@@ -7511,8 +7990,8 @@ msgid "Copy SSH Command"
 msgstr "Копировать команду SSH"
 
 #: src/sshpilot/sidebar.py:4455
-msgid "Verify Configuration"
-msgstr "Проверить конфигурацию"
+msgid "Host Info…"
+msgstr "Сведения об узле…"
 
 #: src/sshpilot/sidebar.py:4474
 msgid "Manage authorized_keys…"
@@ -8956,67 +9435,67 @@ msgstr "Закрытие приложения приведет к заверше
 msgid "Quit Anyway"
 msgstr "Все равно выйти"
 
-#: src/sshpilot/window.py:7065
+#: src/sshpilot/window.py:7052
 msgid "SSH command copied"
 msgstr "Команда SSH скопирована"
 
-#: src/sshpilot/window.py:7074 src/sshpilot/window.py:7080
+#: src/sshpilot/window.py:7061 src/sshpilot/window.py:7067
 msgid "SSH command unavailable"
 msgstr "Команда SSH недоступна"
 
-#: src/sshpilot/window.py:7075
+#: src/sshpilot/window.py:7062
 msgid "This daemon cannot prepare the SSH command for this connection."
 msgstr "Этот демон не может подготовить команду SSH для этого подключения."
 
-#: src/sshpilot/window.py:7081
+#: src/sshpilot/window.py:7068
 msgid "The SSH command for this connection could not be prepared."
 msgstr "Не удалось подготовить команду SSH для этого подключения."
 
-#: src/sshpilot/window.py:7170 src/sshpilot/window.py:7228
+#: src/sshpilot/window.py:7167 src/sshpilot/window.py:7225
 msgid "Connect to the SSH Pilot daemon before moving connections."
 msgstr "Подключитесь к демону SSH Pilot перед перемещением подключений."
 
-#: src/sshpilot/window.py:7214 src/sshpilot/window.py:7238
+#: src/sshpilot/window.py:7211 src/sshpilot/window.py:7235
 #, python-brace-format
 msgid "Failed to move connection: {error}"
 msgstr "Не удалось переместить подключение: {error}"
 
-#: src/sshpilot/window.py:7307 src/sshpilot/window.py:7343
-#: src/sshpilot/window.py:7363
+#: src/sshpilot/window.py:7304 src/sshpilot/window.py:7340
+#: src/sshpilot/window.py:7360
 msgid "External terminal unavailable"
 msgstr "Внешний терминал недоступен"
 
-#: src/sshpilot/window.py:7308 src/sshpilot/window.py:7344
+#: src/sshpilot/window.py:7305 src/sshpilot/window.py:7341
 msgid "This daemon cannot prepare an external SSH launch."
 msgstr "Этот демон не может подготовить внешний запуск SSH."
 
-#: src/sshpilot/window.py:7348 src/sshpilot/window.py:7373
+#: src/sshpilot/window.py:7345 src/sshpilot/window.py:7370
 msgid "Connection unavailable"
 msgstr "Подключение недоступно"
 
-#: src/sshpilot/window.py:7364
+#: src/sshpilot/window.py:7361
 msgid "The daemon could not prepare this SSH launch."
 msgstr "Демон не смог подготовить этот запуск SSH."
 
-#: src/sshpilot/window.py:7376 src/sshpilot/window.py:7386
-#: src/sshpilot/window.py:8233
+#: src/sshpilot/window.py:7373 src/sshpilot/window.py:7383
+#: src/sshpilot/window.py:8230
 msgid "Effective configuration unavailable"
 msgstr "Действующая конфигурация недоступна"
 
-#: src/sshpilot/window.py:7377
+#: src/sshpilot/window.py:7374
 msgid "This daemon does not provide effective SSH configuration comparison."
 msgstr "Этот демон не поддерживает сравнение действующей конфигурации SSH."
 
-#: src/sshpilot/window.py:7387
+#: src/sshpilot/window.py:7384
 msgid "SSH Pilot could not resolve or compare the effective SSH configuration."
 msgstr ""
 "SSH Pilot не смог определить или сравнить действующую конфигурацию SSH."
 
-#: src/sshpilot/window.py:7397
+#: src/sshpilot/window.py:7394
 msgid "No Terminal Found"
 msgstr "Терминал не найден"
 
-#: src/sshpilot/window.py:7398
+#: src/sshpilot/window.py:7395
 msgid ""
 "Could not find a suitable terminal application. Please install a terminal "
 "like gnome-terminal, konsole, or xterm."
@@ -9024,64 +9503,64 @@ msgstr ""
 "Не удалось найти подходящий терминал. Установите терминал, например gnome-"
 "terminal, konsole или xterm."
 
-#: src/sshpilot/window.py:7417
+#: src/sshpilot/window.py:7414
 msgid "SSH Connection Failed"
 msgstr "Сбой подключения SSH"
 
-#: src/sshpilot/window.py:7418
+#: src/sshpilot/window.py:7415
 msgid "Could not establish SSH connection to the server. Please check:"
 msgstr "Не удалось установить подключение SSH к серверу. Проверьте следующее:"
 
-#: src/sshpilot/window.py:7421
+#: src/sshpilot/window.py:7418
 msgid "• Server is running and accessible"
 msgstr "• Сервер запущен и доступен"
 
-#: src/sshpilot/window.py:7422
+#: src/sshpilot/window.py:7419
 msgid "• SSH service is enabled on the server"
 msgstr "• Служба SSH включена на сервере"
 
-#: src/sshpilot/window.py:7423
+#: src/sshpilot/window.py:7420
 msgid "• Firewall allows SSH connections"
 msgstr "• Межсетевой экран разрешает подключения SSH"
 
-#: src/sshpilot/window.py:7424
+#: src/sshpilot/window.py:7421
 msgid "• Your SSH keys or credentials are correct"
 msgstr "• Ваши ключи SSH или учетные данные верны"
 
-#: src/sshpilot/window.py:7425
+#: src/sshpilot/window.py:7422
 msgid "• Network connectivity to the server"
 msgstr "• Сетевое соединение с сервером"
 
-#: src/sshpilot/window.py:7428
+#: src/sshpilot/window.py:7425
 msgid "File Manager Error"
 msgstr "Ошибка диспетчера файлов"
 
-#: src/sshpilot/window.py:7429
+#: src/sshpilot/window.py:7426
 msgid "Failed to open file manager for remote server."
 msgstr "Не удалось открыть диспетчер файлов для удаленного сервера."
 
-#: src/sshpilot/window.py:7431
+#: src/sshpilot/window.py:7428
 msgid "• Try again in a moment"
 msgstr "• Повторите попытку через некоторое время"
 
-#: src/sshpilot/window.py:7432
+#: src/sshpilot/window.py:7429
 msgid "• Check if the server is accessible"
 msgstr "• Проверьте доступность сервера"
 
-#: src/sshpilot/window.py:7433
+#: src/sshpilot/window.py:7430
 msgid "• Ensure you have proper permissions"
 msgstr "• Убедитесь в наличии необходимых прав доступа"
 
-#: src/sshpilot/window.py:7573 src/sshpilot/window.py:7960
-#: src/sshpilot/window.py:7970
+#: src/sshpilot/window.py:7570 src/sshpilot/window.py:7957
+#: src/sshpilot/window.py:7967
 msgid "Saved, but tags/Wake-on-LAN settings could not be stored."
 msgstr "Сохранено, но не удалось сохранить параметры тегов и Wake-on-LAN."
 
-#: src/sshpilot/window.py:8212
+#: src/sshpilot/window.py:8209
 msgid "Failed to save connection"
 msgstr "Не удалось сохранить подключение"
 
-#: src/sshpilot/window.py:8234
+#: src/sshpilot/window.py:8231
 msgid ""
 "The daemon could not resolve or compare this connection's effective SSH "
 "configuration."
@@ -9635,10 +10114,6 @@ msgstr "закрытых ключей: {count}"
 #, python-brace-format
 msgid "Restored {items}."
 msgstr "Восстановлено: {items}."
-
-#: src/sshpilot/window_dialogs.py:2171
-msgid ", "
-msgstr ", "
 
 #: src/sshpilot/window_dialogs.py:2173
 msgid ""
@@ -11097,6 +11572,9 @@ msgstr "Сквозная передача"
 #: src/sshpilot/resources/ui/sshcopyid_window.ui:21
 msgid "Copy key to Server"
 msgstr "Скопировать ключ на сервер"
+
+#~ msgid "Verify Configuration"
+#~ msgstr "Проверить конфигурацию"
 
 #~ msgid ""
 #~ "Default identity provider whose agent/keys are offered to connections. "

@@ -1306,7 +1306,7 @@ class MachineInfoDialog:
         page.append(_section_label(_("Bandwidth")))
         table = _Table(
             (
-                (_("Interface"), 0.0, False),
+                (_("Network interface"), 0.0, False),
                 (_("Received"), 1.0, False),
                 (_("Transmitted"), 1.0, False),
                 (_("Rate ↓"), 1.0, True),
