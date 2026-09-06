@@ -281,6 +281,8 @@ def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
         if len(parts) < 5 or parts[0] in ('Netid', 'State', 'Proto', 'Active'):
             continue
         if is_netstat:
+            if len(parts) > 5 and parts[5] in ('LISTEN', 'TIME_WAIT'):
+                continue
             local, peer = (parts[3], parts[4]) if len(parts) > 4 else ('', '')
         else:
             local = parts[4] if len(parts) > 4 else ''
@@ -292,13 +294,8 @@ def _ssh_sessions_from_ss(ss_text: str) -> List[Dict[str, str]]:
         if peer_addr in seen:
             continue
         seen.add(peer_addr)
-        proc = ''
-        rest = ' '.join(parts[5:])
-        proc_m = re.search(r'users:\(\("([^"]+)"|(\d+)/(\S+)', rest)
-        if proc_m:
-            proc = proc_m.group(1) or proc_m.group(3) or ''
         rows.append({
-            'user': proc or 'sshd',
+            'user': '',
             'tty': 'ssh',
             'from': peer_addr,
             'since': '',
@@ -834,6 +831,10 @@ class MachineInfoDialog:
             rows = _parse_w(self._data.get('W', ''))
         if not rows:
             rows = _ssh_sessions_from_ss(self._data.get('SS_ESTAB', ''))
+            login_name = getattr(self._connection, 'username', '') or ''
+            for r in rows:
+                if not r.get('user'):
+                    r['user'] = login_name
         return rows
 
     # ── Traffic polling ────────────────────────────────────────────────
@@ -954,7 +955,10 @@ class MachineInfoDialog:
         mem_frac = mem_used / mem_total if mem_total else 0
 
         df_rows = _parse_df(self._data.get('DF', ''))
-        root_row = next((r for r in df_rows if r['mount'] == '/'), None)
+        root_row = (
+            next((r for r in df_rows if r['mount'] == '/overlay'), None)
+            or next((r for r in df_rows if r['mount'] == '/'), None)
+        )
         root_frac = 0.0
         root_used_str = root_size_str = root_type_str = ''
         if root_row:
@@ -1082,6 +1086,8 @@ class MachineInfoDialog:
                 freq_text = f"{bogo} BogoMIPS"
         info_card.append(_kv_row(_("CPU frequency"), freq_text or _("N/A"),
                                  mono=bool(freq_text)))
+
+        info_card.append(_kv_row(_("Memory"), _fmt_bytes(mem_total), mono=True))
 
         uptime_secs = 0.0
         uptime_raw = self._data.get('UPTIME', '').strip()
