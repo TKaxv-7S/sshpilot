@@ -406,3 +406,61 @@ def test_remote_identity_rejects_an_unknown_connection():
 
     with pytest.raises(Exception):
         prov.remote_identity("missing")
+
+
+def test_headless_remote_command_strips_verbosity_but_keeps_multiplexing(
+    monkeypatch,
+):
+    """Piped probes with ``-v`` + ControlMaster hang on first master creation.
+
+    The backgrounding master inherits the capture pipes for debug logging, so
+    the client sees its exit status but never EOF and hangs until the probe
+    timeout; the second run reuses the live master and succeeds ("fails first
+    time after startup, works afterwards"). Headless remote commands must never
+    carry ``-v``/``LogLevel``; interactive terminals keep them.
+    """
+
+    import sshpilot.ssh_connection_builder as builder
+    from sshpilot.daemon.connection_launch_provider import (
+        _strip_verbosity_for_headless,
+    )
+
+    assert _strip_verbosity_for_headless(
+        (
+            "ssh", "-v", "-o", "LogLevel=VERBOSE",
+            "-o", "ControlMaster=auto",
+            "-o", "ControlPath=/tmp/cm/%C",
+            "web", "echo hi",
+        )
+    ) == (
+        "ssh",
+        "-o", "ControlMaster=auto",
+        "-o", "ControlPath=/tmp/cm/%C",
+        "web", "echo hi",
+    )
+
+    class Prepared:
+        command = (
+            "ssh", "-T",
+            "-o", "StrictHostKeyChecking=accept-new",
+            "-v", "-o", "LogLevel=VERBOSE",
+            "-o", "ControlMaster=auto",
+            "-o", "ControlPath=/tmp/cm/%C",
+            "web", "echo hi",
+        )
+        env = {}
+        use_askpass = False
+
+    monkeypatch.setattr(builder, "build_ssh_connection", lambda _ctx: Prepared())
+    monkeypatch.setattr(
+        "sshpilot.daemon.connection_launch_provider.shutil.which",
+        lambda _name, **_kwargs: "/usr/bin/ssh",
+    )
+
+    prov = DaemonConnectionLaunchProvider(
+        lambda cid: _record(), secret_provider=None, app_config=None
+    )
+    argv, _env = prov.prepare_remote_command_launch("web", "echo hi")
+    assert "-v" not in argv
+    assert not any("LogLevel" in str(part) for part in argv)
+    assert any("ControlMaster=auto" in str(part) for part in argv)

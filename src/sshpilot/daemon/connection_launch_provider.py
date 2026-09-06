@@ -49,6 +49,47 @@ def _string(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _strip_verbosity_for_headless(argv: Tuple[str, ...]) -> Tuple[str, ...]:
+    """Remove ``-v``/``LogLevel`` debugging flags from a headless SSH argv.
+
+    A piped one-shot ``ssh`` (broadcast, host-info, privileged reads) that
+    creates its ``ControlMaster`` with ``-v`` never returns: the backgrounding
+    master inherits the capture pipes for its own debug logging, so the client
+    receives its exit status but never sees EOF and hangs until the probe
+    timeout. The second run then reuses the now-live master and succeeds,
+    which reads as "fails the first time after startup, works afterwards".
+
+    Interactive terminals keep their verbosity (a PTY is not a capture pipe);
+    machine-parsed probes never need it.
+    """
+
+    cleaned: List[str] = []
+    index = 0
+    total = len(argv)
+    while index < total:
+        token = argv[index]
+        stripped = token.strip()
+        if stripped.startswith("-") and set(stripped[1:]) == {"v"} and len(stripped) > 1:
+            index += 1
+            continue
+        if token == "-o" and index + 1 < total:
+            option = str(argv[index + 1]).strip()
+            if option.lower().startswith("loglevel="):
+                index += 2
+                continue
+            cleaned.extend((token, argv[index + 1]))
+            index += 2
+            continue
+        if stripped.startswith("-o") and len(stripped) > 2:
+            option = stripped[2:].strip()
+            if option.lower().startswith("loglevel="):
+                index += 1
+                continue
+        cleaned.append(token)
+        index += 1
+    return tuple(cleaned)
+
+
 class HeadlessConnectionView:
     """Headless compatibility view over a ``ConnectionRecord``.
 
@@ -547,6 +588,8 @@ class DaemonConnectionLaunchProvider:
                 f"LocalCommand={local_command}",
                 argv[-1],
             )
+        if interaction_policy == "broker":
+            argv = _strip_verbosity_for_headless(argv)
         executable = shutil.which(argv[0], path=environment.get("PATH"))
         if executable is None:
             raise SshPilotError(
@@ -747,13 +790,14 @@ class DaemonConnectionLaunchProvider:
                 "Remote commands require an SSH connection",
                 connection_id=connection_id,
             )
-        return self._prepare_ssh_launch(
+        argv, environment = self._prepare_ssh_launch(
             connection,
             interaction_policy=interaction_policy,
             command_type="ssh",
             extra_args=["-T"],
             remote_command=remote_command,
         )
+        return _strip_verbosity_for_headless(argv), environment
 
     def prepare_copy_id_launch(
         self,
