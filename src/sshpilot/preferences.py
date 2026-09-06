@@ -5939,6 +5939,7 @@ class PreferencesWindow(Adw.NavigationPage):
                     snapshot = controller.reset()
                 except Exception as exc:
                     logger.error(f"Failed to reset global SSH overrides: {exc}")
+                    self._refresh_advanced_ssh_snapshot()
                     return False
                 self._apply_ssh_override_values_to_rows(snapshot)
                 try:
@@ -5959,14 +5960,45 @@ class PreferencesWindow(Adw.NavigationPage):
             return True
         except Exception as e:
             logger.error(f"Failed to apply default advanced SSH settings: {e}")
+            self._refresh_advanced_ssh_snapshot()
             return False
 
-    def on_reset_advanced_ssh(self, *args):
-        """Reset only advanced SSH keys to defaults and update UI."""
+    def _refresh_advanced_ssh_snapshot(self):
+        """Re-baseline the last-good snapshot to what the rows now show.
+
+        A failed reset still persists the Config-owned keys and still moves
+        their rows, so the rows *are* what is on disk.  Leaving the snapshot
+        at its pre-reset value would make the next failed edit restore that
+        stale value through ``_restore_advanced_ssh_rows`` — under autosave
+        suppression, so nothing writes it — leaving the switch contradicting
+        the file it claims to describe.  Best-effort: a failure to re-baseline
+        is logged, never raised, so it cannot mask the original error.
+        """
+        if not hasattr(self, 'connect_timeout_row'):
+            return
         try:
-            self._apply_default_advanced_settings()
+            self._advanced_ssh_last_good_snapshot = self._snapshot_advanced_ssh_rows()
+        except Exception:
+            logger.warning(
+                "Failed to refresh the advanced SSH last-good snapshot",
+                exc_info=True,
+            )
+
+    def on_reset_advanced_ssh(self, *args):
+        """Reset only advanced SSH keys to defaults and update UI.
+
+        A failed reset is a *partial* reset — the Config-owned keys are
+        already persisted while the nine daemon-owned fields keep their old
+        values — so the failure is surfaced rather than discarded, the same
+        way a failed save is.  Silently swallowing it left the user looking at
+        a page where Reset had visibly worked on half the rows.
+        """
+        try:
+            if not self._apply_default_advanced_settings():
+                self._show_ssh_save_failure()
         except Exception as e:
             logger.error(f"Failed to reset advanced SSH settings: {e}")
+            self._show_ssh_save_failure()
 
     def on_operation_mode_toggled(self, button):
         """Request a daemon-owned live switch between SSH configuration scopes."""

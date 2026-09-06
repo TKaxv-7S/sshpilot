@@ -891,3 +891,101 @@ def test_successful_save_keeps_the_toggled_value(tmp_path, monkeypatch):
     assert prefs.controlmaster_row.get_active() is True
     config.reload_json_cache_strict()
     assert config.get_setting("ssh.controlmaster", None) is True
+
+
+# ---------------------------------------------------------------------------
+# Reset path: a failed reset is partial, so it must be surfaced and must not
+# leave a stale last-good snapshot behind
+# ---------------------------------------------------------------------------
+
+
+class _FailingResetClient(_ServiceClient):
+    """A client whose reset always fails, leaving a partial reset behind."""
+
+    def reset_global_ssh_overrides(self, expected_revision=None):
+        raise SshPilotError(
+            ErrorCode.UNSUPPORTED_CAPABILITY, "SSH overrides are unavailable"
+        )
+
+
+def test_failed_reset_is_surfaced_to_the_user(tmp_path, monkeypatch):
+    """A partial reset must not be silently discarded."""
+    config = _make_config(tmp_path, monkeypatch, {"ssh": {"controlmaster": True}})
+    service = SshOverridesService(tmp_path / "config.json")
+    prefs = _make_prefs(config, SshOverridesController(_FailingResetClient(service)))
+    prefs.controlmaster_row.set_active(True)
+    prefs._advanced_ssh_last_good_snapshot = prefs._snapshot_advanced_ssh_rows()
+    failures = []
+    prefs._show_ssh_save_failure = lambda: failures.append(True)
+    _expiry_record(monkeypatch)
+
+    prefs.on_reset_advanced_ssh()
+
+    assert failures == [True]
+
+
+def test_failed_reset_rebaselines_the_last_good_snapshot(tmp_path, monkeypatch):
+    """The snapshot must follow the rows the partial reset already moved."""
+    config = _make_config(tmp_path, monkeypatch, {"ssh": {"controlmaster": True}})
+    service = SshOverridesService(tmp_path / "config.json")
+    prefs = _make_prefs(config, SshOverridesController(_FailingResetClient(service)))
+    prefs.controlmaster_row.set_active(True)
+    prefs._advanced_ssh_last_good_snapshot = prefs._snapshot_advanced_ssh_rows()
+    prefs._show_ssh_save_failure = lambda: None
+    _expiry_record(monkeypatch)
+
+    assert prefs._apply_default_advanced_settings() is False
+
+    config.reload_json_cache_strict()
+    assert prefs.controlmaster_row.get_active() is False
+    assert config.get_setting("ssh.controlmaster", None) is False
+    # The stale snapshot would still say True and resurrect it later.
+    assert prefs._advanced_ssh_last_good_snapshot["controlmaster"] is False
+
+
+def test_failed_edit_after_failed_reset_keeps_row_and_file_agreed(
+    tmp_path, monkeypatch
+):
+    """The two-step path back to the divergence stays closed.
+
+    A failed reset followed by any failed edit used to restore the pre-reset
+    multiplexing value into the row — under suppression, so nothing wrote it —
+    leaving the switch ON while config.json said OFF.
+    """
+    config = _make_config(tmp_path, monkeypatch, {"ssh": {"controlmaster": True}})
+    service = SshOverridesService(tmp_path / "config.json")
+    prefs = _make_prefs(config, SshOverridesController(_FailingResetClient(service)))
+    prefs.controlmaster_row.set_active(True)
+    prefs._advanced_ssh_last_good_snapshot = prefs._snapshot_advanced_ssh_rows()
+    prefs._show_ssh_save_failure = lambda: None
+    _expiry_record(monkeypatch)
+
+    prefs.on_reset_advanced_ssh()
+
+    # Any later edit that the daemon also rejects.
+    prefs.ssh_overrides_controller = SshOverridesController(_FailingClient(service))
+    prefs.compression_row.set_active(True)
+    prefs._on_advanced_ssh_field_changed(prefs.compression_row, None)
+
+    config.reload_json_cache_strict()
+    assert prefs.controlmaster_row.get_active() is False
+    assert config.get_setting("ssh.controlmaster", None) is False
+
+
+def test_successful_reset_still_advances_the_snapshot(tmp_path, monkeypatch):
+    """The happy path is unchanged and reports no failure."""
+    config = _make_config(tmp_path, monkeypatch, {"ssh": {"controlmaster": True}})
+    service = SshOverridesService(tmp_path / "config.json")
+    controller = SshOverridesController(_ServiceClient(service))
+    controller.load()
+    prefs = _make_prefs(config, controller)
+    prefs.controlmaster_row.set_active(True)
+    failures = []
+    prefs._show_ssh_save_failure = lambda: failures.append(True)
+    _expiry_record(monkeypatch)
+
+    prefs.on_reset_advanced_ssh()
+
+    assert failures == []
+    assert prefs.controlmaster_row.get_active() is False
+    assert prefs._advanced_ssh_last_good_snapshot["controlmaster"] is False
