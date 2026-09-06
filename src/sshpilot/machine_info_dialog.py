@@ -1830,12 +1830,8 @@ class MachineInfoDialog:
         page.set_margin_start(24)
         page.set_margin_end(24)
 
-        two_col = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        two_col.set_homogeneous(True)
-
         # Logged-in users
-        users_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        users_box.append(_section_label(_("Logged-in users")))
+        page.append(_section_label(_("Logged-in users")))
         users_card = _card_box()
 
         who_rows = self._get_logged_in_users()
@@ -1884,13 +1880,10 @@ class MachineInfoDialog:
             empty.add_css_class("dim-label")
             users_card.append(empty)
 
-        users_box.append(users_card)
-        two_col.append(users_box)
+        page.append(users_card)
 
         # Updates
-        updates_box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        updates_box.append(_section_label(_("Updates")))
+        page.append(_section_label(_("Updates")))
         updates_card = _card_box()
 
         apt_up = self._data.get('APT_UPGRADABLE', '').strip()
@@ -1919,35 +1912,5 @@ class MachineInfoDialog:
         updates_card.append(_kv_row(
             _("Last apt update"), last_update, mono=True, last=True))
 
-        updates_box.append(updates_card)
-        two_col.append(updates_box)
-        page.append(two_col)
-
-        # SSH connection details
-        page.append(_section_label(_("SSH connection")))
-        ssh_card = _card_box()
-
-        nickname = getattr(self._connection, 'nickname', '') or ''
-        hostname = getattr(self._connection, 'hostname', '') or ''
-        host = getattr(self._connection, 'host', '') or ''
-        effective_host = hostname or host or nickname
-        user = getattr(self._connection, 'username', '') or ''
-        port = getattr(self._connection, 'port', 22)
-        source = getattr(self._connection, 'source', '') or ''
-
-        ssh_card.append(_kv_row(_("Host alias"), nickname, mono=True))
-        ssh_card.append(_kv_row(
-            _("HostName / Port"), f"{effective_host} : {port}", mono=True))
-        ssh_card.append(_kv_row(_("User"), user, mono=True))
-        ssh_card.append(_kv_row(
-            _("Source"), source or _("(unknown)"),
-            mono=True, last=True))
-
-        page.append(ssh_card)
-
-        note = Gtk.Label(label=_("Effective values from the saved connection."))
-        note.set_xalign(0)
-        note.add_css_class("caption")
-        note.set_opacity(0.55)
-        page.append(note)
+        page.append(updates_card)
         return page
