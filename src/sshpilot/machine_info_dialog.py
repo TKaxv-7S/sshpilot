@@ -957,21 +957,31 @@ class MachineInfoDialog:
 
         page.append(gauges)
 
-        # Identity card
-        identity_label = _section_label(_("Identity"))
-        page.append(identity_label)
-
-        identity_card = _card_box()
+        info_card = _card_box()
 
         hostname = self._data.get('HOSTNAME', '').strip()
-        identity_card.append(_kv_row(_("Hostname"), hostname, mono=True))
+        info_card.append(_kv_row(_("Hostname"), hostname, mono=True))
 
         osr = _parse_os_release(self._data.get('OS_RELEASE', ''))
         os_text = osr.get('PRETTY_NAME', '')
-        identity_card.append(_kv_row(_("Operating system"), os_text))
+        info_card.append(_kv_row(_("Operating system"), os_text))
 
         uname = self._data.get('UNAME', '').strip()
-        identity_card.append(_kv_row(_("Kernel"), uname, mono=True))
+        info_card.append(_kv_row(_("Kernel"), uname, mono=True))
+
+        lscpu = _parse_lscpu(self._data.get('LSCPU', ''))
+        model = lscpu.get('Model name', '')
+        cores = lscpu.get('Core(s) per socket', '?')
+        threads_per = lscpu.get('Thread(s) per core', '1')
+        sockets = lscpu.get('Socket(s)', '1')
+        try:
+            total_threads = int(cores) * int(threads_per) * int(sockets)
+        except ValueError:
+            total_threads = '?'
+        topo_text = (f"{cores} cores · {total_threads} threads"
+                     f" · {sockets} socket{'s' if sockets != '1' else ''}")
+        cpu_text = f"{model}  ({topo_text})" if model else topo_text
+        info_card.append(_kv_row(_("Processor"), cpu_text))
 
         uptime_secs = 0.0
         uptime_raw = self._data.get('UPTIME', '').strip()
@@ -985,7 +995,7 @@ class MachineInfoDialog:
             uptime_pretty = uptime_pretty[3:]
         if not uptime_pretty and uptime_secs:
             uptime_pretty = _fmt_uptime_seconds(uptime_secs)
-        identity_card.append(_kv_row(_("Uptime"), uptime_pretty))
+        info_card.append(_kv_row(_("Uptime"), uptime_pretty))
 
         boot_time = self._data.get('BOOT_TIME', '').strip()
         boot_text = ''
@@ -995,9 +1005,9 @@ class MachineInfoDialog:
                 boot_text = ' '.join(parts[-2:])
         if not boot_text:
             boot_text = self._data.get('UPTIME_SINCE', '').strip()
-        identity_card.append(_kv_row(_("Booted"), boot_text, last=True))
+        info_card.append(_kv_row(_("Booted"), boot_text, last=True))
 
-        page.append(identity_card)
+        page.append(info_card)
         return page
 
     def _gauge_card(self, fraction: float, color: Tuple,
@@ -1058,37 +1068,6 @@ class MachineInfoDialog:
         page.set_margin_bottom(24)
         page.set_margin_start(24)
         page.set_margin_end(24)
-
-        lscpu = _parse_lscpu(self._data.get('LSCPU', ''))
-
-        # Processor
-        page.append(_section_label(_("Processor")))
-        proc_card = _card_box()
-        model = lscpu.get('Model name', '')
-        proc_card.append(_kv_row(_("Model"), model))
-
-        cores = lscpu.get('Core(s) per socket', '?')
-        threads_per = lscpu.get('Thread(s) per core', '1')
-        sockets = lscpu.get('Socket(s)', '1')
-        try:
-            total_threads = int(cores) * int(threads_per) * int(sockets)
-        except ValueError:
-            total_threads = '?'
-        topo_text = (f"{cores} cores · {total_threads} threads"
-                     f" · {sockets} socket{'s' if sockets != '1' else ''}")
-        proc_card.append(_kv_row(_("Topology"), topo_text))
-
-        freq_text = ''
-        freq_line = self._data.get('CPU_FREQ', '')
-        fm = re.search(r'([\d.]+)', freq_line)
-        if fm:
-            try:
-                freq_text = f"{float(fm.group(1)) / 1000:.2f} GHz"
-            except ValueError:
-                freq_text = f"{fm.group(1)} MHz"
-        proc_card.append(_kv_row(_("Current frequency"), freq_text,
-                                 mono=True, last=True))
-        page.append(proc_card)
 
         # Load average
         loadavg = self._data.get('LOADAVG', '').split()
