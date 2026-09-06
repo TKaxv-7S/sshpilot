@@ -30,6 +30,7 @@ _GATHER_CMD = (
     'echo "===UPTIME==="; cat /proc/uptime 2>/dev/null;'
     'echo "===UPTIME_PRETTY==="; uptime -p 2>/dev/null;'
     'echo "===BOOT_TIME==="; who -b 2>/dev/null;'
+    'echo "===UPTIME_SINCE==="; uptime -s 2>/dev/null;'
     'echo "===LOADAVG==="; cat /proc/loadavg 2>/dev/null;'
     'echo "===NPROC==="; nproc 2>/dev/null;'
     'echo "===LSCPU==="; lscpu 2>/dev/null;'
@@ -942,6 +943,8 @@ class MachineInfoDialog:
             parts = boot_time.split()
             if len(parts) >= 3:
                 boot_text = ' '.join(parts[-2:])
+        if not boot_text:
+            boot_text = self._data.get('UPTIME_SINCE', '').strip()
         identity_card.append(_kv_row(_("Booted"), boot_text, last=True))
 
         page.append(identity_card)
